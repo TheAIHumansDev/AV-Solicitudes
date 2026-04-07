@@ -575,7 +575,7 @@
             
             if (!userDataString) {
                 alert('Por favor inicie sesión primero.');
-                window.location.href = 'loginAir2.html';
+                window.location.href = 'index.html';
                 return;
             }
 
@@ -586,7 +586,7 @@
                 const validRoles = ['B6', 'AA', 'AS', 'E9', 'AV', 'Admin'];
                 if (!validRoles.includes(userData.role)) {
                     alert('Acceso denegado. Esta sección es solo para aerolíneas.');
-                    window.location.href = 'loginAir2.html';
+                    window.location.href = 'index.html';
                     return;
                 }
 
@@ -598,7 +598,7 @@
             } catch (error) {
                 console.error('❌ Error al parsear datos:', error);
                 alert('Sesión inválida. Por favor inicie sesión nuevamente.');
-                window.location.href = 'loginAir2.html';
+                window.location.href = 'index.html';
             }
         });
 
