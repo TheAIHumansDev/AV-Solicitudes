@@ -650,7 +650,7 @@
         // ============================================
         // CONFIGURACIÓN
         // ============================================
-        const SCRIPT_URL = 'https://script.google.com/macros/s/TU_URL_AQUI/exec';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz9cnnzJkb0jzN4kPjglkfY85Fyi6omMi3i8V1ZgymBCBU2PDEQAF1iCYHqs_6g2NcUKw/exec';
 
         const AIRLINE_NAMES = {
             'B6': 'JetBlue',
@@ -821,6 +821,7 @@
                 airline: userData.role,
                 airlineName: AIRLINE_NAMES[userData.role] || userData.role,
                 username: userData.username,
+                email: userData.username,  // ← AGREGAR ESTA LÍNEA
                 flightDirection: flightDirection,
                 flightNumber: flightNumber,
                 wheelchairCount: parseInt(wheelchairCount),
