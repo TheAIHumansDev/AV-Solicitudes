@@ -841,26 +841,29 @@
         // ============================================
         // ENVIAR A GOOGLE SHEETS
         // ============================================
-        function sendToGoogleSheets(data) {
-            fetch(SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            })
-            .then(() => {
-                console.log('✅ Solicitud enviada');
-                showCompletionScreen(data);
-            })
-            .catch(error => {
-                console.error('❌ Error:', error);
-                showAlert('Error al enviar la solicitud. Por favor intente nuevamente.', 'error');
-                const submitBtn = document.getElementById('submitBtn');
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Enviar Solicitud';
-            });
-        }
+    function sendToGoogleSheets(data) {
+    // Apps Script requiere envío como form URLencoded con no-cors,
+    // por eso serializamos el JSON como parámetro dentro del form
+    const formData = new FormData();
+    formData.append('payload', JSON.stringify(data));
 
+    fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        body: formData
+    })
+    .then(() => {
+        console.log('✅ Solicitud enviada');
+        showCompletionScreen(data);
+    })
+    .catch(error => {
+        console.error('❌ Error:', error);
+        showAlert('Error al enviar la solicitud. Por favor intente nuevamente.', 'error');
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Enviar Solicitud';
+    });
+}
         // ============================================
         // MOSTRAR PANTALLA DE COMPLETADO
         // ============================================
