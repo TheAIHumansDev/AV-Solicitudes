@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avianca – Solicitudes de Servicio de Sillas</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        :root {
+            --av-red:       #DA291C;
+            --av-red-dark:  #B01F14;
+            --av-red-deep:  #7D1510;
+            --av-red-light: #F5E0DE;
+            --av-red-glow:  rgba(218, 41, 28, 0.18);
+            --av-white:     #FFFFFF;
+            --av-offwhite:  #FDF5F5;
+            --av-gray:      #1A1A1A;
+            --av-gray-mid:  #4A4A4A;
+            --av-gray-soft: #9A9A9A;
+            --av-border:    rgba(218, 41, 28, 0.25);
+            --av-border-faint: rgba(218, 41, 28, 0.12);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0d0505;
+            overflow-x: hidden;
+        }
+
+        #canvas-container {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 1;
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 30px 20px;
+        }
+
+        .form-box {
+            background: rgba(18, 5, 5, 0.88);
+            backdrop-filter: blur(24px);
+            border: 1px solid var(--av-border);
+            border-radius: 24px;
+            padding: 0;
+            width: 100%;
+            max-width: 620px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.6), 0 0 80px var(--av-red-glow);
+            overflow: hidden;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(28px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ---- HEADER BAND ---- */
+        .brand-header {
+            background: var(--av-red);
+            padding: 28px 36px 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .brand-header::before {
+            content: '';
+            position: absolute;
+            top: -40px; right: -40px;
+            width: 180px; height: 180px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 50%;
+        }
+
+        .brand-header::after {
+            content: '';
+            position: absolute;
+            bottom: -60px; right: 60px;
+            width: 140px; height: 140px;
+            background: rgba(255,255,255,0.04);
+            border-radius: 50%;
+        }
+
+        .brand-logo-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 12px;
+        }
+
+        .brand-condor {
+            width: 52px;
+            height: 52px;
+            flex-shrink: 0;
+        }
+
+        .brand-name {
+            font-size: 34px;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .brand-divider {
+            width: 48px;
+            height: 3px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 2px;
+            margin-bottom: 10px;
+        }
+
+        .brand-subtitle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: rgba(255,255,255,0.9);
+            font-size: 15px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+
+        .brand-subtitle .emoji {
+            font-size: 20px;
+        }
+
+        /* ---- BODY ---- */
+        .form-body {
+            padding: 32px 36px 36px;
+        }
+
+        /* ---- USER INFO ---- */
+        .user-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+            padding: 12px 16px;
+            background: rgba(218, 41, 28, 0.08);
+            border-radius: 10px;
+            border: 1px solid var(--av-border-faint);
+        }
+
+        .user-info .user-name {
+            color: #e8c8c6;
+            font-size: 14px;
+        }
+
+        .airline-badge {
+            background: var(--av-red);
+            padding: 5px 14px;
+            border-radius: 6px;
+            font-weight: 700;
+            color: #fff;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+        }
+
+        .logout-btn {
+            background: rgba(218, 41, 28, 0.12);
+            color: #f5a0a0;
+            border: 1px solid rgba(218, 41, 28, 0.3);
+            padding: 7px 14px;
+            border-radius: 7px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s ease;
+        }
+
+        .logout-btn:hover { background: rgba(218, 41, 28, 0.25); }
+
+        /* ---- FORM SECTIONS ---- */
+        .form-section { margin-bottom: 22px; }
+
+        .form-section label {
+            display: block;
+            color: #e8c8c6;
+            font-size: 13px;
+            margin-bottom: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+
+        .form-section input,
+        .form-section select {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(30, 8, 8, 0.7);
+            border: 1px solid var(--av-border);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.25s ease;
+        }
+
+        .form-section input:focus,
+        .form-section select:focus {
+            border-color: var(--av-red);
+            background: rgba(40, 10, 10, 0.85);
+            box-shadow: 0 0 0 3px var(--av-red-glow);
+        }
+
+        .form-section input::placeholder { color: #6b3a38; }
+
+        select option { background: #1a0505; color: #fff; }
+
+        /* ---- DIRECTION TOGGLE ---- */
+        .direction-toggle {
+            display: flex;
+            background: rgba(30, 8, 8, 0.7);
+            border: 1px solid var(--av-border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .direction-toggle input[type="radio"] { display: none; }
+
+        .direction-toggle label {
+            flex: 1;
+            padding: 14px 18px;
+            text-align: center;
+            cursor: pointer;
+            color: #6b3a38;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.25s ease;
+            margin-bottom: 0;
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-transform: none;
+            letter-spacing: 0;
+        }
+
+        .direction-toggle label:first-of-type {
+            border-right: 1px solid var(--av-border);
+        }
+
+        .direction-toggle input[type="radio"]:checked + label {
+            background: var(--av-red);
+            color: #fff;
+        }
+
+        /* ---- PASSENGERS ---- */
+        .passengers-container {
+            display: none;
+            margin-top: 20px;
+            animation: fadeIn 0.35s ease;
+        }
+
+        .passengers-container.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .passengers-header {
+            margin-bottom: 14px;
+        }
+
+        .passengers-header h3 {
+            color: #fff;
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .passengers-header p {
+            color: #6b3a38;
+            font-size: 13px;
+        }
+
+        .passenger-card {
+            background: rgba(30, 8, 8, 0.5);
+            border: 1px solid var(--av-border-faint);
+            border-radius: 10px;
+            padding: 16px 18px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .passenger-number {
+            background: var(--av-red);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .passenger-card input {
+            flex: 1;
+            padding: 10px 14px;
+            background: rgba(20, 5, 5, 0.6);
+            border: 1px solid var(--av-border);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.25s ease;
+        }
+
+        .passenger-card input:focus {
+            border-color: var(--av-red);
+            box-shadow: 0 0 0 3px var(--av-red-glow);
+        }
+
+        .passenger-card input::placeholder { color: #6b3a38; }
+
+        /* ---- BUTTONS ---- */
+        .btn-primary {
+            width: 100%;
+            padding: 16px;
+            background: var(--av-red);
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            margin-top: 20px;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary:hover {
+            background: var(--av-red-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(218, 41, 28, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 15px; height: 15px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ---- COMPLETION ---- */
+        .completion-screen { display: none; text-align: center; }
+        .completion-screen.active { display: block; }
+
+        .completion-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            animation: bounce 0.9s ease;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-18px); }
+            60% { transform: translateY(-8px); }
+        }
+
+        .completion-title {
+            color: #fff;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .completion-subtitle {
+            color: #9a5a58;
+            font-size: 15px;
+            margin-bottom: 28px;
+        }
+
+        .request-id {
+            background: rgba(218, 41, 28, 0.12);
+            border: 1px solid rgba(218, 41, 28, 0.4);
+            padding: 18px 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .request-id-label {
+            color: #9a5a58;
+            font-size: 11px;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .request-id-value {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--av-red);
+            letter-spacing: 2px;
+        }
+
+        .summary-card {
+            background: rgba(30, 8, 8, 0.5);
+            border: 1px solid var(--av-border-faint);
+            border-radius: 12px;
+            padding: 22px;
+            margin-bottom: 16px;
+            text-align: left;
+        }
+
+        .summary-title {
+            color: #fff;
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 18px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--av-border-faint);
+        }
+
+        .summary-item:last-child { border-bottom: none; }
+
+        .summary-label { color: #9a5a58; font-size: 13px; }
+
+        .summary-value { color: #fff; font-weight: 600; font-size: 14px; }
+
+        .direction-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .direction-badge.llegando {
+            background: rgba(34, 197, 94, 0.15);
+            color: #86efac;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .direction-badge.saliendo {
+            background: rgba(251, 191, 36, 0.15);
+            color: #fde68a;
+            border: 1px solid rgba(251, 191, 36, 0.3);
+        }
+
+        .passengers-list { margin-top: 4px; }
+
+        .passenger-item {
+            background: rgba(20, 5, 5, 0.5);
+            padding: 9px 14px;
+            border-radius: 7px;
+            margin-bottom: 7px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .passenger-item .number {
+            background: rgba(218, 41, 28, 0.25);
+            width: 22px; height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--av-red);
+            flex-shrink: 0;
+        }
+
+        .passenger-item .name { color: #d0b0ae; font-size: 14px; }
+
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn-secondary {
+            padding: 13px 20px;
+            background: rgba(218, 41, 28, 0.08);
+            color: #d0b0ae;
+            border: 1px solid rgba(218, 41, 28, 0.2);
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .btn-secondary:hover { background: rgba(218, 41, 28, 0.15); }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 9px;
+            margin-bottom: 18px;
+            display: none;
+            animation: fadeIn 0.3s ease;
+            font-size: 14px;
+        }
+
+        .alert.show { display: block; }
+
+        .alert.error {
+            background: rgba(218, 41, 28, 0.15);
+            border: 1px solid rgba(218, 41, 28, 0.4);
+            color: #f5a0a0;
+        }
+
+        .alert.success {
+            background: rgba(34, 197, 94, 0.12);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #86efac;
+        }
+
+        /* Thin red accent line at the bottom of the card */
+        .form-box::after {
+            content: '';
+            display: block;
+            height: 4px;
+            background: var(--av-red);
+            border-radius: 0 0 24px 24px;
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container"></div>
+
+    <div class="container">
+        <div class="form-box">
+
+            <!-- BRAND HEADER -->
+            <div class="brand-header">
+                <div class="brand-logo-row">
+                    <!-- Condor SVG (stylized geometric) -->
+                    <svg class="brand-condor" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="26" cy="26" r="26" fill="rgba(255,255,255,0.12)"/>
+                        <!-- Wings -->
+                        <path d="M8 28 Q18 18 26 24 Q34 18 44 28 Q34 30 26 26 Q18 30 8 28Z" fill="rgba(255,255,255,0.9)"/>
+                        <!-- Body -->
+                        <ellipse cx="26" cy="27" rx="4" ry="6" fill="white"/>
+                        <!-- Head -->
+                        <circle cx="26" cy="19" r="3.5" fill="white"/>
+                        <!-- Tail -->
+                        <path d="M23 32 L26 40 L29 32Z" fill="rgba(255,255,255,0.85)"/>
+                    </svg>
+                    <span class="brand-name">avianca</span>
+                </div>
+                <div class="brand-divider"></div>
+                <div class="brand-subtitle">
+                    <span class="emoji">♿</span>
+                    <span>Solicitudes de Servicio de Sillas</span>
+                </div>
+            </div>
+
+            <!-- FORM BODY -->
+            <div class="form-body">
+
+                <!-- User Info -->
+                <div class="user-info">
+                    <span class="user-name">👤 <span id="userDisplay">Cargando...</span></span>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <span class="airline-badge" id="airlineDisplay">AV</span>
+                        <button class="logout-btn" onclick="logout()">🚪 Salir</button>
+                    </div>
+                </div>
+
+                <!-- Alert -->
+                <div class="alert" id="alert"></div>
+
+                <!-- REQUEST FORM -->
+                <div id="requestForm">
+
+                    <!-- Llegando / Saliendo -->
+                    <div class="form-section">
+                        <label>Tipo de vuelo</label>
+                        <div class="direction-toggle">
+                            <input type="radio" name="flightDirection" id="dirLlegando" value="Llegando">
+                            <label for="dirLlegando">🛬 Llegando</label>
+                            <input type="radio" name="flightDirection" id="dirSaliendo" value="Saliendo">
+                            <label for="dirSaliendo">🛫 Saliendo</label>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <label for="flightNumber">Número de vuelo</label>
+                        <input type="text"
+                               id="flightNumber"
+                               placeholder="Ej: AV 1234"
+                               oninput="this.value = this.value.toUpperCase()">
+                    </div>
+
+                    <div class="form-section">
+                        <label for="wheelchairCount">Cantidad de sillas de ruedas</label>
+                        <select id="wheelchairCount" onchange="handleWheelchairCountChange(this.value)">
+                            <option value="">-- Seleccione --</option>
+                            <option value="1">1</option><option value="2">2</option>
+                            <option value="3">3</option><option value="4">4</option>
+                            <option value="5">5</option><option value="6">6</option>
+                            <option value="7">7</option><option value="8">8</option>
+                            <option value="9">9</option><option value="10">10</option>
+                            <option value="11">11</option><option value="12">12</option>
+                            <option value="13">13</option><option value="14">14</option>
+                            <option value="15">15</option><option value="16">16</option>
+                            <option value="17">17</option><option value="18">18</option>
+                            <option value="19">19</option><option value="20">20</option>
+                        </select>
+                    </div>
+
+                    <!-- Passengers -->
+                    <div class="passengers-container" id="passengersContainer">
+                        <div class="passengers-header">
+                            <h3>👥 Información de Pasajeros <span style="color: #6b3a38; font-weight: 400;">(Opcional)</span></h3>
+                            <p>Nombre del pasajero o código de reserva</p>
+                        </div>
+                        <div id="passengersList"></div>
+                    </div>
+
+                    <button class="btn-primary" onclick="submitRequest()" id="submitBtn">
+                        Enviar Solicitud
+                    </button>
+                </div>
+
+                <!-- COMPLETION SCREEN -->
+                <div class="completion-screen" id="completionScreen">
+                    <div class="completion-icon">✅</div>
+                    <h2 class="completion-title">¡Solicitud Registrada!</h2>
+                    <p class="completion-subtitle">Su solicitud ha sido procesada exitosamente</p>
+
+                    <div class="request-id">
+                        <div class="request-id-label">ID de Solicitud</div>
+                        <div class="request-id-value" id="requestIdDisplay">#LOADING...</div>
+                    </div>
+
+                    <div class="summary-card">
+                        <div class="summary-title">📋 Resumen</div>
+                        <div class="summary-item">
+                            <span class="summary-label">Aerolínea</span>
+                            <span class="summary-value" id="summaryAirline"></span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Usuario</span>
+                            <span class="summary-value" id="summaryUser"></span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Tipo de Vuelo</span>
+                            <span class="summary-value" id="summaryDirection"></span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Vuelo</span>
+                            <span class="summary-value" id="summaryFlight"></span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Sillas Solicitadas</span>
+                            <span class="summary-value" id="summaryWheelchairs"></span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Fecha y Hora</span>
+                            <span class="summary-value" id="summaryDateTime"></span>
+                        </div>
+                    </div>
+
+                    <div class="summary-card" id="passengersCard" style="display: none;">
+                        <div class="summary-title">👥 Pasajeros Registrados</div>
+                        <div class="passengers-list" id="summaryPassengersList"></div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn-primary" onclick="newRequest()">➕ Nueva Solicitud</button>
+                        <button class="btn-secondary" onclick="logout()">🚪 Cerrar Sesión</button>
+                    </div>
+                </div>
+
+            </div><!-- /form-body -->
+        </div><!-- /form-box -->
+    </div>
+
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/TU_URL_AQUI/exec';
+
+        const AIRLINE_NAMES = {
+            'B6': 'JetBlue', 'AA': 'American Airlines',
+            'AS': 'Alaska Airlines', 'E9': 'Iberojet', 'AV': 'Avianca'
+        };
+
+        let userData = null;
+
+        window.addEventListener('load', () => {
+            const str = sessionStorage.getItem('user');
+            if (!str) { alert('Por favor inicie sesión primero.'); window.location.href = 'index.html'; return; }
+            try {
+                userData = JSON.parse(str);
+                const validRoles = ['B6','AA','AS','E9','AV','Admin'];
+                if (!validRoles.includes(userData.role)) {
+                    alert('Acceso denegado.'); window.location.href = 'index.html'; return;
+                }
+                document.getElementById('userDisplay').textContent = userData.username;
+                document.getElementById('airlineDisplay').textContent = AIRLINE_NAMES[userData.role] || userData.role;
+            } catch(e) {
+                alert('Sesión inválida.'); window.location.href = 'index.html';
+            }
+        });
+
+        /* THREE.JS — red particles */
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        container.appendChild(renderer.domElement);
+
+        const geo = new THREE.BufferGeometry();
+        const count = 3000;
+        const pos = new Float32Array(count * 3);
+        for (let i = 0; i < count * 3; i++) pos[i] = (Math.random() - 0.5) * 100;
+        geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+
+        const mat = new THREE.PointsMaterial({
+            size: 0.07, color: 0xda291c,
+            transparent: true, opacity: 0.7,
+            blending: THREE.AdditiveBlending
+        });
+
+        const mesh = new THREE.Points(geo, mat);
+        scene.add(mesh);
+        camera.position.z = 30;
+
+        (function animate() {
+            requestAnimationFrame(animate);
+            mesh.rotation.y += 0.0008;
+            mesh.rotation.x += 0.0004;
+            renderer.render(scene, camera);
+        })();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        /* FORM LOGIC */
+        function handleWheelchairCountChange(count) {
+            const pc = document.getElementById('passengersContainer');
+            const pl = document.getElementById('passengersList');
+            if (!count) { pc.classList.remove('active'); pl.innerHTML = ''; return; }
+            pc.classList.add('active');
+            pl.innerHTML = '';
+            for (let i = 1; i <= parseInt(count); i++) {
+                const card = document.createElement('div');
+                card.className = 'passenger-card';
+                card.innerHTML = `
+                    <span class="passenger-number">${i}</span>
+                    <input type="text" id="passenger${i}" placeholder="Nombre o código de reserva (opcional)">
+                `;
+                pl.appendChild(card);
+            }
+        }
+
+        function submitRequest() {
+            const flightNumber    = document.getElementById('flightNumber').value.trim();
+            const wheelchairCount = document.getElementById('wheelchairCount').value;
+            const dirEl           = document.querySelector('input[name="flightDirection"]:checked');
+
+            if (!dirEl)           { showAlert('Por favor seleccione si el vuelo es Llegando o Saliendo', 'error'); return; }
+            if (!flightNumber)    { showAlert('Por favor ingrese el número de vuelo', 'error'); return; }
+            if (!wheelchairCount) { showAlert('Por favor seleccione la cantidad de sillas', 'error'); return; }
+
+            const passengers = [];
+            for (let i = 1; i <= parseInt(wheelchairCount); i++) {
+                const el = document.getElementById(`passenger${i}`);
+                if (el && el.value.trim()) passengers.push(el.value.trim());
+            }
+
+            const requestData = {
+                action: 'saveWheelchairRequest',
+                requestId: generateRequestId(),
+                airline: userData.role,
+                airlineName: AIRLINE_NAMES[userData.role] || userData.role,
+                username: userData.username,
+                flightDirection: dirEl.value,
+                flightNumber,
+                wheelchairCount: parseInt(wheelchairCount),
+                passengers,
+                timestamp: new Date().toISOString()
+            };
+
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading-spinner"></span>Enviando...';
+
+            fetch(SCRIPT_URL, {
+                method: 'POST', mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(requestData)
+            })
+            .then(() => showCompletionScreen(requestData))
+            .catch(() => {
+                showAlert('Error al enviar la solicitud. Intente nuevamente.', 'error');
+                btn.disabled = false;
+                btn.textContent = 'Enviar Solicitud';
+            });
+        }
+
+        function showCompletionScreen(data) {
+            document.getElementById('requestForm').style.display = 'none';
+            document.getElementById('completionScreen').classList.add('active');
+
+            document.getElementById('requestIdDisplay').textContent = data.requestId;
+            document.getElementById('summaryAirline').textContent   = data.airlineName;
+            document.getElementById('summaryUser').textContent      = data.username;
+            document.getElementById('summaryFlight').textContent    = data.flightNumber;
+            document.getElementById('summaryWheelchairs').textContent = data.wheelchairCount;
+
+            const isLlegando = data.flightDirection === 'Llegando';
+            document.getElementById('summaryDirection').innerHTML =
+                `<span class="direction-badge ${isLlegando ? 'llegando' : 'saliendo'}">${isLlegando ? '🛬' : '🛫'} ${data.flightDirection}</span>`;
+
+            document.getElementById('summaryDateTime').textContent =
+                new Date().toLocaleString('es-ES', { year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit' });
+
+            if (data.passengers && data.passengers.length > 0) {
+                document.getElementById('passengersCard').style.display = 'block';
+                const list = document.getElementById('summaryPassengersList');
+                list.innerHTML = data.passengers.map((n, i) =>
+                    `<div class="passenger-item"><span class="number">${i+1}</span><span class="name">${n}</span></div>`
+                ).join('');
+            }
+        }
+
+        function generateRequestId() {
+            const d = new Date();
+            const pad = n => String(n).padStart(2,'0');
+            return `WC-${String(d.getFullYear()).slice(-2)}${pad(d.getMonth()+1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}-${Math.floor(Math.random()*1000).toString().padStart(3,'0')}`;
+        }
+
+        function newRequest() {
+            document.getElementById('flightNumber').value   = '';
+            document.getElementById('wheelchairCount').value = '';
+            document.getElementById('passengersContainer').classList.remove('active');
+            document.getElementById('passengersList').innerHTML = '';
+            document.querySelectorAll('input[name="flightDirection"]').forEach(r => r.checked = false);
+            document.getElementById('completionScreen').classList.remove('active');
+            document.getElementById('requestForm').style.display = 'block';
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = false;
+            btn.textContent = 'Enviar Solicitud';
+        }
+
+        function logout() {
+            if (confirm('¿Está seguro de que desea cerrar sesión?')) {
+                sessionStorage.removeItem('user');
+                window.location.href = 'loginAir.html';
+            }
+        }
+
+        function showAlert(msg, type) {
+            const el = document.getElementById('alert');
+            el.textContent = msg;
+            el.className = `alert ${type} show`;
+            setTimeout(() => el.classList.remove('show'), 5000);
+        }
+    </script>
+</body>
+</html>
