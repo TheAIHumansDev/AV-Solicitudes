@@ -472,7 +472,7 @@
 <script>
     // ─── CONFIG ────────────────────────────────────────────────────────────────
     // ⚠️  Reemplaza con la URL de tu nuevo Apps Script de reset
-    const RESET_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby041dFQ_B4vv4j6XFtYbV2wjk0OKEfAq8JWHsgMN3zCqfAs1D5ioaWmXWF_I5mfvf2/exec';
+    const RESET_SCRIPT_URL = 'https://script.google.com/macros/s/TU_NUEVO_SCRIPT_ID/exec';
 
     let currentEmail = '';
     let currentStep  = 1;
@@ -577,32 +577,57 @@
 
     function jsonp(params, callbackPrefix) {
         return new Promise((resolve, reject) => {
-            const cbName = callbackPrefix + Date.now();
-            const qs = Object.entries(params).map(([k,v]) => `${k}=${encodeURIComponent(v)}`).join('&');
-            const url = `${RESET_SCRIPT_URL}?${qs}&callback=${cbName}`;
+            // Unique callback name and script ID per call
+            const uid    = callbackPrefix + '_' + Date.now() + '_' + Math.floor(Math.random() * 9999);
+            const scriptId = 'jsonp_script_' + uid;
 
-            window[cbName] = (res) => {
-                delete window[cbName];
-                const s = document.getElementById('__jsonp__');
-                if (s) s.remove();
+            // Build query string — callback goes LAST so Apps Script sees it clearly
+            const qs  = Object.entries(params)
+                .map(([k, v]) => encodeURIComponent(k) + '=' + encodeURIComponent(v))
+                .join('&');
+            const url = RESET_SCRIPT_URL + '?' + qs + '&callback=' + uid;
+
+            console.log('📡 JSONP call:', url);
+
+            let done = false;
+
+            window[uid] = function(res) {
+                if (done) return;
+                done = true;
+                delete window[uid];
+                const s = document.getElementById(scriptId);
+                if (s) s.parentNode.removeChild(s);
+                console.log('✅ JSONP response:', res);
                 resolve(res);
             };
 
             const script = document.createElement('script');
-            script.id  = '__jsonp__';
-            script.src = url;
-            script.onerror = () => {
-                delete window[cbName];
+            script.id    = scriptId;
+            script.type  = 'text/javascript';
+            script.src   = url;
+
+            script.onerror = function() {
+                if (done) return;
+                done = true;
+                delete window[uid];
+                const s = document.getElementById(scriptId);
+                if (s) s.parentNode.removeChild(s);
+                console.error('❌ JSONP script load error');
                 reject(new Error('Network error'));
             };
-            document.body.appendChild(script);
 
-            setTimeout(() => {
-                if (window[cbName]) {
-                    delete window[cbName];
-                    reject(new Error('Timeout'));
-                }
-            }, 15000);
+            document.head.appendChild(script);
+
+            // Timeout fallback
+            setTimeout(function() {
+                if (done) return;
+                done = true;
+                delete window[uid];
+                const s = document.getElementById(scriptId);
+                if (s) s.parentNode.removeChild(s);
+                console.warn('⏱️ JSONP timeout');
+                reject(new Error('Timeout'));
+            }, 20000);
         });
     }
 
