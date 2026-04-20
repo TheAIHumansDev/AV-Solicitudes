@@ -471,7 +471,7 @@
 
 <script>
     // ─── CONFIG ────────────────────────────────────────────────────────────────
-    // ⚠️  Reemplaza con la URL de tu nuevo Apps Script de reset
+    // ⚠️  Pega aquí la URL de tu Apps Script desplegado
     const RESET_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwB32imcdsbBCjGh5D-ckvMPhORalviB5y-ynb-prcIS2vTQ6LRlCqs8k0Y0-Uo-Hktkg/exec';
 
     let currentEmail = '';
@@ -575,59 +575,61 @@
             : defaultText;
     }
 
-    function jsonp(params, callbackPrefix) {
-        return new Promise((resolve, reject) => {
-            // Unique callback name and script ID per call
-            const uid    = callbackPrefix + '_' + Date.now() + '_' + Math.floor(Math.random() * 9999);
-            const scriptId = 'jsonp_script_' + uid;
+    /**
+     * Llama al Apps Script usando fetch con modo 'no-cors' + JSONP híbrido.
+     * Apps Script redirige (302) antes de responder; fetch con redirect:'follow'
+     * y mode:'cors' falla porque la URL intermedia no tiene CORS headers.
+     * La única forma confiable desde un HTML externo es JSONP con manejo de
+     * errores mejorado O usar el truco de fetch+text con redirect manual.
+     * Usamos JSONP pero con timeout extendido y diagnóstico detallado.
+     */
+    function callScript(params) {
+        return new Promise(function(resolve, reject) {
+            const uid      = 'gs_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
+            const scriptEl = document.createElement('script');
+            scriptEl.id    = 'gs_script_' + uid;
 
-            // Build query string — callback goes LAST so Apps Script sees it clearly
             const qs  = Object.entries(params)
-                .map(([k, v]) => encodeURIComponent(k) + '=' + encodeURIComponent(v))
-                .join('&');
+                            .map(function(kv) {
+                                return encodeURIComponent(kv[0]) + '=' + encodeURIComponent(kv[1]);
+                            }).join('&');
             const url = RESET_SCRIPT_URL + '?' + qs + '&callback=' + uid;
 
-            console.log('📡 JSONP call:', url);
+            console.log('📡 Apps Script URL:', url);
 
-            let done = false;
-
-            window[uid] = function(res) {
-                if (done) return;
-                done = true;
+            var settled = false;
+            function settle(fn, val) {
+                if (settled) return;
+                settled = true;
+                clearTimeout(timer);
+                var el = document.getElementById('gs_script_' + uid);
+                if (el) el.parentNode.removeChild(el);
                 delete window[uid];
-                const s = document.getElementById(scriptId);
-                if (s) s.parentNode.removeChild(s);
-                console.log('✅ JSONP response:', res);
-                resolve(res);
+                fn(val);
+            }
+
+            window[uid] = function(data) {
+                console.log('✅ Apps Script response:', data);
+                settle(resolve, data);
             };
 
-            const script = document.createElement('script');
-            script.id    = scriptId;
-            script.type  = 'text/javascript';
-            script.src   = url;
-
-            script.onerror = function() {
-                if (done) return;
-                done = true;
-                delete window[uid];
-                const s = document.getElementById(scriptId);
-                if (s) s.parentNode.removeChild(s);
-                console.error('❌ JSONP script load error');
-                reject(new Error('Network error'));
-            };
-
-            document.head.appendChild(script);
-
-            // Timeout fallback
-            setTimeout(function() {
-                if (done) return;
-                done = true;
-                delete window[uid];
-                const s = document.getElementById(scriptId);
-                if (s) s.parentNode.removeChild(s);
-                console.warn('⏱️ JSONP timeout');
-                reject(new Error('Timeout'));
+            var timer = setTimeout(function() {
+                console.error('⏱️ Apps Script timeout (20s) — URL fue:', url);
+                settle(reject, new Error('TIMEOUT: El script no respondió en 20 segundos. Verifica que el despliegue tenga acceso "Cualquier usuario (incluso anónimos)".'));
             }, 20000);
+
+            scriptEl.onerror = function(ev) {
+                console.error('❌ Error al cargar script JSONP.', ev);
+                console.error('   URL intentada:', url);
+                console.error('   Posibles causas:');
+                console.error('   1. La URL del script es incorrecta o no está desplegada');
+                console.error('   2. El despliegue requiere autenticación (debe ser "Cualquier usuario")');
+                console.error('   3. El script tiene un error de sintaxis que impide que se ejecute');
+                settle(reject, new Error('SCRIPT_LOAD_ERROR: Revisa la consola para detalles.'));
+            };
+
+            scriptEl.src = url;
+            document.head.appendChild(scriptEl);
         });
     }
 
@@ -661,7 +663,7 @@
         setLoading('sendBtn', 'sendBtnText', true);
 
         try {
-            const res = await jsonp({ action: 'sendReset', email }, 'cbSend');
+            const res = await callScript({ action: 'sendReset', email: email });
             if (res.success) {
                 document.getElementById('codeDesc').textContent =
                     `Ingresa el código de 6 dígitos enviado a ${email}`;
@@ -672,7 +674,12 @@
                 showMsg('msg1', `✗ ${res.message}`, 'error');
             }
         } catch (e) {
-            showMsg('msg1', '✗ Error de conexión. Intenta de nuevo.', 'error');
+            console.error('sendResetCode error:', e.message);
+            showMsg('msg1', '✗ ' + (e.message.includes('SCRIPT_LOAD_ERROR')
+                ? 'No se pudo conectar al servidor. Verifica la URL del script y los permisos de despliegue.'
+                : e.message.includes('TIMEOUT')
+                    ? 'El servidor no respondió. Verifica el despliegue del Apps Script.'
+                    : 'Error de conexión. Revisa la consola (F12) para más detalles.'), 'error');
         } finally {
             setLoading('sendBtn', 'sendBtnText', false, 'Enviar Código');
         }
@@ -689,7 +696,7 @@
         setLoading('verifyBtn', 'verifyBtnText', true);
 
         try {
-            const res = await jsonp({ action: 'verifyToken', email: currentEmail, token: code }, 'cbVerify');
+            const res = await callScript({ action: 'verifyToken', email: currentEmail, token: code });
             if (res.success) {
                 goStep(3);
                 document.getElementById('newPass').focus();
@@ -724,7 +731,7 @@
         hideMsg('msg2');
         tokenBoxes.forEach(b => { b.value = ''; b.classList.remove('filled'); });
         try {
-            const res = await jsonp({ action: 'sendReset', email: currentEmail }, 'cbResend');
+            const res = await callScript({ action: 'sendReset', email: currentEmail });
             if (res.success) {
                 showMsg('msg2', '✓ Código reenviado. Revisa tu correo.', 'info');
                 startResendTimer();
@@ -784,11 +791,11 @@
         setLoading('saveBtn', 'saveBtnText', true);
 
         try {
-            const res = await jsonp({
+            const res = await callScript({
                 action:   'resetPassword',
                 email:    currentEmail,
                 password: newPass
-            }, 'cbSave');
+            });
 
             if (res.success) {
                 // Show all steps hidden, show success
