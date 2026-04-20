@@ -472,7 +472,7 @@
 <script>
     // ─── CONFIG ────────────────────────────────────────────────────────────────
     // ⚠️  Pega aquí la URL de tu Apps Script desplegado
-    const RESET_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwLSeYzyzIgH_634A3v8jApU5fLsIJ5LE46aqwSArGkzmtQW7Fi2auX57t_oBD9go_Jxg/exec';
+    const RESET_SCRIPT_URL = 'https://script.google.com/macros/s/TU_NUEVO_SCRIPT_ID/exec';
 
     let currentEmail = '';
     let currentStep  = 1;
@@ -576,61 +576,37 @@
     }
 
     /**
-     * Llama al Apps Script usando fetch con modo 'no-cors' + JSONP híbrido.
-     * Apps Script redirige (302) antes de responder; fetch con redirect:'follow'
-     * y mode:'cors' falla porque la URL intermedia no tiene CORS headers.
-     * La única forma confiable desde un HTML externo es JSONP con manejo de
-     * errores mejorado O usar el truco de fetch+text con redirect manual.
-     * Usamos JSONP pero con timeout extendido y diagnóstico detallado.
+     * Llama al Apps Script via fetch POST con Content-Type text/plain.
+     * Esto evita el preflight CORS (no hay OPTIONS request) y Apps Script
+     * responde con los headers correctos desde doPost.
+     * El body viaja como JSON en texto plano para eludir la restricción de CORS preflight.
      */
-    function callScript(params) {
-        return new Promise(function(resolve, reject) {
-            const uid      = 'gs_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
-            const scriptEl = document.createElement('script');
-            scriptEl.id    = 'gs_script_' + uid;
+    async function callScript(params) {
+        const body = JSON.stringify(params);
+        console.log('📡 POST →', RESET_SCRIPT_URL, body);
 
-            const qs  = Object.entries(params)
-                            .map(function(kv) {
-                                return encodeURIComponent(kv[0]) + '=' + encodeURIComponent(kv[1]);
-                            }).join('&');
-            const url = RESET_SCRIPT_URL + '?' + qs + '&callback=' + uid;
-
-            console.log('📡 Apps Script URL:', url);
-
-            var settled = false;
-            function settle(fn, val) {
-                if (settled) return;
-                settled = true;
-                clearTimeout(timer);
-                var el = document.getElementById('gs_script_' + uid);
-                if (el) el.parentNode.removeChild(el);
-                delete window[uid];
-                fn(val);
-            }
-
-            window[uid] = function(data) {
-                console.log('✅ Apps Script response:', data);
-                settle(resolve, data);
-            };
-
-            var timer = setTimeout(function() {
-                console.error('⏱️ Apps Script timeout (20s) — URL fue:', url);
-                settle(reject, new Error('TIMEOUT: El script no respondió en 20 segundos. Verifica que el despliegue tenga acceso "Cualquier usuario (incluso anónimos)".'));
-            }, 20000);
-
-            scriptEl.onerror = function(ev) {
-                console.error('❌ Error al cargar script JSONP.', ev);
-                console.error('   URL intentada:', url);
-                console.error('   Posibles causas:');
-                console.error('   1. La URL del script es incorrecta o no está desplegada');
-                console.error('   2. El despliegue requiere autenticación (debe ser "Cualquier usuario")');
-                console.error('   3. El script tiene un error de sintaxis que impide que se ejecute');
-                settle(reject, new Error('SCRIPT_LOAD_ERROR: Revisa la consola para detalles.'));
-            };
-
-            scriptEl.src = url;
-            document.head.appendChild(scriptEl);
+        const response = await fetch(RESET_SCRIPT_URL, {
+            method:   'POST',
+            // text/plain no dispara preflight OPTIONS → Apps Script lo acepta
+            headers:  { 'Content-Type': 'text/plain;charset=utf-8' },
+            body:     body,
+            // redirect: 'follow' sigue el 302 de Google automáticamente
+            redirect: 'follow',
         });
+
+        if (!response.ok) {
+            throw new Error('HTTP ' + response.status + ': ' + response.statusText);
+        }
+
+        const text = await response.text();
+        console.log('✅ Respuesta raw:', text);
+
+        try {
+            return JSON.parse(text);
+        } catch(e) {
+            console.error('No es JSON válido:', text);
+            throw new Error('Respuesta inesperada del servidor.');
+        }
     }
 
     function goStep(n) {
@@ -674,12 +650,8 @@
                 showMsg('msg1', `✗ ${res.message}`, 'error');
             }
         } catch (e) {
-            console.error('sendResetCode error:', e.message);
-            showMsg('msg1', '✗ ' + (e.message.includes('SCRIPT_LOAD_ERROR')
-                ? 'No se pudo conectar al servidor. Verifica la URL del script y los permisos de despliegue.'
-                : e.message.includes('TIMEOUT')
-                    ? 'El servidor no respondió. Verifica el despliegue del Apps Script.'
-                    : 'Error de conexión. Revisa la consola (F12) para más detalles.'), 'error');
+            console.error('sendResetCode error:', e);
+            showMsg('msg1', '✗ Error de conexión: ' + e.message, 'error');
         } finally {
             setLoading('sendBtn', 'sendBtnText', false, 'Enviar Código');
         }
