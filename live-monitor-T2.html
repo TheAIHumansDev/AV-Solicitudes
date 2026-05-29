@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard WCH · Avianca SAL</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Unbounded:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#f0ede8;
+  --surface:#ffffff;
+  --surface2:#f5f2ed;
+  --surface3:#ebe7e1;
+  --red:#c8001a;
+  --red2:#a50015;
+  --red-light:#fbeaea;
+  --red-mid:#f5c6c6;
+  --text:#1a1612;
+  --muted:#7a7268;
+  --border:#ddd8d0;
+  --green:#1a6b45;
+  --green-light:#eaf5ef;
+  --amber:#8a5200;
+  --amber-light:#fdf3e0;
+  --blue:#1a4080;
+  --blue-light:#eaf0fa;
+  --purple:#5a1a8a;
+  --purple-light:#f2eafa;
+  --gold:#b87600;
+  --gold-light:#fff8e6;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);min-height:100vh;color:var(--text);}
+
+/* HEADER */
+.header{background:var(--red);padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.18);}
+.header-brand{display:flex;align-items:center;gap:12px;}
+.header-logo{width:30px;height:30px;background:rgba(255,255,255,.18);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;color:#fff;border:1px solid rgba(255,255,255,.28);}
+.header-title{font-family:'Unbounded',sans-serif;font-size:12px;font-weight:700;color:#fff;letter-spacing:.5px;}
+.header-sub{font-family:'DM Mono',monospace;font-size:9px;color:rgba(255,255,255,.6);letter-spacing:2px;margin-top:1px;}
+.header-right{display:flex;align-items:center;gap:8px;}
+.badge-live{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.28);border-radius:20px;padding:4px 11px;font-family:'DM Mono',monospace;font-size:10px;color:#fff;display:flex;align-items:center;gap:6px;letter-spacing:1px;}
+.pulse{width:7px;height:7px;border-radius:50%;background:#4ade80;animation:pulse 1.5s ease-in-out infinite;flex-shrink:0;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.8)}}
+.refresh-info{font-family:'DM Mono',monospace;font-size:9px;color:rgba(255,255,255,.5);letter-spacing:1px;}
+
+/* MAIN */
+.main{padding:22px 28px 60px;}
+
+/* CONFIG BAR */
+.config-bar{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 18px;margin-bottom:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.config-bar label{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:1px;flex-shrink:0;}
+.config-bar input{flex:1;min-width:260px;padding:7px 11px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:12px;font-family:'DM Mono',monospace;outline:none;}
+.config-bar input:focus{border-color:var(--red);}
+.btn-connect{padding:7px 18px;border-radius:7px;background:var(--red);color:#fff;border:none;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;transition:background .2s;white-space:nowrap;}
+.btn-connect:hover{background:var(--red2);}
+.status-dot{width:8px;height:8px;border-radius:50%;background:#ccc;flex-shrink:0;}
+.status-dot.connected{background:#22c55e;}
+.status-dot.error{background:var(--red);}
+.status-text{font-size:11px;color:var(--muted);}
+
+/* ── SECCIÓN FACTURACIÓN DIARIA ── */
+.billing-section{margin-bottom:20px;}
+.billing-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.billing-title{font-family:'Unbounded',sans-serif;font-size:11px;font-weight:700;color:var(--text);letter-spacing:.3px;display:flex;align-items:center;gap:8px;}
+.billing-title-badge{background:var(--gold);color:#fff;font-size:9px;font-family:'DM Mono',monospace;padding:2px 8px;border-radius:4px;letter-spacing:1px;}
+.billing-subtitle{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;}
+.billing-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;}
+.billing-day{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 10px;text-align:center;transition:all .2s;position:relative;overflow:hidden;}
+.billing-day::before{content:'';position:absolute;top:0;left:0;width:100%;height:2px;background:var(--border);}
+.billing-day.has-data::before{background:linear-gradient(90deg,var(--gold),#f0a500);}
+.billing-day.today-day{border-color:var(--red);box-shadow:0 0 0 1px var(--red-light);}
+.billing-day.today-day::before{background:var(--red);}
+.billing-day-date{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:.5px;margin-bottom:4px;}
+.billing-day-dow{font-size:9px;color:var(--muted);margin-bottom:6px;}
+.billing-day-count{font-family:'Unbounded',sans-serif;font-size:20px;font-weight:700;color:var(--text);line-height:1;}
+.billing-day.today-day .billing-day-count{color:var(--red);}
+.billing-day.has-data .billing-day-count{color:var(--gold);}
+.billing-day.today-day.has-data .billing-day-count{color:var(--red);}
+.billing-day-label{font-size:9px;color:var(--muted);margin-top:3px;font-family:'DM Mono',monospace;}
+.billing-total-bar{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 18px;margin-top:8px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.billing-total-item{display:flex;align-items:center;gap:10px;}
+.billing-total-label{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:.5px;}
+.billing-total-val{font-family:'Unbounded',sans-serif;font-size:18px;font-weight:700;}
+.billing-total-val.gold{color:var(--gold);}
+.billing-total-val.red{color:var(--red);}
+.billing-breakdown{display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.billing-breakdown-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);}
+.billing-breakdown-dot{width:8px;height:8px;border-radius:50%;}
+.billing-breakdown-dot.counter{background:#f59e0b;}
+.billing-breakdown-dot.aeronave{background:var(--green);}
+
+/* ── MÉTRICAS GLOBALES (reactivas a filtros) ── */
+.metrics-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}
+.metric-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px;position:relative;overflow:hidden;}
+.metric-card::before{content:'';position:absolute;top:0;left:0;width:100%;height:3px;}
+.metric-card.red::before{background:var(--red);}
+.metric-card.green::before{background:var(--green);}
+.metric-card.amber::before{background:var(--gold);}
+.metric-label{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;}
+.metric-value{font-family:'Unbounded',sans-serif;font-size:24px;font-weight:700;color:var(--text);line-height:1.1;}
+.metric-sub{font-size:10px;color:var(--muted);margin-top:4px;}
+.metric-filter-tag{display:inline-flex;align-items:center;gap:4px;background:var(--red-light);border:1px solid var(--red-mid);border-radius:4px;padding:1px 6px;font-size:9px;color:var(--red);font-family:'DM Mono',monospace;margin-top:4px;letter-spacing:.5px;}
+.metric-filter-tag.hidden{display:none;}
+
+/* FILTERS */
+.filters-panel{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:16px;}
+.filters-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.filters-title{font-family:'Unbounded',sans-serif;font-size:11px;font-weight:700;letter-spacing:.3px;display:flex;align-items:center;gap:7px;}
+.filters-active-badge{background:var(--red);color:#fff;border-radius:10px;padding:1px 8px;font-size:9px;font-family:'DM Mono',monospace;display:none;}
+.filters-active-badge.show{display:inline-block;}
+.filters-grid{display:grid;grid-template-columns:repeat(5,1fr) 120px;gap:10px;}
+.filter-group label{display:block;font-size:10px;font-family:'DM Mono',monospace;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;}
+.filter-group input,.filter-group select{width:100%;padding:8px 11px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:12px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s;appearance:none;-webkit-appearance:none;}
+.filter-group input:focus,.filter-group select:focus{border-color:var(--red);}
+.filter-group select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%237a7268'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;padding-right:26px;cursor:pointer;}
+.btn-filter{padding:8px 16px;border-radius:7px;background:var(--red);color:#fff;border:none;font-size:12px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;transition:background .2s;white-space:nowrap;height:36px;align-self:end;}
+.btn-filter:hover{background:var(--red2);}
+.btn-clear-f{background:var(--surface2);color:var(--muted);border:1px solid var(--border);border-radius:7px;padding:5px 12px;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;}
+.btn-clear-f:hover{border-color:var(--red);color:var(--red);}
+.filter-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
+.chip{border-radius:20px;padding:3px 11px;font-size:10px;cursor:pointer;font-family:'DM Mono',monospace;letter-spacing:.5px;border:1px solid var(--border);color:var(--muted);background:var(--surface2);transition:all .2s;}
+.chip:hover{border-color:var(--red);color:var(--red);}
+.chip.active-chip{background:var(--red);color:#fff;border-color:var(--red);}
+
+/* TABLE */
+.table-panel{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+.table-toolbar{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.table-toolbar-title{font-family:'Unbounded',sans-serif;font-size:11px;font-weight:700;}
+.results-count{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:3px 11px;}
+.table-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+th{background:var(--surface2);padding:10px 14px;text-align:left;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);white-space:nowrap;font-weight:500;cursor:pointer;user-select:none;}
+th:hover{color:var(--text);}
+th .sort-icon{margin-left:3px;opacity:.35;font-size:8px;}
+th.sorted .sort-icon{opacity:1;color:var(--red);}
+td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:var(--surface2);}
+tr.billable-row td:first-child{border-left:2px solid var(--gold);}
+.badge{display:inline-flex;align-items:center;border-radius:5px;padding:2px 8px;font-family:'DM Mono',monospace;font-size:9px;font-weight:500;letter-spacing:.5px;white-space:nowrap;}
+.badge-counter{background:#fff3cd;color:#856404;border:1px solid #e8c54a;}
+.badge-sala{background:var(--blue-light);color:var(--blue);border:1px solid #b8cef0;}
+.badge-aeronave{background:var(--green-light);color:var(--green);border:1px solid #95d4b4;}
+.badge-des{background:var(--amber-light);color:var(--amber);border:1px solid #e8c07a;}
+.badge-otro{background:var(--purple-light);color:var(--purple);border:1px solid #c8a8e8;}
+.badge-wchr{background:#e8f4fd;color:#0d5fc4;border:1px solid #9fc7f0;}
+.badge-wchs{background:#fdf3e0;color:#8a5200;border:1px solid #e8c07a;}
+.badge-wchc{background:#fcebeb;color:#a32d2d;border:1px solid #f0b8b8;}
+.badge-wch{background:var(--red-light);color:var(--red);border:1px solid var(--red-mid);}
+.billable-pill{display:inline-flex;align-items:center;gap:3px;background:var(--gold-light);border:1px solid #e8c07a;border-radius:10px;padding:1px 7px;font-size:9px;color:var(--gold);font-family:'DM Mono',monospace;margin-left:5px;}
+td.cell-date{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);}
+td.cell-vuelo{font-family:'DM Mono',monospace;font-size:11px;font-weight:500;}
+td.cell-name{font-weight:500;}
+.empty-state{text-align:center;padding:50px 20px;color:var(--muted);}
+.empty-icon{font-size:36px;margin-bottom:10px;}
+.empty-title{font-family:'Unbounded',sans-serif;font-size:13px;font-weight:700;margin-bottom:5px;color:var(--text);}
+.empty-sub{font-size:12px;}
+.loading-bar{height:3px;background:linear-gradient(90deg,var(--red) 0%,#ff7a8a 50%,var(--red) 100%);background-size:200% 100%;animation:loading .8s linear infinite;}
+@keyframes loading{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.pagination{display:flex;align-items:center;justify-content:center;gap:5px;padding:14px;border-top:1px solid var(--border);}
+.page-btn{width:30px;height:30px;border-radius:6px;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-size:11px;cursor:pointer;font-family:'DM Mono',monospace;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.page-btn:hover,.page-btn.active{background:var(--red);color:#fff;border-color:var(--red);}
+.page-info{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);padding:0 6px;}
+.btn-export{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:5px 12px;font-size:11px;font-family:'DM Sans',sans-serif;color:var(--muted);cursor:pointer;transition:all .2s;}
+.btn-export:hover{border-color:var(--red);color:var(--red);}
+
+/* DEBUG */
+.debug-panel{background:#0d1117;border:1px solid #30363d;border-radius:10px;padding:14px;margin-bottom:16px;}
+.debug-title{color:#58a6ff;font-size:9px;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;font-family:'DM Mono',monospace;display:flex;align-items:center;justify-content:space-between;}
+.debug-log{max-height:160px;overflow-y:auto;display:flex;flex-direction:column;gap:2px;}
+.debug-line{padding:3px 7px;border-radius:3px;color:#c9d1d9;border-left:2px solid #30363d;font-family:'DM Mono',monospace;font-size:10px;line-height:1.5;}
+.debug-line.info{border-color:#58a6ff;color:#a5d6ff;}
+.debug-line.success{border-color:#3fb950;color:#56d364;}
+.debug-line.error{border-color:#f85149;color:#ffa198;}
+.debug-line.warn{border-color:#d29922;color:#e3b341;}
+.debug-line.raw{border-color:#6e40c9;color:#d2a8ff;word-break:break-all;white-space:pre-wrap;}
+.debug-url-box{background:#161b22;border:1px solid #30363d;border-radius:5px;padding:7px 9px;margin-bottom:7px;color:#8b949e;word-break:break-all;font-size:9px;font-family:'DM Mono',monospace;}
+.debug-actions{display:flex;gap:7px;margin-top:8px;flex-wrap:wrap;}
+.btn-debug{background:transparent;border:1px solid #30363d;border-radius:4px;color:#8b949e;font-size:9px;padding:3px 9px;cursor:pointer;font-family:'DM Mono',monospace;transition:all .2s;}
+.btn-debug:hover{border-color:#58a6ff;color:#58a6ff;}
+.btn-debug.green{border-color:#3fb950;color:#56d364;}
+.btn-debug.green:hover{background:rgba(63,185,80,.1);}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-brand">
+    <div class="header-logo">&#9851;</div>
+    <div>
+      <div class="header-title">Dashboard WCH · Avianca SAL</div>
+      <div class="header-sub">OPERACIONES EN TIEMPO REAL</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <span class="refresh-info" id="refreshInfo">auto-refresh: --</span>
+    <div class="badge-live">
+      <div class="pulse" id="liveDot"></div>
+      <span id="liveStatus">CONECTANDO</span>
+    </div>
+  </div>
+</header>
+
+<div class="main">
+
+  <!-- CONFIG BAR -->
+  <div class="config-bar">
+    <label>SCRIPT URL</label>
+    <input type="text" id="scriptUrl" placeholder="https://script.google.com/macros/s/.../exec">
+    <button class="btn-connect" onclick="loadData()">Conectar</button>
+    <div class="status-dot" id="statusDot"></div>
+    <span class="status-text" id="statusText">Ingrese la URL y haga clic en Conectar</span>
+  </div>
+
+  <!-- DEBUG PANEL -->
+  <div class="debug-panel" id="debugPanel">
+    <div class="debug-title">
+      <span>&#128270; Debug Console</span>
+      <button class="btn-debug" onclick="clearDebug()">Limpiar</button>
+    </div>
+    <div class="debug-url-box" id="debugUrl">URL: (no configurada)</div>
+    <div class="debug-log" id="debugLog"><div class="debug-line info">Esperando conexion...</div></div>
+    <div class="debug-actions">
+      <button class="btn-debug green" onclick="testRawFetch()">Abrir URL en nueva pestana</button>
+      <button class="btn-debug" onclick="copyDebugLog()">Copiar log</button>
+    </div>
+  </div>
+
+  <!-- ── FACTURACIÓN DIARIA ── -->
+  <div class="billing-section">
+    <div class="billing-header">
+      <div class="billing-title">
+        Facturaci&#243;n Diaria
+        <span class="billing-title-badge">COUNTER + AERONAVE</span>
+      </div>
+      <div class="billing-subtitle" id="billWeekLabel">&#8212;</div>
+    </div>
+    <div class="billing-grid" id="billingGrid">
+      <!-- generado por JS -->
+    </div>
+    <div class="billing-total-bar">
+      <div class="billing-total-item">
+        <div>
+          <div class="metric-label">Sillas facturadas hoy</div>
+          <div class="billing-total-val red" id="billToday">&#8212;</div>
+        </div>
+      </div>
+      <div class="billing-breakdown" id="billBreakdown">
+        <div class="billing-breakdown-item">
+          <div class="billing-breakdown-dot counter"></div>
+          <span>Counter&#8594;Insp: <strong id="billCounterToday">0</strong></span>
+        </div>
+        <div class="billing-breakdown-item">
+          <div class="billing-breakdown-dot aeronave"></div>
+          <span>Aeronave&#8594;Salida: <strong id="billAeronaveToday">0</strong></span>
+        </div>
+      </div>
+      <div class="billing-total-item">
+        <div>
+          <div class="metric-label">Total semana</div>
+          <div class="billing-total-val gold" id="billWeekTotal">&#8212;</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MÉTRICAS (reactivas a filtros) ── -->
+  <div class="metrics-row">
+    <div class="metric-card red">
+      <div class="metric-label">Servicios (vista)</div>
+      <div class="metric-value" id="metTotal">&#8212;</div>
+      <div class="metric-sub">en la tabla actual</div>
+      <div class="metric-filter-tag hidden" id="tagTotal">FILTRADO</div>
+    </div>
+    <div class="metric-card green">
+      <div class="metric-label">Vuelos AV (vista)</div>
+      <div class="metric-value" id="metAV">&#8212;</div>
+      <div class="metric-sub">solo Avianca</div>
+      <div class="metric-filter-tag hidden" id="tagAV">FILTRADO</div>
+    </div>
+    <div class="metric-card amber">
+      <div class="metric-label">Facturables (vista)</div>
+      <div class="metric-value" id="metBillable">&#8212;</div>
+      <div class="metric-sub">Counter + Aeronave en filtro</div>
+      <div class="metric-filter-tag hidden" id="tagBillable">FILTRADO</div>
+    </div>
+  </div>
+
+  <!-- FILTERS -->
+  <div class="filters-panel">
+    <div class="filters-header">
+      <div class="filters-title">
+        Filtros
+        <span class="filters-active-badge" id="activeFiltersCount">0 activos</span>
+      </div>
+      <button class="btn-clear-f" onclick="clearFilters()">Limpiar filtros</button>
+    </div>
+    <div class="filters-grid">
+      <div class="filter-group">
+        <label>Fecha</label>
+        <input type="date" id="fFecha" onchange="applyFilters()">
+      </div>
+      <div class="filter-group">
+        <label>Staff</label>
+        <select id="fStaff" onchange="applyFilters()"><option value="">Todos</option></select>
+      </div>
+      <div class="filter-group">
+        <label>Tramo</label>
+        <select id="fTramo" onchange="applyFilters()">
+          <option value="">Todos</option>
+          <option value="counter-inspeccion">Counter&#8594;Insp</option>
+          <option value="inspeccion-sala">Insp&#8594;Sala</option>
+          <option value="aeronave-salida">Aeronave&#8594;Salida</option>
+          <option value="Desabordaje">Desabordaje</option>
+          <option value="otro">Otro</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Pasajero</label>
+        <input type="text" id="fPasajero" placeholder="Nombre..." oninput="applyFilters()">
+      </div>
+      <div class="filter-group">
+        <label>Tipo WCH</label>
+        <select id="fWCH" onchange="applyFilters()">
+          <option value="">Todos</option>
+          <option value="WCHR">WCHR</option>
+          <option value="WCHS">WCHS</option>
+          <option value="WCHC">WCHC</option>
+        </select>
+      </div>
+      <button class="btn-filter" onclick="applyFilters()">Filtrar</button>
+    </div>
+    <div class="filter-chips" id="tramoChips">
+      <span class="chip active-chip" onclick="setTramoChip('')" data-tramo="">Todos</span>
+      <span class="chip" onclick="setTramoChip('counter-inspeccion')" data-tramo="counter-inspeccion">Counter&#8594;Insp</span>
+      <span class="chip" onclick="setTramoChip('inspeccion-sala')" data-tramo="inspeccion-sala">Insp&#8594;Sala</span>
+      <span class="chip" onclick="setTramoChip('aeronave-salida')" data-tramo="aeronave-salida">Aeronave&#8594;Salida</span>
+      <span class="chip" onclick="setTramoChip('Desabordaje')" data-tramo="Desabordaje">Desabordaje</span>
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-panel">
+    <div id="loadingBar" style="display:none;"><div class="loading-bar"></div></div>
+    <div class="table-toolbar">
+      <div class="table-toolbar-title">Servicios WCH &#8212; Solo vuelos Avianca (AV)</div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span class="results-count" id="resultsCount">0 resultados</span>
+        <button class="btn-export" onclick="exportCSV()">&#8595; CSV</button>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th onclick="sortBy('fecha')">Fecha<span class="sort-icon" id="sh-fecha">&#8597;</span></th>
+            <th onclick="sortBy('usuario')">Staff<span class="sort-icon" id="sh-usuario">&#8597;</span></th>
+            <th onclick="sortBy('tramo')">Tramo<span class="sort-icon" id="sh-tramo">&#8597;</span></th>
+            <th onclick="sortBy('pasajero')">Pasajero<span class="sort-icon" id="sh-pasajero">&#8597;</span></th>
+            <th onclick="sortBy('wchType')">WCH<span class="sort-icon" id="sh-wchType">&#8597;</span></th>
+            <th onclick="sortBy('vuelo')">Vuelo AV<span class="sort-icon" id="sh-vuelo">&#8597;</span></th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <tr><td colspan="6">
+            <div class="empty-state">
+              <div class="empty-icon">&#128225;</div>
+              <div class="empty-title">Sin datos</div>
+              <div class="empty-sub">Ingrese la URL del Apps Script y haga clic en Conectar</div>
+            </div>
+          </td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="pagination" id="paginationBar" style="display:none;"></div>
+  </div>
+
+</div>
+
+<script>
+const SCRIPT_URL_KEY = 'wch_dash_url_v2';
+const PAGE_SIZE = 30;
+const REFRESH_MS = 60000; // auto-refresh cada 60s
+const BILLABLE_TRAMOS = ['counter-inspeccion','aeronave-salida'];
+
+let allRecords = [];
+let filteredRecords = [];
+let currentPage = 1;
+let sortField = 'fecha';
+let sortDir = -1;
+let debugLines = [];
+let refreshTimer = null;
+let refreshCountdown = 0;
+let countdownTimer = null;
+
+// ── HELPERS: detectar si un tramo es facturable ──
+function isBillable(tramo){
+  const t = (tramo||'').toLowerCase();
+  return t.includes('counter') || t.includes('aeronave');
+}
+
+// ── HELPERS: parsear fecha DD/MM/YYYY a string comparable YYYY-MM-DD ──
+function fechaToISO(f){
+  const p=(f||'').split('/');
+  if(p.length!==3) return '';
+  return p[2]+'-'+p[1].padStart(2,'0')+'-'+p[0].padStart(2,'0');
+}
+function fechaToTs(f,h){
+  const iso=fechaToISO(f);
+  if(!iso) return 0;
+  try{ return new Date(iso+'T'+(h||'00:00:00')).getTime()||0; }catch(e){return 0;}
+}
+
+// ── INIT ──
+(function init(){
+  const saved = localStorage.getItem(SCRIPT_URL_KEY);
+  if(saved){ document.getElementById('scriptUrl').value=saved; dbg('info','URL guardada: '+saved); }
+  renderBillingGrid([]); // grid vacío al inicio
+})();
+
+// ── DEBUG ──
+function dbg(type,msg){
+  console.log('[WCH]['+type.toUpperCase()+'] '+msg);
+  const ts=new Date().toLocaleTimeString('es-CR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  debugLines.push({type,msg,ts});
+  const log=document.getElementById('debugLog');
+  const line=document.createElement('div');
+  line.className='debug-line '+type;
+  line.textContent='['+ts+'] '+msg;
+  log.appendChild(line);
+  log.scrollTop=log.scrollHeight;
+}
+function clearDebug(){ debugLines=[]; document.getElementById('debugLog').innerHTML='<div class="debug-line info">Log limpiado.</div>'; }
+function copyDebugLog(){ const t=debugLines.map(l=>'['+l.ts+']['+l.type+'] '+l.msg).join('\n'); navigator.clipboard.writeText(t).then(()=>dbg('success','Copiado')).catch(()=>dbg('warn','No se pudo copiar')); }
+function testRawFetch(){ const url=document.getElementById('scriptUrl').value.trim(); if(!url){dbg('error','Sin URL');return;} window.open(url+'?action=getDashboardData&callback=test','_blank'); }
+
+// ── LOAD DATA ──
+function loadData(silent){
+  const url=document.getElementById('scriptUrl').value.trim();
+  if(!url){ setStatus('error','Sin URL'); return; }
+  localStorage.setItem(SCRIPT_URL_KEY,url);
+
+  const cbName='dashCb_'+Date.now();
+  const fullUrl=url+'?action=getDashboardData&callback='+cbName;
+
+  document.getElementById('debugUrl').textContent='URL: '+fullUrl;
+  if(!silent){
+    dbg('info','Conectando...');
+    setStatus('loading','Conectando...');
+    showLoading(true);
+  }
+
+  window[cbName]=function(data){
+    delete window[cbName];
+    const s=document.getElementById('ds');if(s)s.remove();
+    showLoading(false);
+
+    if(data && data.success){
+      allRecords=data.records||[];
+      if(!silent) dbg('success','Cargados '+allRecords.length+' registros AV');
+      populateStaffSelect(allRecords);
+      applyFilters();
+      renderBillingGrid(allRecords);
+      setStatus('connected','Actualizado '+new Date().toLocaleTimeString('es-CR',{hour:'2-digit',minute:'2-digit',second:'2-digit'})+' · '+allRecords.length+' registros');
+      document.getElementById('liveStatus').textContent='EN VIVO';
+      startRefreshCountdown();
+    } else {
+      const err=data?(data.message||'error'):'sin respuesta';
+      dbg('error','Error: '+err);
+      if(!silent) setStatus('error','Error: '+err);
+    }
+  };
+
+  const scr=document.createElement('script');
+  scr.id='ds'; scr.src=fullUrl;
+  scr.onerror=function(){
+    delete window[cbName]; scr.remove(); showLoading(false);
+    dbg('error','No se pudo cargar el script');
+    setStatus('error','Error de conexion. Verifique URL.');
+  };
+  document.body.appendChild(scr);
+  setTimeout(function(){
+    if(window[cbName]){
+      delete window[cbName]; showLoading(false);
+      dbg('error','Timeout 15s');
+      setStatus('error','Timeout. Use "Abrir URL" para diagnosticar.');
+    }
+  },15000);
+}
+
+// ── AUTO-REFRESH ──
+function startRefreshCountdown(){
+  if(countdownTimer) clearInterval(countdownTimer);
+  refreshCountdown = Math.floor(REFRESH_MS/1000);
+  if(refreshTimer) clearTimeout(refreshTimer);
+  refreshTimer = setTimeout(function(){ loadData(true); }, REFRESH_MS);
+  countdownTimer = setInterval(function(){
+    refreshCountdown--;
+    document.getElementById('refreshInfo').textContent='refresh en '+refreshCountdown+'s';
+    if(refreshCountdown<=0) clearInterval(countdownTimer);
+  },1000);
+}
+
+// ── BILLING GRID (últimos 7 días) ──
+function renderBillingGrid(records){
+  const grid=document.getElementById('billingGrid');
+  const today=new Date();
+  const days=[];
+  for(let i=6;i>=0;i--){
+    const d=new Date(today);
+    d.setDate(today.getDate()-i);
+    const dd=String(d.getDate()).padStart(2,'0');
+    const mm=String(d.getMonth()+1).padStart(2,'0');
+    const yyyy=d.getFullYear();
+    const dateStr=dd+'/'+mm+'/'+yyyy;
+    const isToday=i===0;
+    const dows=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+    const dow=dows[d.getDay()];
+
+    // Contar solo billable y aerolinea AV
+    const dayRecs=records.filter(function(r){
+      return (r.aerolinea||'').toUpperCase()==='AV'
+        && (r.fecha||'')=== dateStr
+        && isBillable(r.tramo);
+    });
+    const counterCount=dayRecs.filter(r=>(r.tramo||'').toLowerCase().includes('counter')).length;
+    const aeronaveCount=dayRecs.filter(r=>(r.tramo||'').toLowerCase().includes('aeronave')).length;
+    const total=dayRecs.length;
+
+    days.push({dateStr,dd,mm,dow,isToday,total,counterCount,aeronaveCount});
+  }
+
+  const weekTotal=days.reduce(function(s,d){return s+d.total;},0);
+  document.getElementById('billWeekTotal').textContent=weekTotal;
+  document.getElementById('billWeekLabel').textContent='Semana: '+days[0].dateStr+' – '+days[6].dateStr;
+
+  const todayData=days[6];
+  document.getElementById('billToday').textContent=todayData.total;
+  document.getElementById('billCounterToday').textContent=todayData.counterCount;
+  document.getElementById('billAeronaveToday').textContent=todayData.aeronaveCount;
+
+  grid.innerHTML=days.map(function(d){
+    const cls='billing-day'+(d.total>0?' has-data':'')+(d.isToday?' today-day':'');
+    const tipDetail=d.total>0?('<br><span style="font-size:9px;color:var(--muted)">C:'+d.counterCount+' A:'+d.aeronaveCount+'</span>'):'';
+    return '<div class="'+cls+'" title="'+d.dateStr+': '+d.total+' sillas facturadas">'
+      +'<div class="billing-day-dow">'+d.dow+'</div>'
+      +'<div class="billing-day-date">'+d.dd+'/'+d.mm+'</div>'
+      +'<div class="billing-day-count">'+d.total+'</div>'
+      +'<div class="billing-day-label">'+(d.total>0?'silla'+(d.total!==1?'s':''):'–')+'</div>'
+      +'</div>';
+  }).join('');
+}
+
+// ── POPULATE STAFF ──
+function populateStaffSelect(records){
+  const sel=document.getElementById('fStaff');
+  const cur=sel.value;
+  const set=[...new Set(records.map(r=>r.usuario).filter(Boolean))].sort();
+  sel.innerHTML='<option value="">Todos</option>'+set.map(s=>'<option value="'+esc(s)+'">'+esc(s)+'</option>').join('');
+  if(cur) sel.value=cur;
+}
+
+// ── APPLY FILTERS → actualiza métricas reactivas ──
+function applyFilters(){
+  const fFecha   =document.getElementById('fFecha').value;
+  const fStaff   =document.getElementById('fStaff').value.toLowerCase();
+  const fTramo   =document.getElementById('fTramo').value.toLowerCase();
+  const fPasajero=document.getElementById('fPasajero').value.toLowerCase();
+  const fWCH     =document.getElementById('fWCH').value.toUpperCase();
+
+  // contar filtros activos
+  let activeCount=0;
+  if(fFecha) activeCount++;
+  if(fStaff) activeCount++;
+  if(fTramo) activeCount++;
+  if(fPasajero) activeCount++;
+  if(fWCH) activeCount++;
+  const badge=document.getElementById('activeFiltersCount');
+  badge.textContent=activeCount+' activo'+(activeCount!==1?'s':'');
+  badge.classList.toggle('show',activeCount>0);
+
+  const isFiltered=activeCount>0;
+
+  filteredRecords=allRecords.filter(function(r){
+    if((r.aerolinea||'').toUpperCase()!=='AV') return false;
+    if(fFecha){
+      const iso=fechaToISO(r.fecha||'');
+      if(iso!==fFecha) return false;
+    }
+    if(fStaff    && !(r.usuario||'').toLowerCase().includes(fStaff)) return false;
+    if(fTramo    && !(r.tramo||'').toLowerCase().includes(fTramo)) return false;
+    if(fPasajero && !(r.pasajero||'').toLowerCase().includes(fPasajero)) return false;
+    if(fWCH      && (r.wchType||'').toUpperCase()!==fWCH) return false;
+    return true;
+  });
+
+  // Métricas reactivas — basadas en filteredRecords
+  const totalVista=filteredRecords.length;
+  const avVista=filteredRecords.filter(r=>(r.aerolinea||'').toUpperCase()==='AV').length;
+  const billableVista=filteredRecords.filter(r=>isBillable(r.tramo)).length;
+
+  document.getElementById('metTotal').textContent=totalVista.toLocaleString();
+  document.getElementById('metAV').textContent=avVista.toLocaleString();
+  document.getElementById('metBillable').textContent=billableVista.toLocaleString();
+
+  // mostrar tag "FILTRADO" si hay filtros activos
+  ['tagTotal','tagAV','tagBillable'].forEach(function(id){
+    document.getElementById(id).classList.toggle('hidden',!isFiltered);
+  });
+
+  doSort();
+  currentPage=1;
+  renderTable();
+}
+
+function clearFilters(){
+  ['fFecha','fPasajero'].forEach(function(id){document.getElementById(id).value='';});
+  ['fStaff','fTramo','fWCH'].forEach(function(id){document.getElementById(id).value='';});
+  setTramoChip('');
+}
+
+function setTramoChip(tramo){
+  document.querySelectorAll('.chip').forEach(function(c){ c.classList.toggle('active-chip',c.dataset.tramo===tramo); });
+  document.getElementById('fTramo').value=tramo;
+  applyFilters();
+}
+
+// ── SORT ──
+function sortBy(field){
+  if(sortField===field) sortDir*=-1; else{sortField=field;sortDir=1;}
+  document.querySelectorAll('th').forEach(function(th){th.classList.remove('sorted');});
+  const sh=document.getElementById('sh-'+field);
+  if(sh){sh.closest('th').classList.add('sorted');sh.textContent=sortDir===1?'↑':'↓';}
+  doSort(); renderTable();
+}
+function doSort(){
+  filteredRecords.sort(function(a,b){
+    if(sortField==='fecha') return (fechaToTs(b.fecha,b.hora)-fechaToTs(a.fecha,a.hora))*sortDir;
+    return ((a[sortField]||'').toString()).localeCompare((b[sortField]||'').toString())*sortDir;
+  });
+}
+
+// ── RENDER TABLE ──
+function renderTable(){
+  const tbody=document.getElementById('tableBody');
+  const total=filteredRecords.length;
+  document.getElementById('resultsCount').textContent=total.toLocaleString()+' resultado'+(total!==1?'s':'');
+
+  if(total===0){
+    tbody.innerHTML='<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">&#128269;</div><div class="empty-title">Sin resultados</div><div class="empty-sub">Ajuste los filtros o conecte el Apps Script</div></div></td></tr>';
+    document.getElementById('paginationBar').style.display='none';
+    return;
+  }
+
+  const start=(currentPage-1)*PAGE_SIZE;
+  const pageData=filteredRecords.slice(start,start+PAGE_SIZE);
+
+  tbody.innerHTML=pageData.map(function(r){
+    const hora=r.hora?r.hora.slice(0,5):'';
+    const billable=isBillable(r.tramo);
+    const rowCls=billable?'billable-row':'';
+    const billPill=billable?'<span class="billable-pill">&#9830; factura</span>':'';
+    return '<tr class="'+rowCls+'">'
+      +'<td class="cell-date">'+esc(r.fecha||'–')+(hora?' <span style="opacity:.45">'+esc(hora)+'</span>':'')+'</td>'
+      +'<td>'+esc(r.usuario||'–')+'</td>'
+      +'<td>'+tramoToBadge(r.tramo)+billPill+'</td>'
+      +'<td class="cell-name">'+esc(r.pasajero||'–')+'</td>'
+      +'<td>'+wchToBadge(r.wchType)+'</td>'
+      +'<td class="cell-vuelo">'+esc(r.vuelo||'–')+'</td>'
+      +'</tr>';
+  }).join('');
+
+  renderPagination(total);
+}
+
+// ── PAGINATION ──
+function renderPagination(total){
+  const tp=Math.ceil(total/PAGE_SIZE);
+  const bar=document.getElementById('paginationBar');
+  if(tp<=1){bar.style.display='none';return;}
+  bar.style.display='flex';
+  let pages=[],html='';
+  if(tp<=7){for(let i=1;i<=tp;i++)pages.push(i);}
+  else{
+    pages=[1];
+    let s=Math.max(2,currentPage-2),e=Math.min(tp-1,currentPage+2);
+    if(s>2)pages.push('...');
+    for(let i=s;i<=e;i++)pages.push(i);
+    if(e<tp-1)pages.push('...');
+    pages.push(tp);
+  }
+  html+='<button class="page-btn" onclick="goPage('+(currentPage-1)+')" '+(currentPage===1?'disabled style="opacity:.3"':'')+'>&#8249;</button>';
+  pages.forEach(function(p){
+    if(p==='...') html+='<span class="page-info">...</span>';
+    else html+='<button class="page-btn'+(p===currentPage?' active':'')+'" onclick="goPage('+p+')">'+p+'</button>';
+  });
+  html+='<button class="page-btn" onclick="goPage('+(currentPage+1)+')" '+(currentPage===tp?'disabled style="opacity:.3"':'')+'>&#8250;</button>';
+  html+='<span class="page-info">'+((currentPage-1)*PAGE_SIZE+1)+'–'+Math.min(currentPage*PAGE_SIZE,total)+' de '+total+'</span>';
+  bar.innerHTML=html;
+}
+function goPage(p){
+  const tp=Math.ceil(filteredRecords.length/PAGE_SIZE);
+  if(p<1||p>tp)return;
+  currentPage=p; renderTable();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── BADGES ──
+function tramoToBadge(t){
+  const tl=(t||'').toLowerCase();
+  if(tl.includes('counter'))     return '<span class="badge badge-counter">Counter&#8594;Insp</span>';
+  if(tl.includes('sala'))        return '<span class="badge badge-sala">Insp&#8594;Sala</span>';
+  if(tl.includes('aeronave'))    return '<span class="badge badge-aeronave">Aeronave&#8594;Salida</span>';
+  if(tl.includes('desabordaje')) return '<span class="badge badge-des">Desabordaje</span>';
+  if(tl==='otro')                return '<span class="badge badge-otro">Otro</span>';
+  return '<span class="badge">'+esc(t||'–')+'</span>';
+}
+function wchToBadge(w){
+  const wu=(w||'').toUpperCase();
+  if(wu==='WCHR') return '<span class="badge badge-wchr">WCHR</span>';
+  if(wu==='WCHS') return '<span class="badge badge-wchs">WCHS</span>';
+  if(wu==='WCHC') return '<span class="badge badge-wchc">WCHC</span>';
+  return '<span class="badge badge-wch">'+esc(w||'–')+'</span>';
+}
+
+// ── EXPORT CSV ──
+function exportCSV(){
+  if(!filteredRecords.length){alert('Sin datos');return;}
+  const h=['Fecha','Hora','Staff','Tramo','Facturable','Pasajero','WCH','Vuelo'];
+  const rows=filteredRecords.map(function(r){
+    return [r.fecha||'',r.hora||'',r.usuario||'',r.tramo||'',isBillable(r.tramo)?'SI':'NO',r.pasajero||'',r.wchType||'',r.vuelo||'']
+      .map(function(v){return '"'+String(v).replace(/"/g,'""')+'"';}).join(',');
+  });
+  const csv=[h.join(',')].concat(rows).join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'}));
+  a.download='wch-'+new Date().toISOString().split('T')[0]+'.csv';
+  a.click();
+  dbg('success','CSV exportado: '+filteredRecords.length+' filas');
+}
+
+// ── UI ──
+function showLoading(s){document.getElementById('loadingBar').style.display=s?'block':'none';}
+function setStatus(type,msg){
+  const dot=document.getElementById('statusDot');
+  const txt=document.getElementById('statusText');
+  const live=document.getElementById('liveStatus');
+  const pDot=document.getElementById('liveDot');
+  dot.className='status-dot'+(type==='connected'?' connected':type==='error'?' error':'');
+  txt.textContent=msg;
+  if(type==='connected'){live.textContent='EN VIVO';pDot.style.background='#4ade80';}
+  else if(type==='error'){live.textContent='ERROR';pDot.style.background='#ef4444';}
+  else{live.textContent='CARGANDO';pDot.style.background='#fbbf24';}
+}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+</script>
+</body>
+</html>
