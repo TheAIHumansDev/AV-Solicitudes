@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wheelchair Services · Dashboard Debug</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red:      #e8001d;
+    --red-dim:  #9b0013;
+    --dark:     #0a0a0f;
+    --surface:  #111118;
+    --card:     #181820;
+    --border:   #2a2a38;
+    --text:     #e8e8f0;
+    --muted:    #6b6b82;
+    --ok:       #22c55e;
+    --warn:     #f59e0b;
+    --info:     #3b82f6;
+    --cyan:     #06b6d4;
+    --mono:     'JetBrains Mono', monospace;
+    --sans:     'Sora', sans-serif;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--dark);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--surface);
+    border-bottom: 2px solid var(--red);
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo-mark {
+    width: 36px; height: 36px;
+    background: var(--red);
+    display: grid; place-items: center;
+    font-family: var(--mono);
+    font-weight: 700; font-size: 12px;
+    letter-spacing: -1px;
+    flex-shrink: 0;
+  }
+  header h1 { font-size: 15px; font-weight: 600; letter-spacing: .5px; }
+  header p  { font-size: 11px; color: var(--muted); font-family: var(--mono); }
+  .header-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .status-pill {
+    font-family: var(--mono); font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 2px;
+    border: 1px solid;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .status-pill.loading { border-color: var(--warn); color: var(--warn); }
+  .status-pill.ok      { border-color: var(--ok);   color: var(--ok);   }
+  .status-pill.error   { border-color: var(--red);  color: var(--red);  }
+  .pulse {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: currentColor;
+    animation: pulse 1.4s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+  /* ── CONFIG PANEL ── */
+  .config-panel {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 32px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: flex-end;
+  }
+  .config-group { display: flex; flex-direction: column; gap: 4px; }
+  .config-group label { font-size: 10px; font-family: var(--mono); color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  .config-group input, .config-group select {
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--mono); font-size: 12px;
+    padding: 7px 12px;
+    border-radius: 3px;
+    outline: none;
+    min-width: 280px;
+  }
+  .config-group input:focus, .config-group select:focus { border-color: var(--cyan); }
+  .config-group.narrow input { min-width: 120px; }
+
+  .btn {
+    padding: 8px 18px;
+    border: none; border-radius: 3px;
+    font-family: var(--mono); font-size: 12px; font-weight: 600;
+    cursor: pointer; letter-spacing: .5px;
+    transition: opacity .15s;
+  }
+  .btn:hover { opacity: .85; }
+  .btn-primary { background: var(--red); color: #fff; }
+  .btn-ghost { background: transparent; color: var(--cyan); border: 1px solid var(--cyan); }
+  .btn-warn  { background: transparent; color: var(--warn); border: 1px solid var(--warn); }
+
+  /* ── MAIN LAYOUT ── */
+  main { padding: 24px 32px; display: flex; flex-direction: column; gap: 24px; }
+
+  /* ── DEBUG CONSOLE ── */
+  .debug-console {
+    background: #0d0d15;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .debug-header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 16px;
+    display: flex; align-items: center; gap: 10px;
+    font-family: var(--mono); font-size: 11px;
+  }
+  .debug-header span { color: var(--cyan); font-weight: 600; }
+  .debug-header .count {
+    margin-left: auto;
+    background: var(--border);
+    padding: 2px 8px; border-radius: 2px;
+    color: var(--muted);
+  }
+  #debugLog {
+    height: 200px;
+    overflow-y: auto;
+    padding: 12px 16px;
+    font-family: var(--mono); font-size: 11px;
+    line-height: 1.7;
+  }
+  #debugLog .log-entry { display: flex; gap: 10px; }
+  #debugLog .log-ts   { color: var(--muted); flex-shrink: 0; min-width: 80px; }
+  #debugLog .log-INFO  { color: var(--info); }
+  #debugLog .log-OK    { color: var(--ok); }
+  #debugLog .log-WARN  { color: var(--warn); }
+  #debugLog .log-ERROR { color: var(--red); }
+  #debugLog .log-DATA  { color: var(--cyan); }
+
+  /* ── KPI STRIP ── */
+  .kpi-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+  }
+  .kpi-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .kpi-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: var(--accent, var(--border));
+  }
+  .kpi-label { font-size: 10px; font-family: var(--mono); color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .kpi-value { font-size: 28px; font-weight: 700; font-family: var(--mono); line-height: 1; }
+  .kpi-sub   { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+  /* ── RAW RESPONSE BOX ── */
+  .raw-box {
+    background: #0d0d15;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .raw-box summary {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 16px;
+    font-family: var(--mono); font-size: 11px; color: var(--cyan);
+    cursor: pointer;
+    user-select: none;
+  }
+  .raw-box summary:hover { background: var(--card); }
+  #rawResponse {
+    max-height: 300px;
+    overflow: auto;
+    padding: 12px 16px;
+    font-family: var(--mono); font-size: 10px;
+    white-space: pre-wrap;
+    word-break: break-all;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* ── DATA TABLE ── */
+  .table-wrap {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .table-toolbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 16px;
+    display: flex; align-items: center; gap: 10px;
+    font-family: var(--mono); font-size: 11px;
+  }
+  .table-toolbar span { color: var(--cyan); font-weight: 600; }
+  .filter-input {
+    margin-left: auto;
+    background: var(--card); border: 1px solid var(--border);
+    color: var(--text); font-family: var(--mono); font-size: 11px;
+    padding: 5px 10px; border-radius: 3px; outline: none;
+    width: 200px;
+  }
+  .filter-input:focus { border-color: var(--cyan); }
+
+  .table-scroll { overflow-x: auto; max-height: 520px; overflow-y: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  thead th {
+    background: #0d0d15;
+    padding: 9px 12px;
+    text-align: left;
+    font-family: var(--mono); font-size: 10px;
+    color: var(--muted); text-transform: uppercase; letter-spacing: 1px;
+    position: sticky; top: 0;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  tbody tr { border-bottom: 1px solid #1c1c28; transition: background .1s; }
+  tbody tr:hover { background: #1a1a24; }
+  tbody td { padding: 8px 12px; vertical-align: middle; white-space: nowrap; }
+  .badge {
+    display: inline-block;
+    padding: 2px 8px; border-radius: 2px;
+    font-family: var(--mono); font-size: 10px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: .5px;
+  }
+  .badge-en-proceso { background: #2d2200; color: var(--warn); border: 1px solid #5a4200; }
+  .badge-completado { background: #0a2d15; color: var(--ok);   border: 1px solid #164d26; }
+  .badge-wchr { background: #1e1e40; color: #818cf8; border: 1px solid #312e81; }
+  .badge-wchs { background: #1a2e40; color: #38bdf8; border: 1px solid #0c4a6e; }
+  .badge-wchc { background: #2d1a2e; color: #e879f9; border: 1px solid #4a006e; }
+  .tramo-chip {
+    padding: 2px 8px; border-radius: 10px;
+    font-family: var(--mono); font-size: 10px;
+    white-space: nowrap;
+  }
+  .tramo-counter  { background: #2d2200; color: #fbbf24; }
+  .tramo-inspeccion { background: #0c2d40; color: #38bdf8; }
+  .tramo-aeronave { background: #1a0a2d; color: #c084fc; }
+  .text-muted { color: var(--muted); font-family: var(--mono); font-size: 11px; }
+  .no-data {
+    text-align: center; padding: 48px;
+    color: var(--muted); font-family: var(--mono); font-size: 13px;
+  }
+
+  /* ── FIELD PROBE ── */
+  .probe-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .probe-card {
+    background: var(--card);
+    border: 1px solid var(--border); border-radius: 6px; padding: 16px;
+  }
+  .probe-card h3 { font-family: var(--mono); font-size: 11px; color: var(--cyan); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+  .probe-row { display: flex; gap: 8px; margin-bottom: 6px; font-family: var(--mono); font-size: 11px; align-items: flex-start; }
+  .probe-key { color: var(--muted); min-width: 120px; flex-shrink: 0; }
+  .probe-val { color: var(--text); word-break: break-all; }
+  .probe-val.bad { color: var(--red); }
+  .probe-val.ok  { color: var(--ok); }
+  .probe-val.warn { color: var(--warn); }
+
+  /* scrollbars */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-mark">WCH</div>
+  <div>
+    <h1>Wheelchair Services · Dashboard</h1>
+    <p>Avianca SAL · Aeropuerto Juan Santamaría · Debug v4.0</p>
+  </div>
+  <div class="header-right">
+    <div class="status-pill loading" id="statusPill">
+      <div class="pulse"></div>
+      <span id="statusText">Esperando...</span>
+    </div>
+  </div>
+</header>
+
+<!-- ── CONFIG ── -->
+<div class="config-panel">
+  <div class="config-group" style="flex:1; min-width:340px;">
+    <label>URL del Apps Script (deployment)</label>
+    <input type="text" id="scriptUrl"
+      placeholder="https://script.google.com/macros/s/XXXXXX/exec"
+      value="">
+  </div>
+  <div class="config-group narrow">
+    <label>Acción</label>
+    <select id="actionSelect">
+      <option value="getDashboardData">getDashboardData</option>
+      <option value="getSillasHistory">getSillasHistory</option>
+      <option value="getRelevoPassengers">getRelevoPassengers</option>
+    </select>
+  </div>
+  <div class="config-group narrow" id="extraParams" style="display:none;">
+    <label>Inspector / Airline·Flight</label>
+    <input type="text" id="extraValue" placeholder="e.g. ana.rico o AV·201">
+  </div>
+  <button class="btn btn-primary" onclick="fetchData()">▶ Ejecutar</button>
+  <button class="btn btn-ghost"   onclick="clearDebug()">⌫ Limpiar log</button>
+  <button class="btn btn-warn"    onclick="runDiagnostics()">🔬 Diagnóstico completo</button>
+</div>
+
+<main>
+
+  <!-- ── KPIs ── -->
+  <div class="kpi-strip" id="kpiStrip" style="display:none;">
+    <div class="kpi-card" style="--accent:var(--info)">
+      <div class="kpi-label">Total registros</div>
+      <div class="kpi-value" id="kpiTotal">–</div>
+      <div class="kpi-sub">recibidos del API</div>
+    </div>
+    <div class="kpi-card" style="--accent:var(--warn)">
+      <div class="kpi-label">En Proceso</div>
+      <div class="kpi-value" id="kpiEnProceso">–</div>
+      <div class="kpi-sub">servicios activos</div>
+    </div>
+    <div class="kpi-card" style="--accent:var(--ok)">
+      <div class="kpi-label">Completados</div>
+      <div class="kpi-value" id="kpiCompletado">–</div>
+      <div class="kpi-sub">ciclos cerrados</div>
+    </div>
+    <div class="kpi-card" style="--accent:var(--cyan)">
+      <div class="kpi-label">Vuelos distintos</div>
+      <div class="kpi-value" id="kpiVuelos">–</div>
+      <div class="kpi-sub">en los datos</div>
+    </div>
+    <div class="kpi-card" style="--accent:#c084fc">
+      <div class="kpi-label">Agentes</div>
+      <div class="kpi-value" id="kpiAgentes">–</div>
+      <div class="kpi-sub">usuarios únicos</div>
+    </div>
+  </div>
+
+  <!-- ── DEBUG CONSOLE ── -->
+  <div class="debug-console">
+    <div class="debug-header">
+      <span>◉ DEBUG CONSOLE</span>
+      <span style="color:var(--muted)">—</span>
+      <span style="color:var(--muted);font-weight:400;">Diagnóstico de conexión y datos</span>
+      <div class="count" id="logCount">0 líneas</div>
+    </div>
+    <div id="debugLog"></div>
+  </div>
+
+  <!-- ── FIELD PROBE (primer registro) ── -->
+  <div class="probe-grid" id="probeSection" style="display:none;">
+    <div class="probe-card">
+      <h3>🔎 Análisis campo a campo — 1er registro</h3>
+      <div id="probeFields"></div>
+    </div>
+    <div class="probe-card">
+      <h3>⚠️ Problemas detectados</h3>
+      <div id="probeIssues"></div>
+    </div>
+  </div>
+
+  <!-- ── RAW RESPONSE ── -->
+  <details class="raw-box" id="rawSection" style="display:none;">
+    <summary>📦 Respuesta RAW del servidor (primeros 4000 chars)</summary>
+    <pre id="rawResponse"></pre>
+  </details>
+
+  <!-- ── DATA TABLE ── -->
+  <div class="table-wrap" id="tableSection" style="display:none;">
+    <div class="table-toolbar">
+      <span>📋 DATOS</span>
+      <span style="color:var(--muted);font-weight:400;" id="tableCount">–</span>
+      <input class="filter-input" type="text" id="filterInput"
+        placeholder="Filtrar por vuelo, pasajero, PNR…"
+        oninput="filterTable()">
+    </div>
+    <div class="table-scroll">
+      <table id="dataTable">
+        <thead id="tableHead"></thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// ══════════════════════════════════════════════════════════
+//  DEBUG LOGGER
+// ══════════════════════════════════════════════════════════
+let logLines = 0;
+function log(level, msg) {
+  const now = new Date();
+  const ts  = now.toTimeString().slice(0,8);
+  const el  = document.getElementById('debugLog');
+  const div = document.createElement('div');
+  div.className = 'log-entry';
+  div.innerHTML = `<span class="log-ts">[${ts}]</span><span class="log-${level}">[${level}]</span><span> ${escHtml(msg)}</span>`;
+  el.appendChild(div);
+  el.scrollTop = el.scrollHeight;
+  logLines++;
+  document.getElementById('logCount').textContent = logLines + ' líneas';
+}
+function escHtml(s) {
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function clearDebug() {
+  document.getElementById('debugLog').innerHTML = '';
+  logLines = 0;
+  document.getElementById('logCount').textContent = '0 líneas';
+}
+
+// ══════════════════════════════════════════════════════════
+//  STATUS PILL
+// ══════════════════════════════════════════════════════════
+function setStatus(state, text) {
+  const pill = document.getElementById('statusPill');
+  pill.className = 'status-pill ' + state;
+  document.getElementById('statusText').textContent = text;
+}
+
+// ══════════════════════════════════════════════════════════
+//  ACCIÓN EXTRA PARAMS
+// ══════════════════════════════════════════════════════════
+document.getElementById('actionSelect').addEventListener('change', function() {
+  const extra = document.getElementById('extraParams');
+  if (this.value === 'getSillasHistory') {
+    extra.style.display = '';
+    document.querySelector('#extraParams label').textContent = 'Inspector (usuario)';
+    document.getElementById('extraValue').placeholder = 'ej: ana.rico';
+  } else if (this.value === 'getRelevoPassengers') {
+    extra.style.display = '';
+    document.querySelector('#extraParams label').textContent = 'Airline · Número vuelo';
+    document.getElementById('extraValue').placeholder = 'ej: AV·201';
+  } else {
+    extra.style.display = 'none';
+  }
+});
+
+// ══════════════════════════════════════════════════════════
+//  MAIN FETCH
+// ══════════════════════════════════════════════════════════
+let lastRawData = null;
+let allRecords  = [];
+
+function fetchData() {
+  const url    = document.getElementById('scriptUrl').value.trim();
+  const action = document.getElementById('actionSelect').value;
+
+  clearDebug();
+  log('INFO', '━━━ Iniciando fetch ━━━');
+  log('INFO', 'Acción: ' + action);
+
+  if (!url) {
+    log('ERROR', 'URL vacía — pega la URL de tu Apps Script deployment');
+    setStatus('error', 'Sin URL');
+    return;
+  }
+
+  // ── validar URL ──
+  if (!url.startsWith('https://script.google.com')) {
+    log('WARN', 'URL no parece ser de Apps Script: ' + url.slice(0,60));
+  } else {
+    log('OK', 'URL válida: ' + url.slice(0,60) + '…');
+  }
+
+  // ── construir query string ──
+  const cbName = 'wchCb_' + Date.now();
+  let qs = '?action=' + encodeURIComponent(action) + '&callback=' + cbName;
+
+  const extra = document.getElementById('extraValue').value.trim();
+  if (action === 'getSillasHistory' && extra) {
+    qs += '&inspector=' + encodeURIComponent(extra);
+    log('INFO', 'Filtro inspector: ' + extra);
+  }
+  if (action === 'getRelevoPassengers' && extra) {
+    const parts = extra.split(/[·\s]+/);
+    qs += '&airline=' + encodeURIComponent(parts[0] || 'AV');
+    qs += '&flight='  + encodeURIComponent(parts[1] || '');
+    log('INFO', 'Filtro airline=' + (parts[0]||'AV') + ' flight=' + (parts[1]||''));
+  }
+
+  const fullUrl = url + qs;
+  log('INFO', 'URL completa: ' + fullUrl.slice(0,120) + (fullUrl.length>120?'…':''));
+  setStatus('loading', 'Cargando…');
+
+  // ── JSONP ──
+  log('INFO', 'Método: JSONP (callback=' + cbName + ')');
+  const timeout = setTimeout(() => {
+    log('ERROR', 'TIMEOUT — No hubo respuesta en 15s');
+    log('WARN',  'Causas posibles: (1) URL incorrecta, (2) script no publicado como "Anyone", (3) CORS bloqueado');
+    setStatus('error', 'Timeout 15s');
+    cleanup();
+  }, 15000);
+
+  window[cbName] = function(data) {
+    clearTimeout(timeout);
+    cleanup();
+    handleResponse(data, action);
+  };
+
+  function cleanup() {
+    delete window[cbName];
+    const el = document.getElementById('jsonp_script');
+    if (el) el.remove();
+  }
+
+  const script = document.createElement('script');
+  script.id  = 'jsonp_script';
+  script.src = fullUrl;
+  script.onerror = function() {
+    clearTimeout(timeout);
+    cleanup();
+    log('ERROR', 'Error al cargar el script JSONP');
+    log('WARN',  '→ Verifica que la URL sea correcta y el script esté publicado');
+    setStatus('error', 'Error de red');
+  };
+  document.head.appendChild(script);
+  log('INFO', 'Script JSONP inyectado, esperando respuesta…');
+}
+
+// ══════════════════════════════════════════════════════════
+//  HANDLE RESPONSE
+// ══════════════════════════════════════════════════════════
+function handleResponse(data, action) {
+  log('OK', '✓ Respuesta recibida del servidor');
+
+  // ── raw ──
+  lastRawData = data;
+  const rawStr = JSON.stringify(data, null, 2);
+  document.getElementById('rawResponse').textContent = rawStr.slice(0, 4000) + (rawStr.length > 4000 ? '\n…[truncado]' : '');
+  document.getElementById('rawSection').style.display = '';
+  log('DATA', 'Raw JSON (primeros 500 chars): ' + rawStr.slice(0, 500));
+
+  // ── success flag ──
+  log('INFO', '─── Analizando estructura ───');
+  log(data.success ? 'OK' : 'ERROR', 'data.success = ' + data.success);
+
+  if (data.message) {
+    log(data.success ? 'INFO' : 'ERROR', 'data.message = "' + data.message + '"');
+  }
+
+  if (!data.success) {
+    log('ERROR', 'El servidor retornó success:false — revisa el mensaje anterior');
+    setStatus('error', 'Error del servidor');
+    return;
+  }
+
+  // ── detectar qué clave tiene los datos ──
+  let records = null;
+  let keyUsed = '';
+
+  if (Array.isArray(data.records)) {
+    records = data.records; keyUsed = 'records';
+    log('OK', 'Datos en data.records — ' + records.length + ' registros');
+  } else if (Array.isArray(data.reports)) {
+    records = data.reports; keyUsed = 'reports';
+    log('OK', 'Datos en data.reports — ' + records.length + ' registros');
+  } else if (Array.isArray(data.passengers)) {
+    records = data.passengers; keyUsed = 'passengers';
+    log('OK', 'Datos en data.passengers — ' + records.length + ' registros');
+  } else {
+    log('ERROR', 'NO SE ENCONTRÓ ARRAY DE DATOS — claves presentes: ' + Object.keys(data).join(', '));
+    log('WARN',  'getDashboardData → data.records | getSillasHistory → data.reports | getRelevoPassengers → data.passengers');
+    setStatus('error', 'Sin datos');
+    return;
+  }
+
+  if (records.length === 0) {
+    log('WARN', 'El array "' + keyUsed + '" está vacío (length=0)');
+    log('WARN', '→ Si getDashboardData: solo devuelve aerolinea==="AV". ¿Hay registros con AV en la hoja?');
+    log('WARN', '→ Si getSillasHistory: el filtro inspector puede no coincidir');
+    document.getElementById('tableSection').style.display = '';
+    document.getElementById('tableBody').innerHTML = '<tr><td colspan="20" class="no-data">⚠ Sin datos — revisa el debug arriba</td></tr>';
+    setStatus('ok', 'Sin datos');
+    return;
+  }
+
+  allRecords = records;
+  probeFirstRecord(records[0], action);
+  renderKPIs(records, action);
+  renderTable(records, action);
+  setStatus('ok', records.length + ' registros');
+  log('OK', '═══ Render completo: ' + records.length + ' filas ═══');
+}
+
+// ══════════════════════════════════════════════════════════
+//  PROBE — analiza primer registro campo a campo
+// ══════════════════════════════════════════════════════════
+function probeFirstRecord(rec, action) {
+  log('INFO', '─── Field probe — 1er registro ───');
+  const issues = [];
+  const probeEl  = document.getElementById('probeFields');
+  const issuesEl = document.getElementById('probeIssues');
+  probeEl.innerHTML = '';
+  issuesEl.innerHTML = '';
+
+  const keys = Object.keys(rec);
+  log('DATA', 'Campos presentes (' + keys.length + '): ' + keys.join(', '));
+
+  // campos críticos esperados
+  const criticalDash = ['numeroReporte','fecha','hora','usuario','tramo','pasajero','pnr','wchType','vuelo','estado'];
+  const criticalHist = ['numeroReporte','fechaCreacion','horaCreacion','usuario','tramo','pasajero','pnrNumber','wchType','vuelo','estado'];
+  const criticalPax  = ['id','nombre','pnrNumber','wchType'];
+
+  const expected = action === 'getDashboardData' ? criticalDash
+                 : action === 'getSillasHistory' ? criticalHist
+                 : criticalPax;
+
+  expected.forEach(k => {
+    const present = k in rec;
+    const val     = rec[k];
+    const isEmpty = val === '' || val === null || val === undefined;
+    const cls     = !present ? 'bad' : isEmpty ? 'warn' : 'ok';
+    const indicator = !present ? '✗ ausente' : isEmpty ? '⚠ vacío' : '✓';
+    log(cls === 'bad' ? 'ERROR' : cls === 'warn' ? 'WARN' : 'OK',
+        'Campo "' + k + '": ' + indicator + (present ? ' → "' + String(val).slice(0,60) + '"' : ''));
+    if (!present) issues.push({ sev: 'error', msg: 'Campo "' + k + '" AUSENTE en la respuesta' });
+    if (present && isEmpty) issues.push({ sev: 'warn', msg: 'Campo "' + k + '" está VACÍO' });
+    addProbeRow(probeEl, k, present ? String(val) : '—', cls);
+  });
+
+  // fecha probe
+  const fechaKey = action === 'getDashboardData' ? 'fecha' : 'fechaCreacion';
+  const horaKey  = action === 'getDashboardData' ? 'hora'  : 'horaCreacion';
+  if (rec[fechaKey]) {
+    const f = rec[fechaKey];
+    const isExcelSerial = /^\d{5}(\.\d+)?$/.test(String(f));
+    const isSpanishDate = /^\d{2}\/\d{2}\/\d{4}$/.test(String(f));
+    if (isExcelSerial) {
+      issues.push({ sev: 'error', msg: '"' + fechaKey + '" contiene serial Excel (' + f + ') — el Apps Script devuelve fecha sin convertir' });
+      log('ERROR', '"' + fechaKey + '" = ' + f + ' → SERIAL EXCEL sin formatear — el Apps Script no está convirtiendo fechas');
+    } else if (isSpanishDate) {
+      log('OK', '"' + fechaKey + '" = ' + f + ' → formato dd/MM/yyyy correcto');
+    } else {
+      log('WARN', '"' + fechaKey + '" = ' + f + ' → formato inusual, verifica parseDate()');
+    }
+  }
+
+  // estado probe
+  if (rec.estado) {
+    const validStates = ['En Proceso', 'Completado'];
+    if (!validStates.includes(rec.estado)) {
+      issues.push({ sev: 'warn', msg: 'Estado "' + rec.estado + '" desconocido (se esperaba: ' + validStates.join('/') + ')' });
+    }
+  }
+
+  // v4.0 nuevos campos
+  const newFields = ['origenVuelo','destinoVuelo','destinoTipo','conexionVuelo'];
+  const missingNew = newFields.filter(f => !(f in rec));
+  if (missingNew.length > 0) {
+    issues.push({ sev: 'warn', msg: 'Campos v4.0 ausentes: ' + missingNew.join(', ') + ' — ¿Apps Script < v4.0?' });
+    log('WARN', 'Campos v4.0 faltantes: ' + missingNew.join(', '));
+  } else {
+    log('OK', 'Todos los campos v4.0 presentes');
+  }
+
+  if (issues.length === 0) {
+    issuesEl.innerHTML = '<div style="color:var(--ok);font-family:var(--mono);font-size:11px;">✓ Sin problemas detectados</div>';
+  } else {
+    issues.forEach(i => {
+      const d = document.createElement('div');
+      d.style.cssText = 'margin-bottom:6px;font-family:var(--mono);font-size:11px;display:flex;gap:6px;';
+      d.innerHTML = `<span style="color:${i.sev==='error'?'var(--red)':'var(--warn)'};">${i.sev==='error'?'✗':'⚠'}</span><span>${escHtml(i.msg)}</span>`;
+      issuesEl.appendChild(d);
+    });
+  }
+
+  document.getElementById('probeSection').style.display = '';
+}
+
+function addProbeRow(el, key, val, cls) {
+  const d = document.createElement('div');
+  d.className = 'probe-row';
+  d.innerHTML = `<span class="probe-key">${escHtml(key)}</span><span class="probe-val ${cls}">${escHtml(String(val).slice(0,80))}</span>`;
+  el.appendChild(d);
+}
+
+// ══════════════════════════════════════════════════════════
+//  KPIs
+// ══════════════════════════════════════════════════════════
+function renderKPIs(records, action) {
+  document.getElementById('kpiStrip').style.display = '';
+  document.getElementById('kpiTotal').textContent = records.length;
+
+  const enProceso  = records.filter(r => r.estado === 'En Proceso').length;
+  const completado = records.filter(r => r.estado === 'Completado').length;
+  document.getElementById('kpiEnProceso').textContent  = enProceso;
+  document.getElementById('kpiCompletado').textContent = completado;
+
+  const vueloKey = action === 'getDashboardData' ? 'vuelo' : 'vuelo';
+  const vuelos   = new Set(records.map(r => r.vuelo || r.flight || '').filter(Boolean));
+  document.getElementById('kpiVuelos').textContent = vuelos.size;
+
+  const agentes = new Set(records.map(r => r.usuario || '').filter(Boolean));
+  document.getElementById('kpiAgentes').textContent = agentes.size;
+
+  log('DATA', 'KPIs → Total:' + records.length + ' EnProceso:' + enProceso + ' Completado:' + completado + ' Vuelos:' + vuelos.size + ' Agentes:' + agentes.size);
+}
+
+// ══════════════════════════════════════════════════════════
+//  TABLE
+// ══════════════════════════════════════════════════════════
+const COL_DEFS_DASH = [
+  { key:'fecha',         label:'Fecha' },
+  { key:'hora',          label:'Hora' },
+  { key:'vuelo',         label:'Vuelo' },
+  { key:'usuario',       label:'Agente' },
+  { key:'tramo',         label:'Tramo' },
+  { key:'pasajero',      label:'Pasajero' },
+  { key:'pnr',           label:'PNR' },
+  { key:'numeroSilla',   label:'Silla' },
+  { key:'wchType',       label:'WCH' },
+  { key:'estado',        label:'Estado' },
+  { key:'origenVuelo',   label:'Origen' },
+  { key:'destinoVuelo',  label:'Destino' },
+  { key:'destinoTipo',   label:'Tipo' },
+  { key:'conexionVuelo', label:'Conexión' },
+  { key:'numeroReporte', label:'Reporte #' },
+];
+
+const COL_DEFS_HIST = [
+  { key:'fechaCreacion',       label:'Fecha' },
+  { key:'horaCreacion',        label:'Hora' },
+  { key:'vuelo',               label:'Vuelo' },
+  { key:'usuario',             label:'Agente' },
+  { key:'tramo',               label:'Tramo' },
+  { key:'pasajero',            label:'Pasajero' },
+  { key:'pnrNumber',           label:'PNR' },
+  { key:'numeroSilla',         label:'Silla' },
+  { key:'wchType',             label:'WCH' },
+  { key:'estado',              label:'Estado' },
+  { key:'minServicio',         label:'Min.Serv' },
+  { key:'descripcionIncidente',label:'Incidente' },
+  { key:'origenVuelo',         label:'Origen' },
+  { key:'destinoVuelo',        label:'Destino' },
+  { key:'numeroReporte',       label:'Reporte #' },
+];
+
+const COL_DEFS_PAX = [
+  { key:'nombre',      label:'Pasajero' },
+  { key:'pnrNumber',   label:'PNR' },
+  { key:'numeroSilla', label:'Silla' },
+  { key:'wchType',     label:'WCH' },
+  { key:'hasDocs',     label:'Docs' },
+  { key:'hasPacemaker',label:'Marcapaso' },
+  { key:'canWalk',     label:'Camina' },
+  { key:'usuario',     label:'Agente' },
+  { key:'origenVuelo', label:'Origen' },
+  { key:'destinoVuelo',label:'Destino' },
+  { key:'id',          label:'ID' },
+];
+
+function renderTable(records, action) {
+  const cols = action === 'getDashboardData' ? COL_DEFS_DASH
+             : action === 'getSillasHistory' ? COL_DEFS_HIST
+             : COL_DEFS_PAX;
+
+  // thead
+  const thead = document.getElementById('tableHead');
+  thead.innerHTML = '';
+  const tr = document.createElement('tr');
+  cols.forEach(c => {
+    const th = document.createElement('th');
+    th.textContent = c.label;
+    tr.appendChild(th);
+  });
+  thead.appendChild(tr);
+
+  renderRows(records, cols);
+  document.getElementById('tableSection').style.display = '';
+  document.getElementById('tableCount').textContent = records.length + ' filas';
+  document.getElementById('filterInput').dataset.cols = JSON.stringify(cols.map(c => c.key));
+}
+
+function renderRows(records, cols) {
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = '';
+
+  if (records.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="' + cols.length + '" class="no-data">Sin resultados</td></tr>';
+    return;
+  }
+
+  records.forEach(rec => {
+    const tr = document.createElement('tr');
+    cols.forEach(c => {
+      const td = document.createElement('td');
+      const val = rec[c.key];
+      td.innerHTML = formatCell(c.key, val);
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+}
+
+function formatCell(key, val) {
+  if (val === undefined || val === null || val === '') {
+    return '<span class="text-muted">—</span>';
+  }
+  const s = String(val);
+
+  if (key === 'estado') {
+    const cls = s === 'Completado' ? 'badge-completado' : 'badge-en-proceso';
+    return `<span class="badge ${cls}">${escHtml(s)}</span>`;
+  }
+  if (key === 'wchType') {
+    const cls = s === 'WCHR' ? 'badge-wchr' : s === 'WCHS' ? 'badge-wchs' : s === 'WCHC' ? 'badge-wchc' : '';
+    return `<span class="badge ${cls}">${escHtml(s)}</span>`;
+  }
+  if (key === 'tramo') {
+    const cls = s.includes('counter') ? 'tramo-counter'
+              : s.includes('inspeccion') ? 'tramo-inspeccion'
+              : s.includes('aeronave') ? 'tramo-aeronave' : '';
+    const label = s === 'counter-inspeccion' ? 'Counter→Insp'
+                : s === 'inspeccion-sala'    ? 'Insp→Sala'
+                : s === 'aeronave-salida'    ? 'Aeronave→Salida'
+                : s;
+    return `<span class="tramo-chip ${cls}">${escHtml(label)}</span>`;
+  }
+  if (key === 'hora' || key === 'horaCreacion') {
+    // detectar si es fracción decimal (Excel) o string HH:mm:ss
+    if (/^0\.\d+$/.test(s)) {
+      const mins = Math.round(parseFloat(s) * 1440);
+      const h = Math.floor(mins / 60).toString().padStart(2,'0');
+      const m = (mins % 60).toString().padStart(2,'0');
+      return `<span class="text-muted" title="⚠ Fracción Excel sin formatear">${h}:${m} ⚠</span>`;
+    }
+    return `<span class="text-muted">${escHtml(s)}</span>`;
+  }
+  if (key === 'fecha' || key === 'fechaCreacion') {
+    if (/^\d{5}(\.\d+)?$/.test(s)) {
+      return `<span style="color:var(--red);" title="⚠ Serial Excel">${escHtml(s)} ⚠</span>`;
+    }
+    return `<span class="text-muted">${escHtml(s)}</span>`;
+  }
+  if (key === 'descripcionIncidente' && s.length > 40) {
+    return `<span title="${escHtml(s)}">${escHtml(s.slice(0,40))}…</span>`;
+  }
+  return escHtml(s);
+}
+
+function filterTable() {
+  const q   = document.getElementById('filterInput').value.toLowerCase();
+  const cols = JSON.parse(document.getElementById('filterInput').dataset.cols || '[]');
+  const action = document.getElementById('actionSelect').value;
+  const colDefs = action === 'getDashboardData' ? COL_DEFS_DASH
+                : action === 'getSillasHistory' ? COL_DEFS_HIST
+                : COL_DEFS_PAX;
+
+  const filtered = q
+    ? allRecords.filter(r =>
+        cols.some(k => String(r[k] || '').toLowerCase().includes(q))
+      )
+    : allRecords;
+
+  renderRows(filtered, colDefs);
+  document.getElementById('tableCount').textContent = filtered.length + ' / ' + allRecords.length + ' filas';
+}
+
+// ══════════════════════════════════════════════════════════
+//  DIAGNÓSTICO COMPLETO — prueba múltiples acciones
+// ══════════════════════════════════════════════════════════
+function runDiagnostics() {
+  const url = document.getElementById('scriptUrl').value.trim();
+  clearDebug();
+  if (!url) { log('ERROR', 'URL vacía'); return; }
+
+  log('INFO', '═══ DIAGNÓSTICO COMPLETO ═══');
+  log('INFO', 'URL: ' + url.slice(0,80));
+
+  // 1. Ping con getDashboardData
+  log('INFO', '1/3 Probando getDashboardData…');
+  jsonpCall(url, { action: 'getDashboardData' }, function(data) {
+    if (!data) { log('ERROR', 'getDashboardData → SIN RESPUESTA'); return; }
+    const n = (data.records || []).length;
+    log(n > 0 ? 'OK' : 'WARN', 'getDashboardData → success:' + data.success + ' records:' + n);
+    if (data.message) log('INFO', '  mensaje: ' + data.message);
+
+    // 2. getSillasHistory
+    log('INFO', '2/3 Probando getSillasHistory (sin filtro)…');
+    jsonpCall(url, { action: 'getSillasHistory' }, function(data2) {
+      if (!data2) { log('ERROR', 'getSillasHistory → SIN RESPUESTA'); return; }
+      const n2 = (data2.reports || []).length;
+      log(n2 > 0 ? 'OK' : 'WARN', 'getSillasHistory → success:' + data2.success + ' reports:' + n2);
+
+      // 3. Comparar totales
+      log('INFO', '3/3 Comparando totales…');
+      if (n !== n2) {
+        log('WARN', 'getDashboardData (' + n + ') ≠ getSillasHistory (' + n2 + ') — getDashboardData filtra solo aerolinea=AV');
+      } else {
+        log('OK', 'Totales coinciden: ' + n);
+      }
+
+      // Analizar campos fecha en ambos
+      if (data.records && data.records[0]) {
+        const r = data.records[0];
+        log('INFO', '─── Diagnóstico de fechas (getDashboardData) ───');
+        checkDateField('fecha', r.fecha);
+        checkDateField('hora',  r.hora);
+      }
+      if (data2.reports && data2.reports[0]) {
+        const r = data2.reports[0];
+        log('INFO', '─── Diagnóstico de fechas (getSillasHistory) ───');
+        checkDateField('fechaCreacion', r.fechaCreacion);
+        checkDateField('horaCreacion',  r.horaCreacion);
+      }
+
+      log('OK', '═══ Diagnóstico completado ═══');
+    });
+  });
+}
+
+function checkDateField(name, val) {
+  if (!val && val !== 0) { log('WARN', name + ' = vacío/undefined'); return; }
+  const s = String(val);
+  if (/^\d{5}(\.\d+)?$/.test(s)) {
+    log('ERROR', name + ' = "' + s + '" → SERIAL EXCEL. El Apps Script NO está convirtiendo la fecha. Revisa cellDate() en tu script.');
+  } else if (/^\d{2}\/\d{2}\/\d{4}$/.test(s)) {
+    log('OK', name + ' = "' + s + '" → formato dd/MM/yyyy ✓');
+  } else if (/^0\.\d+$/.test(s)) {
+    log('ERROR', name + ' = "' + s + '" → FRACCIÓN de hora Excel. El Apps Script no formatea cellTime(). Revisa que cellTime() no esté recibiendo un número.');
+  } else if (/^\d{2}:\d{2}(:\d{2})?$/.test(s)) {
+    log('OK', name + ' = "' + s + '" → formato HH:mm:ss ✓');
+  } else {
+    log('WARN', name + ' = "' + s + '" → formato inusual, verifica manualmente');
+  }
+}
+
+function jsonpCall(baseUrl, params, cb) {
+  const cbName = 'diag_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+  const qs = Object.entries(params).map(([k,v]) => k + '=' + encodeURIComponent(v)).join('&');
+  const timeout = setTimeout(() => {
+    delete window[cbName];
+    const s = document.getElementById('diag_' + cbName);
+    if (s) s.remove();
+    cb(null);
+  }, 12000);
+  window[cbName] = function(data) {
+    clearTimeout(timeout);
+    delete window[cbName];
+    const s = document.getElementById('diag_s_' + cbName);
+    if (s) s.remove();
+    cb(data);
+  };
+  const script = document.createElement('script');
+  script.id  = 'diag_s_' + cbName;
+  script.src = baseUrl + '?' + qs + '&callback=' + cbName;
+  script.onerror = function() {
+    clearTimeout(timeout);
+    delete window[cbName];
+    script.remove();
+    cb(null);
+  };
+  document.head.appendChild(script);
+}
+
+// ── init ──
+log('INFO', 'Dashboard WCH Debug v4.0 listo');
+log('INFO', 'Pega la URL de tu Apps Script y haz clic en ▶ Ejecutar');
+log('INFO', 'O usa 🔬 Diagnóstico completo para probar todas las acciones');
+</script>
+</body>
+</html>
