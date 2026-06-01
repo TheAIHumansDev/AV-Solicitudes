@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WCH · Dashboard Debug v2</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red:#e8001d; --dark:#0a0a0f; --surface:#111118; --card:#181820;
+    --border:#2a2a38; --text:#e8e8f0; --muted:#6b6b82;
+    --ok:#22c55e; --warn:#f59e0b; --info:#3b82f6; --cyan:#06b6d4;
+    --mono:'JetBrains Mono',monospace; --sans:'Sora',sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--dark);color:var(--text);font-family:var(--sans);min-height:100vh;}
+
+  header{
+    background:var(--surface);border-bottom:2px solid var(--red);
+    padding:14px 28px;display:flex;align-items:center;gap:14px;
+    position:sticky;top:0;z-index:100;
+  }
+  .logo{width:34px;height:34px;background:var(--red);display:grid;place-items:center;
+    font-family:var(--mono);font-weight:700;font-size:11px;flex-shrink:0;}
+  header h1{font-size:14px;font-weight:600;}
+  header p{font-size:10px;color:var(--muted);font-family:var(--mono);}
+  .hright{margin-left:auto;display:flex;align-items:center;gap:10px;}
+  .pill{font-family:var(--mono);font-size:10px;padding:3px 9px;border-radius:2px;
+    border:1px solid;display:flex;align-items:center;gap:5px;}
+  .pill.loading{border-color:var(--warn);color:var(--warn);}
+  .pill.ok{border-color:var(--ok);color:var(--ok);}
+  .pill.error{border-color:var(--red);color:var(--red);}
+  .dot{width:6px;height:6px;border-radius:50%;background:currentColor;
+    animation:blink 1.4s ease-in-out infinite;}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+  .cfg{background:var(--surface);border-bottom:1px solid var(--border);
+    padding:14px 28px;display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;}
+  .cg{display:flex;flex-direction:column;gap:3px;}
+  .cg label{font-size:9px;font-family:var(--mono);color:var(--muted);
+    text-transform:uppercase;letter-spacing:1px;}
+  .cg input,.cg select{
+    background:var(--card);border:1px solid var(--border);color:var(--text);
+    font-family:var(--mono);font-size:12px;padding:6px 11px;border-radius:3px;outline:none;}
+  .cg input{min-width:360px;}
+  .cg input:focus,.cg select:focus{border-color:var(--cyan);}
+  .btn{padding:7px 16px;border:none;border-radius:3px;
+    font-family:var(--mono);font-size:11px;font-weight:600;cursor:pointer;letter-spacing:.5px;}
+  .btn:hover{opacity:.85;}
+  .bp{background:var(--red);color:#fff;}
+  .bg{background:transparent;color:var(--cyan);border:1px solid var(--cyan);}
+  .bw{background:transparent;color:var(--warn);border:1px solid var(--warn);}
+
+  main{padding:20px 28px;display:flex;flex-direction:column;gap:18px;}
+
+  /* KPIs */
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;}
+  .kc{background:var(--card);border:1px solid var(--border);border-radius:5px;
+    padding:14px 16px;position:relative;overflow:hidden;}
+  .kc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--ac,var(--border));}
+  .kl{font-size:9px;font-family:var(--mono);color:var(--muted);text-transform:uppercase;
+    letter-spacing:1px;margin-bottom:6px;}
+  .kv{font-size:26px;font-weight:700;font-family:var(--mono);line-height:1;}
+  .ks{font-size:10px;color:var(--muted);margin-top:3px;}
+
+  /* Debug console */
+  .dbg{background:#0d0d15;border:1px solid var(--border);border-radius:5px;overflow:hidden;}
+  .dbg-head{background:var(--surface);border-bottom:1px solid var(--border);
+    padding:8px 14px;display:flex;align-items:center;gap:8px;
+    font-family:var(--mono);font-size:10px;}
+  .dbg-head .t{color:var(--cyan);font-weight:600;}
+  .dbg-head .cnt{margin-left:auto;background:var(--border);
+    padding:1px 7px;border-radius:2px;color:var(--muted);}
+  #dbgLog{height:220px;overflow-y:auto;padding:10px 14px;
+    font-family:var(--mono);font-size:10.5px;line-height:1.75;}
+  .le{display:flex;gap:8px;}
+  .lts{color:var(--muted);flex-shrink:0;min-width:76px;}
+  .INFO{color:var(--info);}.OK{color:var(--ok);}.WARN{color:var(--warn);}
+  .ERROR{color:var(--red);}.DATA{color:var(--cyan);}
+
+  /* Schema viewer */
+  .schema-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .sc{background:var(--card);border:1px solid var(--border);border-radius:5px;padding:14px;}
+  .sc h3{font-family:var(--mono);font-size:10px;color:var(--cyan);
+    margin-bottom:10px;text-transform:uppercase;letter-spacing:1px;}
+  .sf{display:flex;gap:8px;margin-bottom:5px;font-family:var(--mono);font-size:10px;align-items:flex-start;}
+  .sk{color:var(--muted);min-width:130px;flex-shrink:0;}
+  .sv{word-break:break-all;}
+  .sv.ok{color:var(--ok);}.sv.warn{color:var(--warn);}.sv.bad{color:var(--red);}
+  .sv.neu{color:var(--text);}
+
+  /* Raw / JSON tree */
+  .raw{background:#0d0d15;border:1px solid var(--border);border-radius:5px;overflow:hidden;}
+  .raw summary{background:var(--surface);border-bottom:1px solid var(--border);
+    padding:8px 14px;font-family:var(--mono);font-size:10px;color:var(--cyan);cursor:pointer;}
+  .raw summary:hover{background:var(--card);}
+  #rawTxt{max-height:340px;overflow:auto;padding:10px 14px;
+    font-family:var(--mono);font-size:10px;white-space:pre-wrap;
+    word-break:break-all;color:var(--muted);line-height:1.6;}
+
+  /* Table */
+  .tw{background:var(--card);border:1px solid var(--border);border-radius:5px;overflow:hidden;}
+  .tb-bar{background:var(--surface);border-bottom:1px solid var(--border);
+    padding:8px 14px;display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:10px;}
+  .tb-bar .t{color:var(--cyan);font-weight:600;}
+  .fi{margin-left:auto;background:var(--card);border:1px solid var(--border);
+    color:var(--text);font-family:var(--mono);font-size:10px;
+    padding:4px 9px;border-radius:3px;outline:none;width:200px;}
+  .fi:focus{border-color:var(--cyan);}
+  .ts{overflow-x:auto;max-height:500px;overflow-y:auto;}
+  table{width:100%;border-collapse:collapse;font-size:11px;}
+  thead th{background:#0d0d15;padding:8px 10px;text-align:left;
+    font-family:var(--mono);font-size:9px;color:var(--muted);
+    text-transform:uppercase;letter-spacing:1px;position:sticky;top:0;
+    border-bottom:1px solid var(--border);white-space:nowrap;}
+  tbody tr{border-bottom:1px solid #1c1c28;transition:background .1s;}
+  tbody tr:hover{background:#1a1a24;}
+  td{padding:7px 10px;vertical-align:middle;white-space:nowrap;}
+  .b{display:inline-block;padding:2px 7px;border-radius:2px;
+    font-family:var(--mono);font-size:9px;font-weight:600;
+    text-transform:uppercase;letter-spacing:.5px;}
+  .b-llegando{background:#0a2d15;color:var(--ok);border:1px solid #164d26;}
+  .b-saliendo{background:#2d1200;color:#fb923c;border:1px solid #7c2d12;}
+  .b-cnx{background:#0c1a2d;color:var(--info);border:1px solid #1e3a5f;}
+  .b-wchr{background:#1e1e40;color:#818cf8;border:1px solid #312e81;}
+  .b-wchs{background:#1a2e40;color:#38bdf8;border:1px solid #0c4a6e;}
+  .b-wchc{background:#2d1a2e;color:#e879f9;border:1px solid #4a006e;}
+  .tm{color:var(--muted);font-family:var(--mono);font-size:10px;}
+  .nd{text-align:center;padding:40px;color:var(--muted);font-family:var(--mono);font-size:12px;}
+  ::-webkit-scrollbar{width:5px;height:5px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">WCH</div>
+  <div><h1>Wheelchair Services · Debug Dashboard</h1>
+    <p>Avianca SAL — estructura auto-detectada</p></div>
+  <div class="hright">
+    <div class="pill loading" id="pill"><div class="dot"></div><span id="pillTxt">Listo</span></div>
+  </div>
+</header>
+
+<div class="cfg">
+  <div class="cg" style="flex:1;min-width:320px;">
+    <label>URL Apps Script deployment</label>
+    <input id="url" placeholder="https://script.google.com/macros/s/…/exec">
+  </div>
+  <div class="cg">
+    <label>Acción</label>
+    <select id="act">
+      <option value="getDashboardData">getDashboardData</option>
+      <option value="getSillasHistory">getSillasHistory</option>
+      <option value="getRelevoPassengers">getRelevoPassengers</option>
+      <option value="custom">Personalizada…</option>
+    </select>
+  </div>
+  <div class="cg" id="customCg" style="display:none;">
+    <label>Acción personalizada</label>
+    <input id="customAct" placeholder="ej: myCustomAction" style="min-width:180px;">
+  </div>
+  <div class="cg" id="extraCg" style="display:none;">
+    <label id="extraLbl">Parámetro extra</label>
+    <input id="extraVal" placeholder="" style="min-width:160px;">
+  </div>
+  <button class="btn bp" onclick="fetchData()">▶ Ejecutar</button>
+  <button class="btn bg" onclick="clearLog()">⌫ Log</button>
+  <button class="btn bw" onclick="autoDiscover()">🔬 Auto-descubrir</button>
+</div>
+
+<main>
+  <div class="kpis" id="kpis" style="display:none;">
+    <div class="kc" style="--ac:var(--info)"><div class="kl">Solicitudes</div>
+      <div class="kv" id="kSol">–</div><div class="ks">total API</div></div>
+    <div class="kc" style="--ac:#f59e0b"><div class="kl">Sillas</div>
+      <div class="kv" id="kSill">–</div><div class="ks">asignadas</div></div>
+    <div class="kc" style="--ac:var(--ok)"><div class="kl">Pasajeros</div>
+      <div class="kv" id="kPax">–</div><div class="ks">registrados</div></div>
+    <div class="kc" style="--ac:var(--cyan)"><div class="kl">Vuelos</div>
+      <div class="kv" id="kVuelos">–</div><div class="ks">únicos</div></div>
+    <div class="kc" style="--ac:#c084fc"><div class="kl">Registros detalle</div>
+      <div class="kv" id="kDet">–</div><div class="ks">filas aplanadas</div></div>
+  </div>
+
+  <div class="dbg">
+    <div class="dbg-head">
+      <span class="t">◉ DEBUG CONSOLE</span>
+      <div class="cnt" id="lcnt">0 líneas</div>
+    </div>
+    <div id="dbgLog"></div>
+  </div>
+
+  <div class="schema-grid" id="schemaSection" style="display:none;">
+    <div class="sc">
+      <h3>🗂 Schema detectado — campos presentes</h3>
+      <div id="schemaFields"></div>
+    </div>
+    <div class="sc">
+      <h3>⚠️ Advertencias y fix sugeridos</h3>
+      <div id="schemaIssues"></div>
+    </div>
+  </div>
+
+  <details class="raw" id="rawSec" style="display:none;" open>
+    <summary>📦 Respuesta RAW completa (scroll para ver todo)</summary>
+    <pre id="rawTxt"></pre>
+  </details>
+
+  <div class="tw" id="tblSec" style="display:none;">
+    <div class="tb-bar">
+      <span class="t">📋 DATOS APLANADOS</span>
+      <span style="color:var(--muted);" id="tblCnt">–</span>
+      <input class="fi" id="fi" placeholder="Filtrar…" oninput="filterTbl()">
+    </div>
+    <div class="ts"><table><thead id="th"></thead><tbody id="tb"></tbody></table></div>
+  </div>
+</main>
+
+<script>
+// ─── Logger ───────────────────────────────────────────────
+let lc=0;
+function log(level,msg){
+  const ts=new Date().toTimeString().slice(0,8);
+  const el=document.getElementById('dbgLog');
+  const d=document.createElement('div');
+  d.className='le';
+  d.innerHTML=`<span class="lts">[${ts}]</span><span class="${level}">[${level}]</span><span> ${esc(msg)}</span>`;
+  el.appendChild(d);el.scrollTop=el.scrollHeight;
+  lc++;document.getElementById('lcnt').textContent=lc+' líneas';
+}
+function clearLog(){document.getElementById('dbgLog').innerHTML='';lc=0;document.getElementById('lcnt').textContent='0 líneas';}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function setP(state,txt){
+  const p=document.getElementById('pill');
+  p.className='pill '+state;
+  document.getElementById('pillTxt').textContent=txt;
+}
+
+// ─── Action select ────────────────────────────────────────
+document.getElementById('act').addEventListener('change',function(){
+  const v=this.value,ec=document.getElementById('extraCg'),cc=document.getElementById('customCg');
+  cc.style.display=v==='custom'?'':'none';
+  if(v==='getSillasHistory'){
+    ec.style.display='';document.getElementById('extraLbl').textContent='Inspector (usuario)';
+    document.getElementById('extraVal').placeholder='ej: ana.rico';
+  } else if(v==='getRelevoPassengers'){
+    ec.style.display='';document.getElementById('extraLbl').textContent='Airline + Vuelo';
+    document.getElementById('extraVal').placeholder='ej: AV 201';
+  } else { ec.style.display='none'; }
+});
+
+// ─── Global state ─────────────────────────────────────────
+let allFlat=[], lastCols=[];
+
+// ─── Main fetch ───────────────────────────────────────────
+function fetchData(){
+  const baseUrl=document.getElementById('url').value.trim();
+  const actSel =document.getElementById('act').value;
+  const action =actSel==='custom'
+    ? document.getElementById('customAct').value.trim()
+    : actSel;
+
+  clearLog();
+  log('INFO','━━━ Iniciando fetch ━━━');
+  log('INFO','Acción: '+action);
+
+  if(!baseUrl){ log('ERROR','URL vacía'); setP('error','Sin URL'); return; }
+  if(!baseUrl.startsWith('https://')){ log('WARN','URL no empieza con https://'); }
+
+  const cb='wchCb_'+Date.now();
+  let qs='?action='+encodeURIComponent(action)+'&callback='+cb;
+
+  const extra=document.getElementById('extraVal').value.trim();
+  if(actSel==='getSillasHistory'&&extra) qs+='&inspector='+encodeURIComponent(extra);
+  if(actSel==='getRelevoPassengers'&&extra){
+    const p=extra.split(/\s+/);
+    qs+='&airline='+encodeURIComponent(p[0]||'AV')+'&flight='+encodeURIComponent(p[1]||'');
+  }
+
+  const full=baseUrl+qs;
+  log('INFO','URL: '+full.slice(0,120)+(full.length>120?'…':''));
+  setP('loading','Cargando…');
+
+  const timer=setTimeout(()=>{
+    log('ERROR','TIMEOUT 15s — sin respuesta');
+    log('WARN','Causas: URL incorrecta, script no publicado como "Anyone", o CORS');
+    setP('error','Timeout');cleanup(cb);
+  },15000);
+
+  window[cb]=function(data){
+    clearTimeout(timer);cleanup(cb);
+    handleResponse(data,action);
+  };
+
+  const sc=document.createElement('script');
+  sc.id='jsc';sc.src=full;
+  sc.onerror=function(){
+    clearTimeout(timer);cleanup(cb);
+    log('ERROR','Error al cargar script JSONP — URL inaccesible o bloqueo CORS');
+    setP('error','Error de red');
+  };
+  document.head.appendChild(sc);
+  log('INFO','Script JSONP inyectado, esperando…');
+}
+
+function cleanup(cb){
+  delete window[cb];
+  const s=document.getElementById('jsc');if(s)s.remove();
+}
+
+// ─── Handle response ──────────────────────────────────────
+function handleResponse(data,action){
+  log('OK','✓ Respuesta recibida');
+
+  // RAW completo
+  const rawStr=JSON.stringify(data,null,2);
+  document.getElementById('rawTxt').textContent=rawStr;
+  document.getElementById('rawSec').style.display='';
+  log('DATA','Tamaño JSON: '+rawStr.length+' chars');
+  log('DATA','Claves raíz: '+Object.keys(data).join(', '));
+
+  // ── detectar schema ──────────────────────────────────
+  log('INFO','─── Auto-detectando schema ───');
+
+  const hasSuccess = 'success' in data;
+  log(hasSuccess?'OK':'WARN','Campo "success": '+(hasSuccess?data.success:'AUSENTE'));
+
+  // Detectar estructura conocida: {totals, flights}
+  if(data.totals && Array.isArray(data.flights)){
+    log('OK','Schema: {totals, flights[]} — estructura de dashboard agrupada por vuelo');
+    handleFlightsSchema(data);
+    return;
+  }
+
+  // Estructura estándar Apps Script v4.0: success + records/reports/passengers
+  if(data.success===false){
+    log('ERROR','success=false — mensaje: '+(data.message||'(sin mensaje)'));
+    setP('error','Error servidor');return;
+  }
+  if(Array.isArray(data.records)){
+    log('OK','Schema: {success, records[]} — '+data.records.length+' registros');
+    handleFlatArray(data.records,action,'records');return;
+  }
+  if(Array.isArray(data.reports)){
+    log('OK','Schema: {success, reports[]} — '+data.reports.length+' registros');
+    handleFlatArray(data.reports,action,'reports');return;
+  }
+  if(Array.isArray(data.passengers)){
+    log('OK','Schema: {success, passengers[]} — '+data.passengers.length+' registros');
+    handleFlatArray(data.passengers,action,'passengers');return;
+  }
+
+  // Schema desconocido — mostrar todo
+  log('WARN','Schema no reconocido — mostrando estructura completa');
+  log('WARN','Claves encontradas: '+Object.keys(data).join(', '));
+  Object.entries(data).forEach(([k,v])=>{
+    if(Array.isArray(v)) log('DATA',`  ${k}: Array[${v.length}]`);
+    else if(typeof v==='object'&&v) log('DATA',`  ${k}: Object{${Object.keys(v).join(', ')}}`);
+    else log('DATA',`  ${k}: ${JSON.stringify(v)}`);
+  });
+  setP('warn','Schema desconocido');
+
+  // Intentar aplanar arrays desconocidos
+  const firstArray=Object.values(data).find(v=>Array.isArray(v)&&v.length>0);
+  if(firstArray){
+    log('INFO','Intentando aplanar primer array encontrado ('+firstArray.length+' items)…');
+    const flat=flattenArray(firstArray);
+    if(flat.length>0){ handleFlatArray(flat,action,'auto'); return; }
+  }
+}
+
+// ─── Schema {totals, flights[{vuelo, tipos, detalle[]}]} ──
+function handleFlightsSchema(data){
+  const t=data.totals;
+  log('OK','totals.solicitudes='+t.solicitudes+' sillas='+t.sillas+' pasajeros='+t.pasajeros+' vuelosUnicos='+t.vuelosUnicos);
+  log('INFO','flights.length='+data.flights.length);
+
+  // KPIs
+  document.getElementById('kSol').textContent   = t.solicitudes||0;
+  document.getElementById('kSill').textContent  = t.sillas||0;
+  document.getElementById('kPax').textContent   = t.pasajeros||0;
+  document.getElementById('kVuelos').textContent= t.vuelosUnicos||data.flights.length;
+
+  // Inspeccionar un vuelo de muestra
+  if(data.flights.length>0){
+    const f0=data.flights[0];
+    log('INFO','─── Vuelo de muestra: '+f0.vuelo+' ───');
+    log('DATA','  Campos vuelo: '+Object.keys(f0).join(', '));
+    log('DATA','  tipos: '+JSON.stringify(f0.tipos));
+    log('DATA','  totalSillas: '+f0.totalSillas+' solicitudes: '+f0.solicitudes);
+    if(Array.isArray(f0.detalle)&&f0.detalle.length>0){
+      const d0=f0.detalle[0];
+      log('DATA','  detalle[0] campos: '+Object.keys(d0).join(', '));
+      log('INFO','─── Campos de detalle[0] ───');
+      Object.entries(d0).forEach(([k,v])=>log('DATA','    '+k+': '+JSON.stringify(v)));
+      analyzeDetailRecord(d0);
+    } else {
+      log('WARN','  detalle vacío para vuelo '+f0.vuelo);
+    }
+  }
+
+  // Aplanar todos los detalles
+  const flat=[];
+  data.flights.forEach(f=>{
+    if(Array.isArray(f.detalle)){
+      f.detalle.forEach(d=>{
+        flat.push({...d, _vuelo:f.vuelo, _tipos:JSON.stringify(f.tipos),
+          _totalSillas:f.totalSillas, _solicitudes:f.solicitudes});
+      });
+    } else {
+      // El vuelo sin detalle — igual lo mostramos como fila resumen
+      flat.push({_vuelo:f.vuelo, _tipos:JSON.stringify(f.tipos),
+        _totalSillas:f.totalSillas,_solicitudes:f.solicitudes,_totalPasajeros:f.totalPasajeros});
+    }
+  });
+
+  log('OK','Total registros aplanados: '+flat.length);
+  document.getElementById('kDet').textContent=flat.length;
+  document.getElementById('kpis').style.display='';
+
+  if(flat.length===0){
+    log('WARN','No hay registros de detalle — los vuelos existen pero sin pasajeros asignados');
+    setP('warn','Sin detalle');
+    renderTable([],[],'flights');
+    return;
+  }
+
+  allFlat=flat;
+  const cols=Object.keys(flat[0]).filter(k=>!k.startsWith('_'));
+  const extraCols=['_vuelo','_tipos','_totalSillas','_solicitudes'];
+  const allCols=[...cols,...extraCols.filter(c=>Object.keys(flat[0]).includes(c))];
+  lastCols=allCols;
+  renderSchemaProbe(flat[0],allCols);
+  renderTable(flat,allCols,'flights');
+  setP('ok',flat.length+' registros');
+}
+
+// ─── Schema array plano ───────────────────────────────────
+function handleFlatArray(records,action,key){
+  document.getElementById('kDet').textContent=records.length;
+  document.getElementById('kpis').style.display='';
+
+  if(records.length===0){
+    log('WARN','Array "'+key+'" vacío');
+    log('WARN','getDashboardData solo devuelve aerolinea==="AV" — ¿hay registros AV?');
+    setP('warn','Sin datos');
+    renderTable([],[],'flat');return;
+  }
+
+  allFlat=records;
+  const cols=Object.keys(records[0]);
+  lastCols=cols;
+  log('DATA','Campos ('+cols.length+'): '+cols.join(', '));
+  analyzeDetailRecord(records[0]);
+  renderSchemaProbe(records[0],cols);
+  renderTable(records,cols,'flat');
+  setP('ok',records.length+' registros');
+}
+
+// ─── Analizar un registro ─────────────────────────────────
+function analyzeDetailRecord(rec){
+  log('INFO','─── Análisis de campos críticos ───');
+  // Fecha
+  ['fecha','fechaCreacion','horaCreacion','hora'].forEach(k=>{
+    if(!(k in rec)) return;
+    const v=String(rec[k]);
+    if(/^\d{5}(\.\d+)?$/.test(v)){
+      log('ERROR',`"${k}"="${v}" → SERIAL EXCEL — cellDate() no convirtió. Fix: ver abajo`);
+    } else if(/^0\.\d+$/.test(v)){
+      log('ERROR',`"${k}"="${v}" → FRACCIÓN HORA Excel — cellTime() no convirtió`);
+    } else if(/^\d{2}\/\d{2}\/\d{4}$/.test(v)){
+      log('OK',`"${k}"="${v}" → dd/MM/yyyy ✓`);
+    } else if(/^\d{2}:\d{2}/.test(v)){
+      log('OK',`"${k}"="${v}" → HH:mm:ss ✓`);
+    } else {
+      log('WARN',`"${k}"="${v}" → formato inusual`);
+    }
+  });
+  // tipoVuelo
+  if(rec.tipoVuelo) log('DATA','"tipoVuelo": "'+rec.tipoVuelo+'"');
+  if(rec.aerolinea) log('DATA','"aerolinea": "'+rec.aerolinea+'"');
+  if(rec.usuario)   log('DATA','"usuario": "'+rec.usuario+'"');
+}
+
+// ─── Render schema probe ──────────────────────────────────
+function renderSchemaProbe(rec,cols){
+  const sf=document.getElementById('schemaFields');
+  const si=document.getElementById('schemaIssues');
+  sf.innerHTML='';si.innerHTML='';
+  const issues=[];
+
+  cols.forEach(k=>{
+    const v=rec[k]; const s=String(v??'');
+    let cls='neu', note='';
+    if(v===''||v===null||v===undefined){ cls='warn'; note=' (vacío)'; }
+    else if(/^\d{5}(\.\d+)?$/.test(s)){ cls='bad'; note=' ⚠ serial fecha'; issues.push({sev:'error',msg:`"${k}" contiene serial Excel (${s}) — no formateado`}); }
+    else if(/^0\.\d{4,}$/.test(s)){ cls='bad'; note=' ⚠ fracción hora'; issues.push({sev:'error',msg:`"${k}" contiene fracción hora Excel (${s})`}); }
+    else { cls='ok'; }
+    const d=document.createElement('div');d.className='sf';
+    d.innerHTML=`<span class="sk">${esc(k)}</span><span class="sv ${cls}">${esc(s.slice(0,60))}${note}</span>`;
+    sf.appendChild(d);
+  });
+
+  if(issues.length===0){
+    si.innerHTML='<div style="color:var(--ok);font-family:var(--mono);font-size:10px;">✓ Sin problemas detectados</div>';
+  } else {
+    issues.forEach(i=>{
+      const d=document.createElement('div');
+      d.style.cssText='margin-bottom:5px;font-family:var(--mono);font-size:10px;display:flex;gap:5px;';
+      d.innerHTML=`<span style="color:${i.sev==='error'?'var(--red)':'var(--warn)'};">${i.sev==='error'?'✗':'⚠'}</span><span>${esc(i.msg)}</span>`;
+      si.appendChild(d);
+    });
+    // Fix sugerido
+    const fixDiv=document.createElement('div');
+    fixDiv.style.cssText='margin-top:10px;padding:8px;background:#0d0d15;border-radius:3px;font-family:var(--mono);font-size:9px;color:var(--warn);line-height:1.6;';
+    fixDiv.innerHTML='FIX Apps Script — cellDate():<br>if(typeof v===\'number\'&&v>40000){<br>&nbsp;const d=new Date((v-25569)*86400*1000);<br>&nbsp;return Utilities.formatDate(d,tz,\'dd/MM/yyyy\');<br>}';
+    si.appendChild(fixDiv);
+  }
+  document.getElementById('schemaSection').style.display='';
+}
+
+// ─── Render table ─────────────────────────────────────────
+function renderTable(rows,cols,mode){
+  const th=document.getElementById('th');
+  const tb=document.getElementById('tb');
+
+  if(!cols||cols.length===0){
+    tb.innerHTML='<tr><td class="nd" colspan="5">Sin datos</td></tr>';
+    document.getElementById('tblSec').style.display='';
+    return;
+  }
+
+  th.innerHTML='<tr>'+cols.map(c=>`<th>${esc(c)}</th>`).join('')+'</tr>';
+  document.getElementById('tblCnt').textContent=rows.length+' filas';
+  renderRows(rows,cols);
+  document.getElementById('tblSec').style.display='';
+}
+
+function renderRows(rows,cols){
+  const tb=document.getElementById('tb');
+  if(!rows||rows.length===0){
+    tb.innerHTML='<tr><td class="nd" colspan="'+cols.length+'">Sin resultados</td></tr>';
+    document.getElementById('tblCnt').textContent='0 filas';
+    return;
+  }
+  tb.innerHTML=rows.map(r=>'<tr>'+cols.map(c=>`<td>${fmtCell(c,r[c])}</td>`).join('')+'</tr>').join('');
+  document.getElementById('tblCnt').textContent=rows.length+(allFlat.length!==rows.length?' / '+allFlat.length:'')+' filas';
+}
+
+function fmtCell(k,v){
+  if(v===undefined||v===null||v==='') return '<span class="tm">—</span>';
+  const s=String(v);
+  if(/^\d{5}(\.\d+)?$/.test(s)) return `<span style="color:var(--red);" title="Serial Excel">${esc(s)} ⚠</span>`;
+  if(/^0\.\d{4,}$/.test(s)){
+    const m=Math.round(parseFloat(s)*1440),h=Math.floor(m/60).toString().padStart(2,'0'),mi=(m%60).toString().padStart(2,'0');
+    return `<span style="color:var(--warn);" title="Fracción hora Excel">${h}:${mi} ⚠</span>`;
+  }
+  if(k==='tipoVuelo'||k==='tipo'){
+    const cls=s==='Llegando'?'b-llegando':s==='Saliendo'?'b-saliendo':s.includes('CNX')||s.includes('onx')?'b-cnx':'';
+    return `<span class="b ${cls}">${esc(s)}</span>`;
+  }
+  if(k==='wchType'||k==='tipo_silla'||k==='silla'){
+    const cls=s==='WCHR'?'b-wchr':s==='WCHS'?'b-wchs':s==='WCHC'?'b-wchc':'';
+    return `<span class="b ${cls}">${esc(s)}</span>`;
+  }
+  return esc(s.length>60?s.slice(0,60)+'…':s);
+}
+
+function filterTbl(){
+  const q=document.getElementById('fi').value.toLowerCase();
+  const filtered=q?allFlat.filter(r=>lastCols.some(k=>String(r[k]||'').toLowerCase().includes(q))):allFlat;
+  renderRows(filtered,lastCols);
+}
+
+// ─── Auto-descubrir todas las acciones ───────────────────
+function autoDiscover(){
+  const url=document.getElementById('url').value.trim();
+  clearLog();
+  if(!url){log('ERROR','URL vacía');return;}
+  log('INFO','═══ AUTO-DISCOVER: probando todas las acciones ═══');
+
+  const actions=[
+    {name:'getDashboardData', params:{}},
+    {name:'getSillasHistory',  params:{}},
+    {name:'getRelevoPassengers',params:{airline:'AV',flight:'200'}},
+    {name:'getAeronavePassengers',params:{user:'test'}},
+  ];
+
+  let idx=0;
+  function next(){
+    if(idx>=actions.length){log('OK','═══ Auto-discover completado ═══');return;}
+    const a=actions[idx++];
+    log('INFO','Probando: '+a.name+' …');
+    const cb='ad_'+Date.now()+'_'+Math.random().toString(36).slice(2);
+    let qs='?action='+a.name+'&callback='+cb;
+    Object.entries(a.params).forEach(([k,v])=>qs+='&'+k+'='+encodeURIComponent(v));
+    const timer=setTimeout(()=>{
+      delete window[cb];log('ERROR',a.name+' → TIMEOUT');next();
+    },10000);
+    window[cb]=function(data){
+      clearTimeout(timer);delete window[cb];
+      const s=document.getElementById('_ad_sc');if(s)s.remove();
+      if(!data){log('ERROR',a.name+' → sin respuesta');next();return;}
+      const keys=Object.keys(data);
+      log('OK',a.name+' → claves: '+keys.join(', '));
+      // Detectar conteo
+      keys.forEach(k=>{
+        const v=data[k];
+        if(Array.isArray(v)) log('DATA','  '+k+': Array['+v.length+']'+(v[0]?' campos: '+Object.keys(v[0]).join(', '):''));
+        else if(typeof v==='object'&&v) log('DATA','  '+k+': {'+Object.keys(v).join(', ')+'}');
+        else log('DATA','  '+k+': '+JSON.stringify(v));
+      });
+      setTimeout(next,300);
+    };
+    const sc=document.createElement('script');sc.id='_ad_sc';sc.src=url+qs;
+    sc.onerror=function(){
+      clearTimeout(timer);delete window[cb];
+      log('ERROR',a.name+' → error de red');next();
+    };
+    document.head.appendChild(sc);
+  }
+  next();
+}
+
+// ─── Flatten helper ───────────────────────────────────────
+function flattenArray(arr){
+  if(!arr||!arr.length)return[];
+  const first=arr[0];
+  // Si tiene subarray, aplanar
+  const subKey=Object.keys(first).find(k=>Array.isArray(first[k]));
+  if(subKey){
+    const flat=[];
+    arr.forEach(r=>{
+      const sub=r[subKey];
+      const rest=Object.fromEntries(Object.entries(r).filter(([k])=>k!==subKey));
+      if(Array.isArray(sub)&&sub.length>0) sub.forEach(s=>flat.push({...s,...rest}));
+      else flat.push(rest);
+    });
+    return flat;
+  }
+  return arr;
+}
+
+// ─── Init ──────────────────────────────────────────────────
+log('INFO','WCH Debug v2 listo — schema auto-detectado');
+log('INFO','Este debugger acepta CUALQUIER estructura de respuesta');
+log('INFO','Pega tu URL y haz clic en ▶ Ejecutar');
+log('WARN','Tip: usa 🔬 Auto-descubrir para probar todas las acciones disponibles');
+</script>
+</body>
+</html>
