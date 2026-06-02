@@ -149,7 +149,6 @@
             color: #64748b;
         }
 
-        /* Estilo especial para input de fecha */
         .form-section input[type="date"] {
             color-scheme: dark;
             cursor: pointer;
@@ -171,7 +170,6 @@
             color: #fff;
         }
 
-        /* Toggle de Llegando / Saliendo */
         .direction-toggle {
             display: flex;
             gap: 0;
@@ -563,17 +561,19 @@
                     <label for="flightDate">📅 Fecha del Vuelo</label>
                     <input type="date" id="flightDate">
                 </div>
-                
-<!-- Horario del Vuelo -->
-<div class="form-section">
-    <label>🕐 Horario del Vuelo</label>
-    <div class="direction-toggle">
-        <input type="radio" name="flightSchedule" id="schedAM" value="AM">
-        <label for="schedAM">🌅 AM</label>
-        <input type="radio" name="flightSchedule" id="schedPM" value="PM">
-        <label for="schedPM">🌆 PM</label>
-    </div>
-</div>
+
+                <!-- Horario del Vuelo -->
+                <div class="form-section">
+                    <label>🕐 Horario del Vuelo</label>
+                    <div class="direction-toggle">
+                        <input type="radio" name="flightSchedule" id="schedAM" value="AM">
+                        <label for="schedAM">🌅 AM</label>
+                        <input type="radio" name="flightSchedule" id="schedPM" value="PM">
+                        <label for="schedPM">🌆 PM</label>
+                    </div>
+                </div>
+
+                <!-- Número de Vuelo -->
                 <div class="form-section">
                     <label for="flightNumber">✈️ Número de Vuelo</label>
                     <input type="text" 
@@ -582,6 +582,7 @@
                            oninput="this.value = this.value.toUpperCase()">
                 </div>
 
+                <!-- Cantidad de Sillas -->
                 <div class="form-section">
                     <label for="wheelchairCount">♿ Cantidad de Sillas de Ruedas</label>
                     <select id="wheelchairCount" onchange="handleWheelchairCountChange(this.value)">
@@ -731,11 +732,10 @@
                         <span class="summary-label">Fecha del Vuelo:</span>
                         <span class="summary-value" id="summaryFlightDate"></span>
                     </div>
-<div class="summary-item">
-    <span class="summary-label">Horario:</span>
-    <span class="summary-value" id="summarySchedule"></span>
-</div>
-                    
+                    <div class="summary-item">
+                        <span class="summary-label">Horario:</span>
+                        <span class="summary-value" id="summarySchedule"></span>
+                    </div>
                     <div class="summary-item">
                         <span class="summary-label">Vuelo:</span>
                         <span class="summary-value" id="summaryFlight"></span>
@@ -809,7 +809,6 @@
                 document.getElementById('userDisplay').textContent = `👤 ${userData.username}`;
                 document.getElementById('airlineDisplay').textContent = AIRLINE_NAMES[userData.role] || userData.role;
 
-                // Establecer la fecha de hoy como valor por defecto
                 const today = new Date().toISOString().split('T')[0];
                 document.getElementById('flightDate').value = today;
                 
@@ -921,22 +920,24 @@
         // ============================================
         // ENVIAR SOLICITUD
         // ============================================
-    function submitRequest() {
-    const flightNumber = document.getElementById('flightNumber').value.trim();
-    const wheelchairCount = document.getElementById('wheelchairCount').value;
-    const flightDate = document.getElementById('flightDate').value;
-    const directionEl = document.querySelector('input[name="flightDirection"]:checked');
-    const scheduleEl = document.querySelector('input[name="flightSchedule"]:checked');  // ← aquí
+        function submitRequest() {
+            // ── Todas las variables al inicio ──
+            const flightNumber    = document.getElementById('flightNumber').value.trim();
+            const wheelchairCount = document.getElementById('wheelchairCount').value;
+            const flightDate      = document.getElementById('flightDate').value;
+            const directionEl     = document.querySelector('input[name="flightDirection"]:checked');
+            const scheduleEl      = document.querySelector('input[name="flightSchedule"]:checked');
 
-if (!directionEl) {
-        showAlert('Por favor seleccione si el vuelo es Llegando o Saliendo', 'error');
-        return;
-    }
+            // ── Validaciones ──
+            if (!directionEl) {
+                showAlert('Por favor seleccione si el vuelo es Llegando o Saliendo', 'error');
+                return;
+            }
 
-    if (!scheduleEl) {
-        showAlert('Por favor seleccione el horario del vuelo (AM/PM)', 'error');
-        return;
-    }
+            if (!scheduleEl) {
+                showAlert('Por favor seleccione el horario del vuelo (AM/PM)', 'error');
+                return;
+            }
 
             if (!flightDate) {
                 showAlert('Por favor seleccione la fecha del vuelo', 'error');
@@ -953,11 +954,7 @@ if (!directionEl) {
                 return;
             }
 
-            const flightDirection = directionEl.value;
-
-            const scheduleEl = document.querySelector('input[name="flightSchedule"]:checked');
-
-            // Recopilar pasajeros
+            // ── Recopilar pasajeros ──
             const passengers = [];
             for (let i = 1; i <= parseInt(wheelchairCount); i++) {
                 const passengerInput = document.getElementById(`passenger${i}`);
@@ -970,19 +967,19 @@ if (!directionEl) {
             currentRequestId = generateRequestId();
 
             const requestData = {
-                action: 'saveWheelchairRequest',
-                requestId: currentRequestId,
-                airline: userData.role,
-                airlineName: AIRLINE_NAMES[userData.role] || userData.role,
-                username: userData.username,
-                email: userData.username,
-                flightDirection: flightDirection,
-                flightSchedule: scheduleEl.value,
-                flightDate: flightDate,
-                flightNumber: flightNumber,
+                action:         'saveWheelchairRequest',
+                requestId:      currentRequestId,
+                airline:        userData.role,
+                airlineName:    AIRLINE_NAMES[userData.role] || userData.role,
+                username:       userData.username,
+                email:          userData.username,
+                flightDirection: directionEl.value,
+                flightSchedule:  scheduleEl.value,
+                flightDate:      flightDate,
+                flightNumber:    flightNumber,
                 wheelchairCount: parseInt(wheelchairCount),
-                passengers: passengers,
-                timestamp: new Date().toISOString()
+                passengers:      passengers,
+                timestamp:       new Date().toISOString()
             };
 
             console.log('📤 Enviando solicitud:', requestData);
@@ -1028,17 +1025,17 @@ if (!directionEl) {
             const completionScreen = document.getElementById('completionScreen');
             completionScreen.classList.add('active');
 
-            document.getElementById('requestIdDisplay').textContent = data.requestId;
-            document.getElementById('summaryAirline').textContent = data.airlineName;
-            document.getElementById('summaryUser').textContent = data.username;
-            document.getElementById('summaryFlight').textContent = data.flightNumber;
+            document.getElementById('requestIdDisplay').textContent  = data.requestId;
+            document.getElementById('summaryAirline').textContent     = data.airlineName;
+            document.getElementById('summaryUser').textContent        = data.username;
+            document.getElementById('summaryFlight').textContent      = data.flightNumber;
             document.getElementById('summaryWheelchairs').textContent = data.wheelchairCount;
-            document.getElementById('summaryFlightDate').textContent = formatFlightDate(data.flightDate);
-            document.getElementById('summarySchedule').textContent = data.flightSchedule === 'AM' ? '🌅 AM' : '🌆 PM';
+            document.getElementById('summaryFlightDate').textContent  = formatFlightDate(data.flightDate);
+            document.getElementById('summarySchedule').textContent    = data.flightSchedule === 'AM' ? '🌅 AM' : '🌆 PM';
 
             // Dirección con badge
             const directionEl = document.getElementById('summaryDirection');
-            const isLlegando = data.flightDirection === 'Llegando';
+            const isLlegando  = data.flightDirection === 'Llegando';
             directionEl.innerHTML = `<span class="direction-badge ${isLlegando ? 'llegando' : 'saliendo'}">${isLlegando ? '🛬' : '🛫'} ${data.flightDirection}</span>`;
 
             const now = new Date();
@@ -1070,14 +1067,14 @@ if (!directionEl) {
         // GENERAR ID ÚNICO
         // ============================================
         function generateRequestId() {
-            const date = new Date();
-            const year = date.getFullYear().toString().slice(-2);
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            const hours = String(date.getHours()).padStart(2, '0');
+            const date    = new Date();
+            const year    = date.getFullYear().toString().slice(-2);
+            const month   = String(date.getMonth() + 1).padStart(2, '0');
+            const day     = String(date.getDate()).padStart(2, '0');
+            const hours   = String(date.getHours()).padStart(2, '0');
             const minutes = String(date.getMinutes()).padStart(2, '0');
             const seconds = String(date.getSeconds()).padStart(2, '0');
-            const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+            const random  = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
             return `WC-${year}${month}${day}-${hours}${minutes}${seconds}-${random}`;
         }
 
@@ -1092,7 +1089,6 @@ if (!directionEl) {
             document.querySelectorAll('input[name="flightDirection"]').forEach(r => r.checked = false);
             document.querySelectorAll('input[name="flightSchedule"]').forEach(r => r.checked = false);
 
-            // Restablecer fecha al día de hoy
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('flightDate').value = today;
             
