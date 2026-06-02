@@ -921,21 +921,22 @@
         // ============================================
         // ENVIAR SOLICITUD
         // ============================================
-        function submitRequest() {
-            const flightNumber = document.getElementById('flightNumber').value.trim();
-            const wheelchairCount = document.getElementById('wheelchairCount').value;
-            const flightDate = document.getElementById('flightDate').value;
-            const directionEl = document.querySelector('input[name="flightDirection"]:checked');
+    function submitRequest() {
+    const flightNumber = document.getElementById('flightNumber').value.trim();
+    const wheelchairCount = document.getElementById('wheelchairCount').value;
+    const flightDate = document.getElementById('flightDate').value;
+    const directionEl = document.querySelector('input[name="flightDirection"]:checked');
+    const scheduleEl = document.querySelector('input[name="flightSchedule"]:checked');  // ← aquí
 
-            if (!directionEl) {
-                showAlert('Por favor seleccione si el vuelo es Llegando o Saliendo', 'error');
-                return;
-            }
+if (!directionEl) {
+        showAlert('Por favor seleccione si el vuelo es Llegando o Saliendo', 'error');
+        return;
+    }
 
-            if (!scheduleEl) {
-    showAlert('Por favor seleccione el horario del vuelo (AM/PM)', 'error');
-    return;
-}
+    if (!scheduleEl) {
+        showAlert('Por favor seleccione el horario del vuelo (AM/PM)', 'error');
+        return;
+    }
 
             if (!flightDate) {
                 showAlert('Por favor seleccione la fecha del vuelo', 'error');
