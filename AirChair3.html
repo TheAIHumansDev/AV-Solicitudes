@@ -563,7 +563,17 @@
                     <label for="flightDate">📅 Fecha del Vuelo</label>
                     <input type="date" id="flightDate">
                 </div>
-
+                
+<!-- Horario del Vuelo -->
+<div class="form-section">
+    <label>🕐 Horario del Vuelo</label>
+    <div class="direction-toggle">
+        <input type="radio" name="flightSchedule" id="schedAM" value="AM">
+        <label for="schedAM">🌅 AM</label>
+        <input type="radio" name="flightSchedule" id="schedPM" value="PM">
+        <label for="schedPM">🌆 PM</label>
+    </div>
+</div>
                 <div class="form-section">
                     <label for="flightNumber">✈️ Número de Vuelo</label>
                     <input type="text" 
@@ -721,6 +731,11 @@
                         <span class="summary-label">Fecha del Vuelo:</span>
                         <span class="summary-value" id="summaryFlightDate"></span>
                     </div>
+<div class="summary-item">
+    <span class="summary-label">Horario:</span>
+    <span class="summary-value" id="summarySchedule"></span>
+</div>
+                    
                     <div class="summary-item">
                         <span class="summary-label">Vuelo:</span>
                         <span class="summary-value" id="summaryFlight"></span>
@@ -917,6 +932,11 @@
                 return;
             }
 
+            if (!scheduleEl) {
+    showAlert('Por favor seleccione el horario del vuelo (AM/PM)', 'error');
+    return;
+}
+
             if (!flightDate) {
                 showAlert('Por favor seleccione la fecha del vuelo', 'error');
                 return;
@@ -933,6 +953,8 @@
             }
 
             const flightDirection = directionEl.value;
+
+            const scheduleEl = document.querySelector('input[name="flightSchedule"]:checked');
 
             // Recopilar pasajeros
             const passengers = [];
@@ -954,6 +976,7 @@
                 username: userData.username,
                 email: userData.username,
                 flightDirection: flightDirection,
+                flightSchedule: scheduleEl.value,
                 flightDate: flightDate,
                 flightNumber: flightNumber,
                 wheelchairCount: parseInt(wheelchairCount),
@@ -1010,6 +1033,7 @@
             document.getElementById('summaryFlight').textContent = data.flightNumber;
             document.getElementById('summaryWheelchairs').textContent = data.wheelchairCount;
             document.getElementById('summaryFlightDate').textContent = formatFlightDate(data.flightDate);
+            document.getElementById('summarySchedule').textContent = data.flightSchedule === 'AM' ? '🌅 AM' : '🌆 PM';
 
             // Dirección con badge
             const directionEl = document.getElementById('summaryDirection');
@@ -1065,6 +1089,7 @@
             document.getElementById('passengersContainer').classList.remove('active');
             document.getElementById('passengersList').innerHTML = '';
             document.querySelectorAll('input[name="flightDirection"]').forEach(r => r.checked = false);
+            document.querySelectorAll('input[name="flightSchedule"]').forEach(r => r.checked = false);
 
             // Restablecer fecha al día de hoy
             const today = new Date().toISOString().split('T')[0];
