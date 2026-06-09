@@ -1244,117 +1244,52 @@ function updateVueloSummary(fVuelo){
  
 function checkVueloConsistency(vueloRecs, fVuelo){
   const alertsWrap = document.getElementById('vueloAlerts');
- 
-  // ── Caso 1 (ERROR CRÍTICO):
-  // Pasajero con destinoTipo='CNX' registrado en tramo counter-inspeccion (SALIDA)
-  // → Debería estar en aeronave-salida (LLEGADA) porque es una conexión
-  const cnxEnSalida = vueloRecs.filter(function(r){
-    const tramo = (r.tramo||'').toLowerCase();
-    const dest  = (r.destinoTipo||'').toUpperCase();
-    return tramo.includes('counter') && dest==='CNX';
-  });
- 
-  // ── Caso 2 (IMPOSIBLE):
-  // Pasajero con destinoTipo='SAL' registrado en tramo aeronave-salida (LLEGADA)
-  // → Un pasajero con destino final no puede venir en aeronave como llegada
-  const salEnLlegada = vueloRecs.filter(function(r){
-    const tramo = (r.tramo||'').toLowerCase();
-    const dest  = (r.destinoTipo||'').toUpperCase();
-    return tramo.includes('aeronave') && dest==='SAL';
-  });
- 
-  // ── Caso 3 (ADVERTENCIA):
-  // Pasajero en tramo counter-inspeccion sin destinoTipo definido
-  // → No podemos saber si es conexión o destino final, verificar manualmente
-  const sinDestino = vueloRecs.filter(function(r){
-    const tramo = (r.tramo||'').toLowerCase();
-    const dest  = (r.destinoTipo||'').trim();
-    return tramo.includes('counter') && !dest;
-  });
- 
-  const hayAlgo = cnxEnSalida.length>0 || salEnLlegada.length>0 || sinDestino.length>0;
-  alertsWrap.classList.toggle('show', hayAlgo);
- 
-  // ── Renderizar Panel 1: CNX en SALIDA ──
-  const errPanel = document.getElementById('vaErrorPanel');
-  if(cnxEnSalida.length>0){
-    errPanel.style.display='block';
-    document.getElementById('vaErrorCount').textContent=
-      cnxEnSalida.length+' pasajero'+(cnxEnSalida.length!==1?'s':'');
-    document.getElementById('vaErrorExplain').innerHTML=
-      '&#9650; Estos pasajeros tienen <strong>destino CONEXIÓN (CNX)</strong> pero están '
-      +'registrados como <strong>SALIDA (Counter→Insp)</strong>. '
-      +'Una conexión se factura en la <strong>LLEGADA (Aeronave→Salida)</strong> del vuelo '
-      +'que los trajo, no como salida. Corrija el tramo o mueva el registro al vuelo correcto.';
-    document.getElementById('vaErrorList').innerHTML=
-      cnxEnSalida.map(function(r){
-        const vuelo   = esc(r.vuelo||'—');
-        const pax     = esc(r.pasajero||'(sin nombre)');
-        const cnxVuelo= r.conexionVuelo ? ' → Conexión: <b>'+esc(r.conexionVuelo)+'</b>' : '';
-        const dest    = r.destinoVuelo  ? ' Destino: '+esc(r.destinoVuelo) : '';
-        return '<div class="va-item">'
-          +'<span class="va-item-pax">'+pax+'</span>'
-          +'<span class="va-item-detail">Vuelo <b>'+vuelo+'</b>'+dest+cnxVuelo+'</span>'
-          +'<span class="va-item-tag cnx-error">&#9650; CNX facturado como SAL</span>'
-          +'</div>';
-      }).join('');
-  }else{
-    errPanel.style.display='none';
+
+  // Un vuelo puede tener pasajeros SAL (counter/sala) o LLE (aeronave/sala)
+  // El error es simple: si hay registros de aeronave-salida Y de counter-inspeccion
+  // en el mismo vuelo, hay un problema: alguno está en el tramo equivocado.
+
+  const tieneCounter  = vueloRecs.filter(r=>(r.tramo||'').toLowerCase().includes('counter'));
+  const tieneAeronave = vueloRecs.filter(r=>(r.tramo||'').toLowerCase().includes('aeronave'));
+
+  // Error: el vuelo tiene pasajeros de SALIDA y de LLEGADA mezclados
+  // → los de aeronave están en un vuelo de salida, o viceversa
+  const hayMezcla = tieneCounter.length > 0 && tieneAeronave.length > 0;
+
+  // Ocultar todo si no hay problema
+  document.getElementById('vaImpPanel').style.display  = 'none';
+  document.getElementById('vaWarnPanel').style.display = 'none';
+
+  if(!hayMezcla){
+    alertsWrap.classList.remove('show');
+    document.getElementById('vaErrorPanel').style.display = 'none';
+    return;
   }
- 
-  // ── Renderizar Panel 2: SAL en LLEGADA (IMPOSIBLE) ──
-  const impPanel = document.getElementById('vaImpPanel');
-  if(salEnLlegada.length>0){
-    impPanel.style.display='block';
-    document.getElementById('vaImpCount').textContent=
-      salEnLlegada.length+' registro'+(salEnLlegada.length!==1?'s':'');
-    document.getElementById('vaImpExplain').innerHTML=
-      '&#128683; Estos pasajeros tienen <strong>destino FINAL (SAL)</strong> pero están '
-      +'registrados en tramo <strong>LLEGADA (Aeronave→Salida)</strong>. '
-      +'Esto es <strong>lógicamente imposible</strong>: un pasajero con destino '
-      +'final en este aeropuerto no puede registrarse como llegada de aeronave. '
-      +'Revise si el tramo o el tipo de destino fue ingresado incorrectamente.';
-    document.getElementById('vaImpList').innerHTML=
-      salEnLlegada.map(function(r){
-        const vuelo = esc(r.vuelo||'—');
-        const pax   = esc(r.pasajero||'(sin nombre)');
-        const dest  = r.destinoVuelo ? ' Destino: '+esc(r.destinoVuelo) : '';
-        return '<div class="va-item">'
-          +'<span class="va-item-pax">'+pax+'</span>'
-          +'<span class="va-item-detail">Vuelo <b>'+vuelo+'</b>'+dest+'</span>'
-          +'<span class="va-item-tag sal-error">&#9660; SAL en tramo LLE — imposible</span>'
-          +'</div>';
-      }).join('');
-  }else{
-    impPanel.style.display='none';
-  }
- 
-  // ── Renderizar Panel 3: Sin destinoTipo (ADVERTENCIA) ──
-  const warnPanel = document.getElementById('vaWarnPanel');
-  if(sinDestino.length>0){
-    warnPanel.style.display='block';
-    document.getElementById('vaWarnCount').textContent=
-      sinDestino.length+' pasajero'+(sinDestino.length!==1?'s':'');
-    document.getElementById('vaWarnExplain').innerHTML=
-      'Estos pasajeros están en tramo <strong>SALIDA</strong> pero no tienen '
-      +'registrado el tipo de destino (SAL o CNX). No es posible verificar '
-      +'automáticamente si son conexiones. Confirme con el agente que los registró.';
-    document.getElementById('vaWarnList').innerHTML=
-      sinDestino.map(function(r){
-        const vuelo = esc(r.vuelo||'—');
-        const pax   = esc(r.pasajero||'(sin nombre)');
-        const usr   = r.usuario ? ' · Agente: '+esc(r.usuario) : '';
-        return '<div class="va-item">'
-          +'<span class="va-item-pax">'+pax+'</span>'
-          +'<span class="va-item-detail">Vuelo <b>'+vuelo+'</b>'+usr+'</span>'
-          +'<span class="va-item-tag warn-tag">&#9432; Sin tipo destino</span>'
-          +'</div>';
-      }).join('');
-  }else{
-    warnPanel.style.display='none';
-  }
+
+  alertsWrap.classList.add('show');
+  document.getElementById('vaErrorPanel').style.display = 'block';
+
+  document.getElementById('vaErrorCount').textContent =
+    tieneAeronave.length + ' pasajero' + (tieneAeronave.length !== 1 ? 's' : '') + ' en tramo incorrecto';
+
+  document.getElementById('vaErrorExplain').innerHTML =
+    'Este vuelo tiene pasajeros mezclados: <strong>' + tieneCounter.length + '</strong> en tramo '
+    + '<strong>SALIDA (Counter→Insp)</strong> y <strong>' + tieneAeronave.length + '</strong> en tramo '
+    + '<strong>LLEGADA (Aeronave→Salida)</strong>. '
+    + 'Un vuelo de <strong>SALIDA</strong> solo debe tener tramos Counter→Insp o Insp→Sala. '
+    + 'Un vuelo de <strong>LLEGADA</strong> solo debe tener tramos Aeronave→Salida o Insp→Sala. '
+    + 'Los pasajeros de Aeronave→Salida debieron reportarse con el vuelo de llegada, no de salida.';
+
+  document.getElementById('vaErrorList').innerHTML =
+    tieneAeronave.map(function(r){
+      return '<div class="va-item">'
+        + '<span class="va-item-pax">' + esc(r.pasajero||'(sin nombre)') + '</span>'
+        + '<span class="va-item-detail">Vuelo <b>' + esc(r.vuelo||'—') + '</b>'
+        + (r.usuario ? ' · Agente: ' + esc(r.usuario) : '') + '</span>'
+        + '<span class="va-item-tag cnx-error">&#9660; Aeronave en vuelo SAL</span>'
+        + '</div>';
+    }).join('');
 }
- 
 
  
 function vaGetRowAlertClass(r){
