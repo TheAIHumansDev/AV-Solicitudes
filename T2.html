@@ -1,0 +1,1900 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Monitor WCH · Avianca SAL</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Unbounded:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#f0ede8;--surface:#ffffff;--surface2:#f5f2ed;--surface3:#ebe7e1;
+  --red:#c8001a;--red2:#a50015;--red-light:#fbeaea;--red-mid:#f5c6c6;
+  --text:#1a1612;--muted:#7a7268;--border:#ddd8d0;
+  --green:#1a6b45;--green-light:#eaf5ef;
+  --amber:#8a5200;--amber-light:#fdf3e0;
+  --blue:#1a4080;--blue-light:#eaf0fa;
+  --purple:#5a1a8a;--purple-light:#f2eafa;
+  --gold:#b87600;--gold-light:#fff8e6;
+  --sal:#1a6b45;--sal-light:#eaf5ef;
+  --lle:#1a4080;--lle-light:#eaf0fa;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);min-height:100vh;color:var(--text);}
+
+/* ══ LOGIN ══ */
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg);padding:20px;}
+.login-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:36px 32px;width:100%;max-width:400px;box-shadow:0 8px 40px rgba(0,0,0,.1);}
+.login-logo{width:48px;height:48px;background:var(--red);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff;margin:0 auto 16px;}
+.login-title{font-family:'Unbounded',sans-serif;font-size:16px;font-weight:700;text-align:center;color:var(--text);margin-bottom:4px;}
+.login-sub{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);text-align:center;letter-spacing:2px;margin-bottom:28px;}
+.login-label{font-size:11px;font-family:'DM Mono',monospace;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:7px;display:block;}
+.login-input-wrap{position:relative;margin-bottom:16px;}
+.login-input{width:100%;padding:12px 44px 12px 14px;background:var(--surface2);border:1.5px solid var(--border);border-radius:9px;color:var(--text);font-size:13px;font-family:'DM Mono',monospace;outline:none;transition:border-color .2s;letter-spacing:.5px;}
+.login-input:focus{border-color:var(--red);}
+.login-eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted);font-size:14px;padding:4px;}
+.login-btn{width:100%;padding:13px;border-radius:9px;background:var(--red);color:#fff;border:none;font-size:14px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:background .2s;letter-spacing:.3px;}
+.login-btn:hover{background:var(--red2);}
+.login-btn:disabled{opacity:.5;pointer-events:none;}
+.login-err{background:var(--red-light);border:1px solid var(--red-mid);border-radius:7px;padding:9px 12px;font-size:12px;color:var(--red);margin-top:10px;display:none;font-family:'DM Mono',monospace;}
+.login-err.show{display:block;}
+.login-hint{font-size:10px;color:var(--muted);text-align:center;margin-top:14px;font-family:'DM Mono',monospace;letter-spacing:.5px;line-height:1.6;}
+.login-spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;display:inline-block;vertical-align:middle;margin-right:6px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ══ HEADER ══ */
+.header{background:var(--red);padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.18);}
+.header-brand{display:flex;align-items:center;gap:10px;min-width:0;}
+.header-logo{width:30px;height:30px;background:rgba(255,255,255,.18);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;color:#fff;border:1px solid rgba(255,255,255,.28);flex-shrink:0;}
+.header-title{font-family:'Unbounded',sans-serif;font-size:11px;font-weight:700;color:#fff;letter-spacing:.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.header-right{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.badge-live{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.28);border-radius:20px;padding:4px 10px;font-family:'DM Mono',monospace;font-size:10px;color:#fff;display:flex;align-items:center;gap:6px;letter-spacing:1px;}
+.pulse{width:7px;height:7px;border-radius:50%;background:#4ade80;animation:pulse 1.5s ease-in-out infinite;flex-shrink:0;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.8)}}
+.refresh-info{font-family:'DM Mono',monospace;font-size:9px;color:rgba(255,255,255,.5);letter-spacing:1px;display:none;}
+.header-user{display:flex;align-items:center;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:4px 10px;}
+.header-user-name{font-family:'DM Mono',monospace;font-size:10px;color:#fff;letter-spacing:1px;}
+.btn-logout{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:4px 8px;color:rgba(255,255,255,.8);font-size:10px;cursor:pointer;font-family:'DM Mono',monospace;transition:all .2s;}
+.btn-logout:hover{background:rgba(255,255,255,.22);}
+.debug-toggle-btn{background:transparent;border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:4px 8px;color:rgba(255,255,255,.55);font-size:9px;cursor:pointer;font-family:'DM Mono',monospace;transition:all .2s;letter-spacing:1px;}
+.debug-toggle-btn:hover{background:rgba(255,255,255,.12);color:#fff;}
+
+/* ══ MAIN ══ */
+.main{padding:16px 16px 60px;}
+
+/* ══ BILLING ══ */
+.billing-section{margin-bottom:20px;}
+.billing-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:6px;}
+.billing-title{font-family:'Unbounded',sans-serif;font-size:11px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px;}
+.billing-badge{background:var(--gold);color:#fff;font-size:9px;font-family:'DM Mono',monospace;padding:2px 8px;border-radius:4px;letter-spacing:1px;}
+.billing-subtitle{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;}
+.billing-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
+.billing-day{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 6px;text-align:center;position:relative;overflow:hidden;}
+.billing-day::before{content:'';position:absolute;top:0;left:0;width:100%;height:2px;background:var(--border);}
+.billing-day.has-data::before{background:linear-gradient(90deg,var(--gold),#f0a500);}
+.billing-day.today-day{border-color:var(--red);}
+.billing-day.today-day::before{background:var(--red);}
+.billing-day-dow{font-size:9px;color:var(--muted);margin-bottom:2px;}
+.billing-day-date{font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);letter-spacing:.3px;margin-bottom:5px;}
+.billing-day-count{font-family:'Unbounded',sans-serif;font-size:16px;font-weight:700;color:var(--text);line-height:1;}
+.billing-day.has-data:not(.today-day) .billing-day-count{color:var(--gold);}
+.billing-day.today-day .billing-day-count{color:var(--red);}
+.billing-day-label{font-size:8px;color:var(--muted);margin-top:3px;font-family:'DM Mono',monospace;}
+.billing-day-breakdown{display:flex;justify-content:center;gap:4px;margin-top:4px;}
+.billing-mini-dot{width:5px;height:5px;border-radius:50%;}
+.billing-mini-dot.sal{background:var(--sal);}
+.billing-mini-dot.lle{background:var(--lle);}
+.billing-total-bar{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-top:8px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+.billing-total-item{display:flex;flex-direction:column;gap:2px;}
+.billing-total-label{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:.5px;}
+.billing-total-val{font-family:'Unbounded',sans-serif;font-size:20px;font-weight:700;}
+.billing-total-val.gold{color:var(--gold);}
+.billing-total-val.red{color:var(--red);}
+.billing-breakdown{display:flex;gap:14px;flex-wrap:wrap;align-items:center;}
+.billing-breakdown-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);}
+.billing-breakdown-dot{width:8px;height:8px;border-radius:50%;}
+.billing-breakdown-dot.sal{background:var(--sal);}
+.billing-breakdown-dot.lle{background:var(--lle);}
+
+/* ══ VUELO SUMMARY ══ */
+.vuelo-summary{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px;margin-bottom:20px;display:none;border-top:3px solid var(--red);}
+.vuelo-summary.show{display:block;}
+.vuelo-summary-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;}
+.vuelo-summary-title{font-family:'Unbounded',sans-serif;font-size:11px;font-weight:700;display:flex;align-items:center;gap:8px;}
+.vuelo-summary-flight{background:var(--red);color:#fff;font-family:'DM Mono',monospace;font-size:11px;padding:3px 11px;border-radius:5px;letter-spacing:1.5px;}
+.vuelo-summary-close{background:none;border:1px solid var(--border);border-radius:5px;padding:3px 10px;font-size:10px;color:var(--muted);cursor:pointer;font-family:'DM Mono',monospace;transition:all .2s;}
+.vuelo-summary-close:hover{border-color:var(--red);color:var(--red);}
+.vuelo-summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.vuelo-stat{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;text-align:center;}
+.vuelo-stat-label{font-size:9px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;}
+.vuelo-stat-val{font-family:'Unbounded',sans-serif;font-size:26px;font-weight:700;line-height:1;}
+.vuelo-stat-val.gold{color:var(--gold);}
+.vuelo-stat-val.sal{color:var(--sal);}
+.vuelo-stat-val.lle{color:var(--lle);}
+.vuelo-stat-val.muted{color:var(--muted);}
+.vuelo-stat-sub{font-size:9px;color:var(--muted);margin-top:4px;font-family:'DM Mono',monospace;}
+.vuelo-stat.highlight{border-color:var(--gold);background:var(--gold-light);}
+
+/* ══ MÉTRICAS ══ */
+.metrics-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+.metric-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:15px 17px;position:relative;overflow:hidden;}
+.metric-card::before{content:'';position:absolute;top:0;left:0;width:100%;height:3px;}
+.metric-card.red::before{background:var(--red);}
+.metric-card.green::before{background:var(--sal);}
+.metric-card.blue::before{background:var(--lle);}
+.metric-card.amber::before{background:var(--gold);}
+.metric-label{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px;}
+.metric-value{font-family:'Unbounded',sans-serif;font-size:22px;font-weight:700;color:var(--text);line-height:1.1;}
+.metric-sub{font-size:9px;color:var(--muted);margin-top:3px;}
+.metric-filter-tag{display:none;align-items:center;gap:3px;background:var(--red-light);border:1px solid var(--red-mid);border-radius:4px;padding:1px 6px;font-size:8px;color:var(--red);font-family:'DM Mono',monospace;margin-top:4px;letter-spacing:.5px;width:fit-content;}
+.metric-filter-tag.show{display:flex;}
+
+/* ══ FILTERS ══ */
+.filters-panel{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:16px;}
+.filters-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.filters-title{font-family:'Unbounded',sans-serif;font-size:11px;font-weight:700;display:flex;align-items:center;gap:7px;}
+.filters-active-badge{background:var(--red);color:#fff;border-radius:10px;padding:1px 8px;font-size:9px;font-family:'DM Mono',monospace;display:none;}
+.filters-active-badge.show{display:inline-block;}
+/* 9 columnas: vuelo + fecha + staff + tramo + pasajero + wch + dir + turno + btn */
+.filters-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr auto;gap:10px;align-items:end;}
+.filter-group label{display:block;font-size:10px;font-family:'DM Mono',monospace;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;}
+.filter-group input,.filter-group select{width:100%;padding:8px 11px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:12px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s;appearance:none;-webkit-appearance:none;}
+.filter-group input:focus,.filter-group select:focus{border-color:var(--red);}
+.filter-group select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%237a7268'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;padding-right:26px;cursor:pointer;}
+.filter-vuelo-wrap{position:relative;}
+.filter-vuelo-wrap input{padding-left:26px;}
+.filter-vuelo-icon{position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--muted);pointer-events:none;}
+.btn-clear-f{background:var(--surface2);color:var(--muted);border:1px solid var(--border);border-radius:7px;padding:8px 13px;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;height:36px;white-space:nowrap;}
+.btn-clear-f:hover{border-color:var(--red);color:var(--red);}
+
+/* ── Turno chips (AM / PM) ── */
+.turno-chips{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
+.turno-chip{border-radius:20px;padding:4px 14px;font-size:10px;cursor:pointer;font-family:'DM Mono',monospace;letter-spacing:.5px;border:1.5px solid var(--border);color:var(--muted);background:var(--surface2);transition:all .2s;display:flex;align-items:center;gap:6px;}
+.turno-chip.all-chip.active-turno{background:var(--text);color:#fff;border-color:var(--text);}
+.turno-chip.am-chip{border-color:var(--gold);color:var(--gold);background:var(--gold-light);}
+.turno-chip.am-chip.active-turno{background:var(--gold);color:#fff;}
+.turno-chip.pm-chip{border-color:var(--blue);color:var(--blue);background:var(--blue-light);}
+.turno-chip.pm-chip.active-turno{background:var(--blue);color:#fff;}
+
+.filter-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
+.chip{border-radius:20px;padding:4px 12px;font-size:10px;cursor:pointer;font-family:'DM Mono',monospace;letter-spacing:.5px;border:1px solid var(--border);color:var(--muted);background:var(--surface2);transition:all .2s;display:flex;align-items:center;gap:5px;}
+.chip:hover{border-color:var(--red);color:var(--red);}
+.chip.active-chip{background:var(--red);color:#fff;border-color:var(--red);}
+.chip-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.chip-dot.sal{background:var(--sal);}
+.chip-dot.lle{background:var(--lle);}
+.chip.active-chip .chip-dot{background:#fff;}
+.dir-chips{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
+.dir-chip{border-radius:20px;padding:4px 12px;font-size:10px;cursor:pointer;font-family:'DM Mono',monospace;letter-spacing:.5px;border:1.5px solid var(--border);color:var(--muted);background:var(--surface2);transition:all .2s;display:flex;align-items:center;gap:5px;}
+.dir-chip.sal-chip{border-color:var(--sal);color:var(--sal);background:var(--sal-light);}
+.dir-chip.sal-chip.active-dir{background:var(--sal);color:#fff;}
+.dir-chip.lle-chip{border-color:var(--lle);color:var(--lle);background:var(--lle-light);}
+.dir-chip.lle-chip.active-dir{background:var(--lle);color:#fff;}
+.dir-chip.all-chip.active-dir{background:var(--text);color:#fff;border-color:var(--text);}
+
+/* ══ TABLE ══ */
+.table-panel{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+.table-toolbar{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.table-toolbar-title{font-family:'Unbounded',sans-serif;font-size:11px;font-weight:700;}
+.toolbar-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.results-count{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:3px 11px;}
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+th{background:var(--surface2);padding:10px 12px;text-align:left;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);white-space:nowrap;font-weight:500;cursor:pointer;user-select:none;}
+th:hover{color:var(--text);}
+th .sort-icon{margin-left:3px;opacity:.35;font-size:8px;}
+th.sorted .sort-icon{opacity:1;color:var(--red);}
+td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:var(--surface2);}
+tr.sal-row td:first-child{border-left:2px solid var(--sal);}
+tr.lle-row td:first-child{border-left:2px solid var(--lle);}
+.badge{display:inline-flex;align-items:center;border-radius:5px;padding:2px 8px;font-family:'DM Mono',monospace;font-size:9px;font-weight:500;letter-spacing:.5px;white-space:nowrap;}
+.badge-counter{background:var(--sal-light);color:var(--sal);border:1px solid #95d4b4;}
+.badge-sala{background:var(--surface2);color:var(--muted);border:1px solid var(--border);}
+.badge-aeronave{background:var(--lle-light);color:var(--lle);border:1px solid #b8cef0;}
+.badge-des{background:var(--amber-light);color:var(--amber);border:1px solid #e8c07a;}
+.badge-otro{background:var(--purple-light);color:var(--purple);border:1px solid #c8a8e8;}
+.badge-wchr{background:#e8f4fd;color:#0d5fc4;border:1px solid #9fc7f0;}
+.badge-wchs{background:#fdf3e0;color:#8a5200;border:1px solid #e8c07a;}
+.badge-wchc{background:#fcebeb;color:#a32d2d;border:1px solid #f0b8b8;}
+.badge-wch{background:var(--red-light);color:var(--red);border:1px solid var(--red-mid);}
+.dir-pill{display:inline-flex;align-items:center;gap:3px;border-radius:10px;padding:2px 8px;font-size:9px;font-family:'DM Mono',monospace;margin-left:5px;font-weight:600;letter-spacing:.5px;}
+.dir-pill.sal{background:var(--sal-light);color:var(--sal);border:1px solid #95d4b4;}
+.dir-pill.lle{background:var(--lle-light);color:var(--lle);border:1px solid #b8cef0;}
+.billable-pill{display:inline-flex;align-items:center;gap:3px;background:var(--gold-light);border:1px solid #e8c07a;border-radius:10px;padding:1px 7px;font-size:9px;color:var(--gold);font-family:'DM Mono',monospace;margin-left:4px;}
+/* turno pill */
+.turno-pill{display:inline-flex;align-items:center;border-radius:10px;padding:1px 7px;font-size:9px;font-family:'DM Mono',monospace;margin-left:4px;font-weight:600;}
+.turno-pill.am{background:var(--gold-light);color:var(--gold);border:1px solid #e8c07a;}
+.turno-pill.pm{background:var(--blue-light);color:var(--blue);border:1px solid #b8cef0;}
+td.cell-date{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);}
+td.cell-vuelo{font-family:'DM Mono',monospace;font-size:11px;font-weight:500;}
+td.cell-name{font-weight:500;}
+.empty-state{text-align:center;padding:50px 20px;color:var(--muted);}
+.empty-icon{font-size:34px;margin-bottom:10px;}
+.empty-title{font-family:'Unbounded',sans-serif;font-size:13px;font-weight:700;margin-bottom:5px;color:var(--text);}
+.empty-sub{font-size:12px;}
+.loading-bar{height:3px;background:linear-gradient(90deg,var(--red) 0%,#ff7a8a 50%,var(--red) 100%);background-size:200% 100%;animation:loading .8s linear infinite;}
+@keyframes loading{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.pagination{display:flex;align-items:center;justify-content:center;gap:5px;padding:14px;border-top:1px solid var(--border);flex-wrap:wrap;}
+.page-btn{width:30px;height:30px;border-radius:6px;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-size:11px;cursor:pointer;font-family:'DM Mono',monospace;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.page-btn:hover,.page-btn.active{background:var(--red);color:#fff;border-color:var(--red);}
+.page-info{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);padding:0 6px;}
+.btn-export{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:5px 12px;font-size:11px;font-family:'DM Sans',sans-serif;color:var(--muted);cursor:pointer;transition:all .2s;}
+.btn-export:hover{border-color:var(--red);color:var(--red);}
+.pdf-export-group{display:flex;align-items:center;gap:0;}
+.pdf-banco-select{padding:5px 26px 5px 9px;background:var(--surface2);border:1px solid var(--border);border-right:none;border-radius:7px 0 0 7px;font-size:11px;font-family:'DM Sans',sans-serif;color:var(--text);cursor:pointer;outline:none;transition:border-color .2s;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='5'%3E%3Cpath d='M0 0l4.5 5 4.5-5z' fill='%237a7268'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 7px center;-webkit-appearance:none;appearance:none;}
+.pdf-banco-select:focus{border-color:var(--red);}
+.btn-pdf{background:var(--red);color:#fff;border:1px solid var(--red);border-radius:0 7px 7px 0;padding:5px 12px;font-size:11px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:background .2s;white-space:nowrap;}
+.btn-pdf:hover{background:var(--red2);border-color:var(--red2);}
+
+/* ══ DEBUG ══ */
+.debug-panel{background:#0d1117;border:1px solid #30363d;border-radius:10px;padding:14px;margin-bottom:16px;display:none;}
+.debug-panel.open{display:block;}
+.debug-title{color:#58a6ff;font-size:9px;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;font-family:'DM Mono',monospace;display:flex;align-items:center;justify-content:space-between;}
+.debug-log{max-height:150px;overflow-y:auto;display:flex;flex-direction:column;gap:2px;}
+.debug-line{padding:3px 7px;border-radius:3px;color:#c9d1d9;border-left:2px solid #30363d;font-family:'DM Mono',monospace;font-size:10px;line-height:1.5;}
+.debug-line.info{border-color:#58a6ff;color:#a5d6ff;}
+.debug-line.success{border-color:#3fb950;color:#56d364;}
+.debug-line.error{border-color:#f85149;color:#ffa198;}
+.debug-line.warn{border-color:#d29922;color:#e3b341;}
+.debug-url-box{background:#161b22;border:1px solid #30363d;border-radius:5px;padding:7px 9px;margin-bottom:7px;color:#8b949e;word-break:break-all;font-size:9px;font-family:'DM Mono',monospace;}
+.debug-actions{display:flex;gap:7px;margin-top:8px;flex-wrap:wrap;}
+.btn-debug{background:transparent;border:1px solid #30363d;border-radius:4px;color:#8b949e;font-size:9px;padding:3px 9px;cursor:pointer;font-family:'DM Mono',monospace;transition:all .2s;}
+.btn-debug:hover{border-color:#58a6ff;color:#58a6ff;}
+.btn-debug.green{border-color:#3fb950;color:#56d364;}
+.btn-debug.green:hover{background:rgba(63,185,80,.1);}
+
+/* ══ PRINT ══ */
+#printFrame{display:none;}
+@media print{
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+  body{margin:0;padding:0;background:#fff;}
+  body>*:not(#printFrame){display:none!important;}
+  #printFrame{display:block!important;position:fixed;top:0;left:0;width:100%;height:100%;border:none;z-index:9999;}
+}
+#appWrap{display:none;}
+
+/* ══ RESPONSIVE ══ */
+@media (max-width:1100px){
+  .filters-grid{grid-template-columns:1fr 1fr 1fr 1fr;}
+  .filters-grid .btn-clear-f{grid-column:1/-1;}
+}
+@media (max-width:900px){
+  .main{padding:14px 12px 60px;}
+  .debug-toggle-btn{display:none;}
+  .billing-grid{grid-template-columns:repeat(4,1fr);}
+  .metrics-row{grid-template-columns:repeat(2,1fr);}
+  .filters-grid{grid-template-columns:1fr 1fr;}
+  .vuelo-summary-grid{grid-template-columns:repeat(2,1fr);}
+}
+@media (max-width:600px){
+  .main{padding:10px 10px 60px;}
+  .header{padding:0 12px;height:52px;}
+  .header-title{font-size:10px;}
+  .header-user{display:none;}
+  .badge-live{padding:3px 8px;font-size:9px;}
+  .billing-grid{grid-template-columns:repeat(4,1fr);gap:4px;}
+  .billing-day{padding:7px 4px;}
+  .billing-day-count{font-size:14px;}
+  .billing-day-label{display:none;}
+  .billing-total-bar{padding:10px 12px;}
+  .billing-total-val{font-size:18px;}
+  .metrics-row{grid-template-columns:repeat(2,1fr);gap:8px;}
+  .metric-card{padding:12px 12px;}
+  .metric-value{font-size:18px;}
+  .filters-grid{grid-template-columns:1fr;}
+  .vuelo-summary-grid{grid-template-columns:repeat(2,1fr);gap:8px;}
+  .vuelo-stat-val{font-size:20px;}
+  .toolbar-right{gap:5px;}
+  .pdf-banco-select{font-size:10px;padding:5px 20px 5px 7px;}
+  .btn-pdf,.btn-export{font-size:10px;padding:5px 8px;}
+  table{font-size:11px;}
+  th{font-size:8px;padding:8px 8px;}
+  td{padding:8px 8px;}
+}
+@media (max-width:420px){
+  .billing-grid{grid-template-columns:repeat(4,1fr);}
+  .metric-value{font-size:17px;}
+  .billing-total-bar{flex-direction:column;align-items:flex-start;gap:8px;}
+}
+ 
+/* ── MODAL OVERLAY ── */
+.et-overlay{
+  position:fixed;inset:0;background:rgba(26,22,18,.55);
+  backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);
+  display:flex;align-items:center;justify-content:center;
+  z-index:9000;padding:20px;opacity:0;pointer-events:none;
+  transition:opacity .2s;
+}
+.et-overlay.open{opacity:1;pointer-events:all;}
+ 
+/* ── MODAL CARD ── */
+.et-modal{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:14px;width:100%;max-width:500px;
+  box-shadow:0 24px 60px rgba(0,0,0,.25);
+  transform:translateY(12px);transition:transform .25s;
+  overflow:hidden;
+}
+.et-overlay.open .et-modal{transform:translateY(0);}
+ 
+/* ── HEADER ── */
+.et-header{
+  background:var(--amber);padding:14px 20px;
+  display:flex;align-items:center;gap:10px;
+}
+.et-header-icon{
+  width:34px;height:34px;background:rgba(255,255,255,.18);
+  border-radius:8px;display:flex;align-items:center;justify-content:center;
+  font-size:16px;flex-shrink:0;border:1px solid rgba(255,255,255,.28);
+}
+.et-header-title{
+  font-family:'Unbounded',sans-serif;font-size:11px;font-weight:700;
+  color:#fff;letter-spacing:.3px;
+}
+.et-header-sub{
+  font-family:'DM Mono',monospace;font-size:9px;color:rgba(255,255,255,.65);
+  margin-top:1px;letter-spacing:1px;
+}
+ 
+/* ── WARNING BANNER ── */
+.et-warn{
+  background:#fff8e6;border-bottom:2px solid var(--amber);
+  padding:10px 18px;display:flex;gap:10px;align-items:flex-start;
+}
+.et-warn-icon{font-size:16px;flex-shrink:0;margin-top:1px;}
+.et-warn-text{font-size:11px;color:var(--amber);line-height:1.55;}
+.et-warn-text strong{display:block;font-family:'DM Mono',monospace;font-size:10px;
+  letter-spacing:.5px;margin-bottom:2px;}
+ 
+/* ── BODY ── */
+.et-body{padding:18px 20px 20px;}
+ 
+/* ── TRAMO SELECTOR ── */
+.et-tramo-row{
+  display:grid;grid-template-columns:1fr auto 1fr;
+  gap:8px;align-items:center;margin-bottom:16px;
+}
+.et-tramo-box{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:9px;padding:10px 12px;
+}
+.et-tramo-lbl{
+  font-family:'DM Mono',monospace;font-size:8px;letter-spacing:1.5px;
+  text-transform:uppercase;color:var(--muted);margin-bottom:4px;
+}
+.et-tramo-val{
+  font-family:'Unbounded',sans-serif;font-size:9px;font-weight:700;
+  line-height:1.3;
+}
+.et-tramo-val.counter{color:var(--sal);}
+.et-tramo-val.sala{color:var(--muted);}
+.et-tramo-val.aeronave{color:var(--lle);}
+.et-arrow{
+  font-size:18px;color:var(--amber);text-align:center;flex-shrink:0;
+}
+.et-select-wrap{display:flex;flex-direction:column;gap:4px;}
+.et-select-wrap .et-tramo-lbl{color:var(--amber);}
+.et-tramo-select{
+  width:100%;padding:10px 28px 10px 11px;
+  background:var(--amber-light);border:1.5px solid var(--amber);
+  border-radius:9px;color:var(--amber);
+  font-size:11px;font-family:'DM Mono',monospace;
+  font-weight:600;outline:none;cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238a5200'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 9px center;
+  -webkit-appearance:none;appearance:none;
+}
+.et-tramo-select:focus{border-color:var(--red);}
+ 
+/* ── BILLING IMPACT ── */
+.et-impact{
+  border-radius:9px;padding:10px 13px;margin-bottom:14px;
+  font-size:11px;line-height:1.55;display:none;border:1px solid;
+}
+.et-impact.show{display:block;}
+.et-impact.add{
+  background:var(--green-light);border-color:#95d4b4;color:var(--green);
+}
+.et-impact.remove{
+  background:var(--red-light);border-color:var(--red-mid);color:var(--red);
+}
+.et-impact.neutral{
+  background:var(--surface2);border-color:var(--border);color:var(--muted);
+}
+.et-impact strong{
+  font-family:'DM Mono',monospace;font-size:10px;
+  letter-spacing:.5px;display:block;margin-bottom:2px;
+}
+ 
+/* ── FORM FIELDS ── */
+.et-field{margin-bottom:13px;}
+.et-label{
+  display:block;font-size:10px;font-family:'DM Mono',monospace;
+  color:var(--muted);letter-spacing:1px;text-transform:uppercase;
+  margin-bottom:5px;
+}
+.et-label span{color:var(--red);}
+.et-input{
+  width:100%;padding:10px 13px;
+  background:var(--surface2);border:1.5px solid var(--border);
+  border-radius:8px;color:var(--text);font-size:13px;
+  font-family:'DM Sans',sans-serif;outline:none;
+  transition:border-color .2s;
+}
+.et-input:focus{border-color:var(--red);}
+.et-input.error{border-color:var(--red);background:var(--red-light);}
+.et-hint{font-size:10px;color:var(--muted);margin-top:3px;
+  font-family:'DM Mono',monospace;}
+ 
+/* ── FOOTER BUTTONS ── */
+.et-footer{
+  display:flex;gap:8px;justify-content:flex-end;
+  border-top:1px solid var(--border);padding:12px 20px;
+  background:var(--surface2);
+}
+.et-btn-cancel{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:8px;padding:9px 18px;font-size:12px;color:var(--muted);
+  cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;
+}
+.et-btn-cancel:hover{border-color:var(--text);color:var(--text);}
+.et-btn-confirm{
+  background:var(--amber);color:#fff;border:none;
+  border-radius:8px;padding:9px 22px;font-size:12px;font-weight:600;
+  font-family:'DM Sans',sans-serif;cursor:pointer;transition:background .2s;
+  display:flex;align-items:center;gap:7px;
+}
+.et-btn-confirm:hover{background:#7a4800;}
+.et-btn-confirm:disabled{opacity:.5;pointer-events:none;}
+.et-spinner{
+  width:14px;height:14px;border:2px solid rgba(255,255,255,.3);
+  border-top-color:#fff;border-radius:50%;
+  animation:spin .6s linear infinite;flex-shrink:0;
+}
+.et-err-msg{
+  background:var(--red-light);border:1px solid var(--red-mid);
+  border-radius:7px;padding:8px 12px;font-size:11px;color:var(--red);
+  font-family:'DM Mono',monospace;margin-bottom:12px;display:none;
+}
+.et-err-msg.show{display:block;}
+ 
+/* ── ÉXITO ── */
+.et-success{
+  text-align:center;padding:32px 20px;display:none;
+}
+.et-success.show{display:block;}
+.et-success-icon{font-size:40px;margin-bottom:12px;}
+.et-success-title{
+  font-family:'Unbounded',sans-serif;font-size:13px;font-weight:700;
+  color:var(--green);margin-bottom:6px;
+}
+.et-success-sub{font-size:11px;color:var(--muted);line-height:1.5;}
+ 
+/* ── EDIT BUTTON en tabla ── */
+.btn-edit-tramo{
+  background:none;border:1px solid var(--border);border-radius:5px;
+  padding:2px 8px;font-size:9px;cursor:pointer;font-family:'DM Mono',monospace;
+  color:var(--muted);transition:all .2s;margin-left:6px;
+  display:inline-flex;align-items:center;gap:3px;
+}
+.btn-edit-tramo:hover{border-color:var(--amber);color:var(--amber);}     
+</style>
+</head>
+<body>
+
+      
+<div class="et-overlay" id="etOverlay" onclick="etClickOutside(event)">
+  <div class="et-modal" role="dialog" aria-modal="true" aria-labelledby="etModalTitle">
+ 
+    <!-- HEADER -->
+    <div class="et-header">
+      <div class="et-header-icon">&#9998;</div>
+      <div>
+        <div class="et-header-title" id="etModalTitle">Editar Tramo / Dirección</div>
+        <div class="et-header-sub" id="etModalSubtitle">&#8212;</div>
+      </div>
+    </div>
+ 
+    <!-- FORM -->
+    <div id="etFormWrap">
+      <!-- WARNING -->
+      <div class="et-warn">
+        <div class="et-warn-icon">&#9888;</div>
+        <div class="et-warn-text">
+          <strong>&#9830; IMPACTO EN FACTURACIÓN</strong>
+          Este cambio puede agregar o remover un servicio facturable
+          (SAL o LLE). Requiere justificación y nombre completo del responsable.
+        </div>
+      </div>
+ 
+      <div class="et-body">
+ 
+        <!-- ERROR global -->
+        <div class="et-err-msg" id="etErrMsg"></div>
+ 
+        <!-- SELECTOR DE TRAMO -->
+        <div class="et-tramo-row">
+          <div class="et-tramo-box">
+            <div class="et-tramo-lbl">Tramo actual</div>
+            <div class="et-tramo-val" id="etTramoActualLabel">&#8212;</div>
+          </div>
+          <div class="et-arrow">&#8594;</div>
+          <div>
+            <div class="et-select-wrap">
+              <div class="et-tramo-lbl">Nuevo tramo <span style="color:var(--red)">*</span></div>
+              <select class="et-tramo-select" id="etNuevoTramo" onchange="etOnTramoChange()">
+                <option value="">— Seleccione —</option>
+                <option value="counter-inspeccion">&#9650; Counter → Insp (SAL)</option>
+                <option value="inspeccion-sala">Insp → Sala</option>
+                <option value="aeronave-salida">&#9660; Aeronave → Salida (LLE)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+ 
+        <!-- IMPACTO EN FACTURACIÓN (dinámico) -->
+        <div class="et-impact" id="etImpact"></div>
+ 
+        <!-- NOMBRE COMPLETO -->
+        <div class="et-field">
+          <label class="et-label" for="etNombre">
+            Nombre completo del responsable <span>*</span>
+          </label>
+          <input type="text" class="et-input" id="etNombre"
+                 placeholder="Nombre y apellido completo"
+                 autocomplete="name" oninput="etClearErr()">
+          <div class="et-hint">Debe coincidir con su identificación oficial</div>
+        </div>
+ 
+        <!-- MOTIVO -->
+        <div class="et-field">
+          <label class="et-label" for="etMotivo">
+            Motivo del cambio <span>*</span>
+          </label>
+          <input type="text" class="et-input" id="etMotivo"
+                 placeholder="Explique la razón del cambio de tramo..."
+                 oninput="etClearErr()">
+          <div class="et-hint">Mínimo 10 caracteres</div>
+        </div>
+ 
+      </div><!-- /et-body -->
+ 
+      <!-- FOOTER -->
+      <div class="et-footer">
+        <button class="et-btn-cancel" onclick="etClose()">Cancelar</button>
+        <button class="et-btn-confirm" id="etBtnConfirm" onclick="etConfirm()">
+          &#9998; Confirmar cambio
+        </button>
+      </div>
+    </div><!-- /etFormWrap -->
+ 
+    <!-- ÉXITO -->
+    <div class="et-success" id="etSuccess">
+      <div class="et-success-icon">&#9989;</div>
+      <div class="et-success-title">Tramo actualizado</div>
+      <div class="et-success-sub" id="etSuccessSub"></div>
+    </div>
+ 
+  </div>
+</div><!-- /et-overlay -->
+
+<!-- LOGIN -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-card">
+    <div class="login-logo">&#9855;</div>
+    <div class="login-title">Monitor WCH</div>
+    <div class="login-sub">Avianca SAL &middot; Operaciones</div>
+    <label class="login-label">ID de Acceso</label>
+    <div class="login-input-wrap">
+      <input type="password" class="login-input" id="loginId"
+             placeholder="Ingrese su ID de acceso"
+             onkeydown="if(event.key==='Enter')doLogin()">
+      <button class="login-eye" onclick="togglePwd()" title="Mostrar/ocultar">&#128065;</button>
+    </div>
+    <button class="login-btn" id="loginBtn" onclick="doLogin()">Acceder</button>
+    <div class="login-err" id="loginErr"></div>
+    <div class="login-hint">Su ID de acceso es proporcionado por el administrador.<br>No lo comparta con terceros.</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="appWrap">
+
+<header class="header">
+  <div class="header-brand">
+    <div class="header-logo">&#9855;</div>
+    <div>
+      <div class="header-title">Monitor WCH &middot; Avianca SAL</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <span class="refresh-info" id="refreshInfo">auto-refresh: --</span>
+    <div class="badge-live">
+      <div class="pulse" id="liveDot"></div>
+      <span id="liveStatus">CONECTANDO</span>
+    </div>
+    <div class="header-user">
+      <span class="header-user-name" id="headerUserId">&#8212;</span>
+    </div>
+    <button class="debug-toggle-btn" onclick="toggleDebug()">&#128270; DEBUG</button>
+    <button class="btn-logout" onclick="doLogout()">Salir</button>
+  </div>
+</header>
+
+<div class="main">
+
+  <!-- DEBUG -->
+  <div class="debug-panel" id="debugPanel">
+    <div class="debug-title">
+      <span>&#128270; Debug Console</span>
+      <button class="btn-debug" onclick="clearDebug()">Limpiar</button>
+    </div>
+    <div class="debug-url-box" id="debugUrl">URL: (no configurada)</div>
+    <div class="debug-log" id="debugLog"><div class="debug-line info">Esperando conexion...</div></div>
+    <div class="debug-actions">
+      <button class="btn-debug green" onclick="testRawFetch()">Abrir URL en nueva pesta&ntilde;a</button>
+      <button class="btn-debug" onclick="copyDebugLog()">Copiar log</button>
+    </div>
+  </div>
+
+  <!-- FACTURACIÓN DIARIA -->
+  <div class="billing-section">
+    <div class="billing-header">
+      <div class="billing-title">
+        Facturaci&#243;n Diaria
+        <span class="billing-badge">SAL + LLE</span>
+      </div>
+      <div class="billing-subtitle" id="billWeekLabel">&#8212;</div>
+    </div>
+    <div class="billing-grid" id="billingGrid"></div>
+    <div class="billing-total-bar">
+      <div class="billing-total-item">
+        <div class="billing-total-label">Sillas facturadas hoy</div>
+        <div class="billing-total-val red" id="billToday">&#8212;</div>
+      </div>
+      <div class="billing-breakdown">
+        <div class="billing-breakdown-item">
+          <div class="billing-breakdown-dot sal"></div>
+          <span>Salidas (Counter): <strong id="billSalToday">0</strong></span>
+        </div>
+        <div class="billing-breakdown-item">
+          <div class="billing-breakdown-dot lle"></div>
+          <span>Llegadas (Aeronave): <strong id="billLleToday">0</strong></span>
+        </div>
+      </div>
+      <div class="billing-total-item">
+        <div class="billing-total-label">Total semana</div>
+        <div class="billing-total-val gold" id="billWeekTotal">&#8212;</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESUMEN POR VUELO -->
+  <div class="vuelo-summary" id="vueloSummary">
+    <div class="vuelo-summary-header">
+      <div class="vuelo-summary-title">
+        &#9992; Resumen Facturaci&#243;n &mdash; Vuelo
+        <span class="vuelo-summary-flight" id="vueloSummaryFlight">AV ---</span>
+      </div>
+      <button class="vuelo-summary-close" onclick="clearVueloFilter()">&#10005; Limpiar vuelo</button>
+    </div>
+    <div class="vuelo-summary-grid">
+      <div class="vuelo-stat highlight">
+        <div class="vuelo-stat-label">&#9830; Total Facturables</div>
+        <div class="vuelo-stat-val gold" id="vsTotal">0</div>
+        <div class="vuelo-stat-sub">counter + aeronave</div>
+      </div>
+      <div class="vuelo-stat">
+        <div class="vuelo-stat-label">&#9650; Counter&#8594;Insp</div>
+        <div class="vuelo-stat-val sal" id="vsCounter">0</div>
+        <div class="vuelo-stat-sub">Salidas (SAL)</div>
+      </div>
+      <div class="vuelo-stat">
+        <div class="vuelo-stat-label">&#9660; Aeronave&#8594;Salida</div>
+        <div class="vuelo-stat-val lle" id="vsAeronave">0</div>
+        <div class="vuelo-stat-sub">Llegadas (LLE)</div>
+      </div>
+      <div class="vuelo-stat">
+        <div class="vuelo-stat-label">Otros servicios</div>
+        <div class="vuelo-stat-val muted" id="vsOtros">0</div>
+        <div class="vuelo-stat-sub">no facturables</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MÉTRICAS -->
+  <div class="metrics-row">
+    <div class="metric-card red">
+      <div class="metric-label">Servicios</div>
+      <div class="metric-value" id="metTotal">&#8212;</div>
+      <div class="metric-sub">en vista actual</div>
+      <div class="metric-filter-tag" id="tagTotal">&#9655; FILTRADO</div>
+    </div>
+    <div class="metric-card green">
+      <div class="metric-label">Salidas (SAL)</div>
+      <div class="metric-value" id="metSal">&#8212;</div>
+      <div class="metric-sub">Counter &#8594; Insp</div>
+      <div class="metric-filter-tag" id="tagSal">&#9655; FILTRADO</div>
+    </div>
+    <div class="metric-card blue">
+      <div class="metric-label">Llegadas (LLE)</div>
+      <div class="metric-value" id="metLle">&#8212;</div>
+      <div class="metric-sub">Aeronave &#8594; Salida</div>
+      <div class="metric-filter-tag" id="tagLle">&#9655; FILTRADO</div>
+    </div>
+    <div class="metric-card amber">
+      <div class="metric-label">Facturables</div>
+      <div class="metric-value" id="metBillable">&#8212;</div>
+      <div class="metric-sub">SAL + LLE en vista</div>
+      <div class="metric-filter-tag" id="tagBillable">&#9655; FILTRADO</div>
+    </div>
+  </div>
+
+  <!-- FILTERS -->
+  <div class="filters-panel">
+    <div class="filters-header">
+      <div class="filters-title">
+        Filtros
+        <span class="filters-active-badge" id="activeFiltersCount">0 activos</span>
+      </div>
+      <button class="btn-clear-f" onclick="clearFilters()">Limpiar filtros</button>
+    </div>
+    <div class="filters-grid">
+      <!-- ① Vuelo -->
+      <div class="filter-group">
+        <label>N&#176; de Vuelo</label>
+        <div class="filter-vuelo-wrap">
+          <span class="filter-vuelo-icon">&#9992;</span>
+          <input type="text" id="fVuelo" placeholder="Ej: 204, 8701..." oninput="applyFilters()" autocomplete="off">
+        </div>
+      </div>
+      <!-- ② Fecha -->
+      <div class="filter-group">
+        <label>Fecha</label>
+        <input type="date" id="fFecha" onchange="applyFilters()">
+      </div>
+      <!-- ③ Staff -->
+      <div class="filter-group">
+        <label>Staff</label>
+        <select id="fStaff" onchange="applyFilters()"><option value="">Todos</option></select>
+      </div>
+      <!-- ④ Tramo -->
+      <div class="filter-group">
+        <label>Tramo</label>
+        <select id="fTramo" onchange="applyFilters()">
+          <option value="">Todos</option>
+          <option value="counter-inspeccion">Counter&#8594;Insp</option>
+          <option value="inspeccion-sala">Insp&#8594;Sala</option>
+          <option value="aeronave-salida">Aeronave&#8594;Salida</option>
+          <option value="Desabordaje">Desabordaje</option>
+          <option value="otro">Otro</option>
+        </select>
+      </div>
+      <!-- ⑤ Pasajero -->
+      <div class="filter-group">
+        <label>Pasajero</label>
+        <input type="text" id="fPasajero" placeholder="Nombre..." oninput="applyFilters()">
+      </div>
+      <!-- ⑥ Tipo WCH -->
+      <div class="filter-group">
+        <label>Tipo WCH</label>
+        <select id="fWCH" onchange="applyFilters()">
+          <option value="">Todos</option>
+          <option value="WCHR">WCHR</option>
+          <option value="WCHS">WCHS</option>
+          <option value="WCHC">WCHC</option>
+        </select>
+      </div>
+      <!-- ⑦ Dirección -->
+      <div class="filter-group">
+        <label>Direcci&#243;n</label>
+        <select id="fDir" onchange="applyFilters()">
+          <option value="">Todas</option>
+          <option value="SAL">&#9650; Salidas (SAL)</option>
+          <option value="LLE">&#9660; Llegadas (LLE)</option>
+        </select>
+      </div>
+      <!-- ⑧ Turno -->
+      <div class="filter-group">
+        <label>Turno</label>
+        <select id="fTurno" onchange="applyFilters()">
+          <option value="">Todos</option>
+          <option value="am">&#9728; AM (antes 12:00)</option>
+          <option value="pm">&#9790; PM (12:00+)</option>
+        </select>
+      </div>
+      <!-- ⑨ Botón -->
+      <button class="btn-clear-f" onclick="clearFilters()">&#10005; Limpiar</button>
+    </div>
+
+    <!-- Chips turno -->
+    <div class="turno-chips">
+      <span class="turno-chip all-chip active-turno" onclick="setTurnoChip('')" data-turno="">&#9654; Todos los turnos</span>
+      <span class="turno-chip am-chip" onclick="setTurnoChip('am')" data-turno="am">&#9728; Turno AM &mdash; antes de 12:00</span>
+      <span class="turno-chip pm-chip" onclick="setTurnoChip('pm')" data-turno="pm">&#9790; Turno PM &mdash; 12:00 en adelante</span>
+    </div>
+
+    <!-- Chips tramo -->
+    <div class="filter-chips" id="tramoChips">
+      <span class="chip active-chip" onclick="setTramoChip('')" data-tramo="">Todos</span>
+      <span class="chip" onclick="setTramoChip('counter-inspeccion')" data-tramo="counter-inspeccion"><span class="chip-dot sal"></span>Counter&#8594;Insp</span>
+      <span class="chip" onclick="setTramoChip('inspeccion-sala')" data-tramo="inspeccion-sala">Insp&#8594;Sala</span>
+      <span class="chip" onclick="setTramoChip('aeronave-salida')" data-tramo="aeronave-salida"><span class="chip-dot lle"></span>Aeronave&#8594;Salida</span>
+      <span class="chip" onclick="setTramoChip('Desabordaje')" data-tramo="Desabordaje">Desabordaje</span>
+    </div>
+
+    <!-- Chips dirección -->
+    <div class="dir-chips">
+      <span class="dir-chip all-chip active-dir" onclick="setDirChip('')" data-dir="">&#9654; Todas las direcciones</span>
+      <span class="dir-chip sal-chip" onclick="setDirChip('SAL')" data-dir="SAL">&#9650; Salidas (SAL) &mdash; Counter</span>
+      <span class="dir-chip lle-chip" onclick="setDirChip('LLE')" data-dir="LLE">&#9660; Llegadas (LLE) &mdash; Aeronave</span>
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-panel">
+    <div id="loadingBar" style="display:none;"><div class="loading-bar"></div></div>
+    <div class="table-toolbar">
+      <div class="table-toolbar-title">Servicios WCH &mdash; Vuelos Avianca (AV)</div>
+      <div class="toolbar-right">
+        <span class="results-count" id="resultsCount">0 resultados</span>
+        <button class="btn-export" onclick="exportCSV()">&#8595; CSV</button>
+        <div class="pdf-export-group">
+          <select id="pdfBanco" class="pdf-banco-select">
+            <option value="all">Todos los vuelos</option>
+            <option value="am">&#9728; Banco AM (antes 12:00)</option>
+            <option value="pm">&#9790; Banco PM (12:00+)</option>
+          </select>
+          <button class="btn-pdf" onclick="exportPDF()">&#128438; PDF Consolidado</button>
+        </div>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th onclick="sortBy('fecha')">Fecha<span class="sort-icon" id="sh-fecha">&#8597;</span></th>
+            <th onclick="sortBy('usuario')">Staff<span class="sort-icon" id="sh-usuario">&#8597;</span></th>
+            <th onclick="sortBy('tramo')">Tramo / Direcci&#243;n<span class="sort-icon" id="sh-tramo">&#8597;</span></th>
+            <th onclick="sortBy('pasajero')">Pasajero<span class="sort-icon" id="sh-pasajero">&#8597;</span></th>
+            <th onclick="sortBy('wchType')">WCH<span class="sort-icon" id="sh-wchType">&#8597;</span></th>
+            <th onclick="sortBy('vuelo')">Vuelo AV<span class="sort-icon" id="sh-vuelo">&#8597;</span></th>
+            <th>Turno</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <tr><td colspan="7">
+            <div class="empty-state">
+              <div class="empty-icon">&#128225;</div>
+              <div class="empty-title">Sin datos</div>
+              <div class="empty-sub">Ingrese su ID de acceso para comenzar</div>
+            </div>
+          </td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="pagination" id="paginationBar" style="display:none;"></div>
+  </div>
+
+</div><!-- /main -->
+</div><!-- /appWrap -->
+<iframe id="printFrame" tabindex="-1" aria-hidden="true"></iframe>
+
+<script>
+const URL_PREFIX = 'https://script.google.com/macros/s/';
+const URL_SUFFIX = '/exec';
+const PAGE_SIZE   = 30;
+const REFRESH_MS  = 60000;
+
+let allRecords      = [];
+let filteredRecords = [];
+let currentPage     = 1;
+let sortField       = 'fecha';
+let sortDir         = -1;
+let debugLines      = [];
+let refreshTimer    = null;
+let countdownTimer  = null;
+let currentUserId   = '';
+
+// ── Dirección SAL / LLE ──
+function getDir(tramo){
+  const t=(tramo||'').toLowerCase();
+  if(t.includes('counter'))  return 'SAL';
+  if(t.includes('aeronave')) return 'LLE';
+  return '';
+}
+function isBillable(tramo){ return getDir(tramo)!==''; }
+
+// ── Turno AM / PM ──
+function getTurno(hora){
+  if(!hora) return '';
+  const h=parseInt((hora||'').split(':')[0],10);
+  if(isNaN(h)) return '';
+  return h<12?'am':'pm';
+}
+
+// ── Conversión de fechas ──
+function fechaToISO(f){
+  const p=(f||'').split('/');
+  return p.length===3 ? p[2]+'-'+p[0].padStart(2,'0')+'-'+p[1].padStart(2,'0') : '';
+}
+function fechaToTs(f,h){
+  const iso=fechaToISO(f);
+  if(!iso) return 0;
+  try{return new Date(iso+'T'+(h||'00:00:00')).getTime()||0;}catch(e){return 0;}
+}
+function dateToRecordFormat(d){
+  const mm=String(d.getMonth()+1).padStart(2,'0');
+  const dd=String(d.getDate()).padStart(2,'0');
+  const yyyy=d.getFullYear();
+  return mm+'/'+dd+'/'+yyyy;
+}
+
+// ── LOGIN ──
+function doLogin(){
+  const raw=document.getElementById('loginId').value.trim();
+  if(!raw){showLoginErr('Ingrese su ID de acceso.');return;}
+  const btn=document.getElementById('loginBtn');
+  btn.innerHTML='<span class="login-spinner"></span>Verificando...';
+  btn.disabled=true;
+  document.getElementById('loginErr').classList.remove('show');
+  const scriptUrl=URL_PREFIX+raw+URL_SUFFIX;
+  const cbName='loginCb_'+Date.now();
+  window[cbName]=function(data){
+    delete window[cbName];
+    const s=document.getElementById('ls');if(s)s.remove();
+    btn.innerHTML='Acceder';btn.disabled=false;
+    if(data&&data.success){
+      currentUserId=raw;
+      localStorage.setItem('wch_user_id',raw);
+      launchApp(scriptUrl,data.records||[]);
+    }else{showLoginErr('ID incorrecto o sin acceso. Verifique e intente de nuevo.');}
+  };
+  const scr=document.createElement('script');
+  scr.id='ls';scr.src=scriptUrl+'?action=getDashboardData&callback='+cbName;
+  scr.onerror=function(){delete window[cbName];scr.remove();btn.innerHTML='Acceder';btn.disabled=false;showLoginErr('No se pudo conectar. Verifique su ID.');};
+  document.body.appendChild(scr);
+  setTimeout(function(){if(window[cbName]){delete window[cbName];btn.innerHTML='Acceder';btn.disabled=false;showLoginErr('Tiempo de espera agotado.');}},15000);
+}
+function showLoginErr(msg){const el=document.getElementById('loginErr');el.textContent=msg;el.classList.add('show');}
+function togglePwd(){const inp=document.getElementById('loginId');inp.type=inp.type==='password'?'text':'password';}
+function doLogout(){
+  if(!confirm('\xBFCerrar sesi\xF3n?'))return;
+  localStorage.removeItem('wch_user_id');
+  if(refreshTimer)clearTimeout(refreshTimer);
+  if(countdownTimer)clearInterval(countdownTimer);
+  currentUserId='';allRecords=[];filteredRecords=[];
+  document.getElementById('loginId').value='';
+  document.getElementById('loginErr').classList.remove('show');
+  document.getElementById('appWrap').style.display='none';
+  document.getElementById('loginWrap').style.display='flex';
+}
+function launchApp(scriptUrl,records){
+  document.getElementById('loginWrap').style.display='none';
+  document.getElementById('appWrap').style.display='block';
+  document.getElementById('headerUserId').textContent=currentUserId.slice(0,8)+'***';
+  window._scriptUrl=scriptUrl;
+  dbg('success','Acceso correcto.');
+  allRecords=records;
+  populateStaffSelect(allRecords);
+  applyFilters();
+  renderBillingGrid(allRecords);
+  setStatus('connected','Actualizado '+nowStr()+' \xB7 '+allRecords.length+' registros');
+  document.getElementById('liveStatus').textContent='EN VIVO';
+  startRefreshCountdown();
+}
+(function tryAutoLogin(){
+  const saved=localStorage.getItem('wch_user_id');
+  if(!saved)return;
+  document.getElementById('loginId').value=saved;
+  const scriptUrl=URL_PREFIX+saved+URL_SUFFIX;
+  const cbName='autoCb_'+Date.now();
+  window[cbName]=function(data){
+    delete window[cbName];
+    const s=document.getElementById('als');if(s)s.remove();
+    if(data&&data.success){currentUserId=saved;launchApp(scriptUrl,data.records||[]);}
+  };
+  const scr=document.createElement('script');
+  scr.id='als';scr.src=scriptUrl+'?action=getDashboardData&callback='+cbName;
+  scr.onerror=function(){delete window[cbName];scr.remove();};
+  document.body.appendChild(scr);
+  setTimeout(function(){if(window[cbName])delete window[cbName];},10000);
+})();
+
+// ── LOAD DATA ──
+function loadData(silent){
+  const url=window._scriptUrl;
+  if(!url){dbg('error','Sin URL de script');return;}
+  const cbName='dashCb_'+Date.now();
+  const fullUrl=url+'?action=getDashboardData&callback='+cbName;
+  document.getElementById('debugUrl').textContent='URL: '+fullUrl;
+  if(!silent){setStatus('loading','Actualizando...');showLoading(true);}
+  window[cbName]=function(data){
+    delete window[cbName];
+    const s=document.getElementById('ds');if(s)s.remove();
+    showLoading(false);
+    if(data&&data.success){
+      allRecords=data.records||[];
+      if(!silent)dbg('success','Actualizados '+allRecords.length+' registros');
+      populateStaffSelect(allRecords);
+      applyFilters();
+      renderBillingGrid(allRecords);
+      setStatus('connected','Actualizado '+nowStr()+' \xB7 '+allRecords.length+' registros');
+      document.getElementById('liveStatus').textContent='EN VIVO';
+      startRefreshCountdown();
+    }else{
+      if(!silent)dbg('error','Error: '+(data?(data.message||'error'):'sin respuesta'));
+      setStatus('error','Error al actualizar');
+    }
+  };
+  const scr=document.createElement('script');
+  scr.id='ds';scr.src=fullUrl;
+  scr.onerror=function(){delete window[cbName];scr.remove();showLoading(false);setStatus('error','Error de red.');};
+  document.body.appendChild(scr);
+  setTimeout(function(){if(window[cbName]){delete window[cbName];showLoading(false);setStatus('error','Timeout');}},15000);
+}
+function startRefreshCountdown(){
+  if(countdownTimer)clearInterval(countdownTimer);
+  if(refreshTimer)clearTimeout(refreshTimer);
+  let cnt=Math.floor(REFRESH_MS/1000);
+  document.getElementById('refreshInfo').textContent='refresh en '+cnt+'s';
+  countdownTimer=setInterval(function(){cnt--;document.getElementById('refreshInfo').textContent='refresh en '+cnt+'s';if(cnt<=0)clearInterval(countdownTimer);},1000);
+  refreshTimer=setTimeout(function(){loadData(true);},REFRESH_MS);
+}
+
+// ── BILLING GRID ──
+function renderBillingGrid(records){
+  const grid=document.getElementById('billingGrid');
+  const today=new Date();
+  const days=[];
+  for(let i=6;i>=0;i--){
+    const d=new Date(today);d.setDate(today.getDate()-i);
+    const dateStr=dateToRecordFormat(d);
+    const dd=String(d.getDate()).padStart(2,'0');
+    const mm=String(d.getMonth()+1).padStart(2,'0');
+    const dows=['Dom','Lun','Mar','Mi\xE9','Jue','Vie','S\xE1b'];
+    const dow=dows[d.getDay()];
+    const dayRecs=records.filter(function(r){
+      return (r.aerolinea||'').toUpperCase()==='AV'&&(r.fecha||'')===dateStr&&isBillable(r.tramo);
+    });
+    const salCount=dayRecs.filter(r=>getDir(r.tramo)==='SAL').length;
+    const lleCount=dayRecs.filter(r=>getDir(r.tramo)==='LLE').length;
+    days.push({dateStr,displayDate:dd+'/'+mm,dow,isToday:i===0,total:dayRecs.length,salCount,lleCount});
+  }
+  const weekTotal=days.reduce(function(s,d){return s+d.total;},0);
+  document.getElementById('billWeekTotal').textContent=weekTotal;
+  document.getElementById('billWeekLabel').textContent='Semana: '+days[0].displayDate+' \u2013 '+days[6].displayDate;
+  const td=days[6];
+  document.getElementById('billToday').textContent=td.total;
+  document.getElementById('billSalToday').textContent=td.salCount;
+  document.getElementById('billLleToday').textContent=td.lleCount;
+  grid.innerHTML=days.map(function(d){
+    const cls='billing-day'+(d.total>0?' has-data':'')+(d.isToday?' today-day':'');
+    const dots=d.total>0?'<div class="billing-day-breakdown">'+(d.salCount>0?'<div class="billing-mini-dot sal"></div>':'')+(d.lleCount>0?'<div class="billing-mini-dot lle"></div>':'')+'</div>':'';
+    return '<div class="'+cls+'" title="'+d.dateStr+'">'
+      +'<div class="billing-day-dow">'+d.dow+'</div>'
+      +'<div class="billing-day-date">'+d.displayDate+'</div>'
+      +'<div class="billing-day-count">'+d.total+'</div>'
+      +'<div class="billing-day-label">'+(d.total>0?'silla'+(d.total!==1?'s':''):'\u2013')+'</div>'
+      +dots+'</div>';
+  }).join('');
+}
+
+// ── POPULATE STAFF ──
+function populateStaffSelect(records){
+  const sel=document.getElementById('fStaff');
+  const cur=sel.value;
+  const set=[...new Set(records.map(r=>r.usuario).filter(Boolean))].sort();
+  sel.innerHTML='<option value="">Todos</option>'+set.map(s=>'<option value="'+esc(s)+'">'+esc(s)+'</option>').join('');
+  if(cur)sel.value=cur;
+}
+
+// ── RESUMEN POR VUELO ──
+function updateVueloSummary(fVuelo){
+  const panel=document.getElementById('vueloSummary');
+  if(!fVuelo.trim()){panel.classList.remove('show');return;}
+  const vueloRecs=allRecords.filter(function(r){
+    return (r.aerolinea||'').toUpperCase()==='AV'&&(r.vuelo||'').toLowerCase().includes(fVuelo.toLowerCase());
+  });
+  const counter=vueloRecs.filter(r=>(r.tramo||'').toLowerCase().includes('counter')).length;
+  const aeronave=vueloRecs.filter(r=>(r.tramo||'').toLowerCase().includes('aeronave')).length;
+  const billable=counter+aeronave;
+  const otros=vueloRecs.length-billable;
+  const nombres=[...new Set(vueloRecs.map(r=>r.vuelo).filter(Boolean))];
+  document.getElementById('vueloSummaryFlight').textContent=nombres.length>0?'AV '+nombres.join(' / '):'AV '+fVuelo.toUpperCase();
+  document.getElementById('vsTotal').textContent=billable;
+  document.getElementById('vsCounter').textContent=counter;
+  document.getElementById('vsAeronave').textContent=aeronave;
+  document.getElementById('vsOtros').textContent=otros;
+  panel.classList.add('show');
+}
+function clearVueloFilter(){document.getElementById('fVuelo').value='';applyFilters();}
+
+// ── APPLY FILTERS ──
+function applyFilters(){
+  const fFecha   =document.getElementById('fFecha').value;
+  const fStaff   =document.getElementById('fStaff').value.toLowerCase();
+  const fTramo   =document.getElementById('fTramo').value.toLowerCase();
+  const fPasajero=document.getElementById('fPasajero').value.toLowerCase();
+  const fWCH     =document.getElementById('fWCH').value.toUpperCase();
+  const fDir     =document.getElementById('fDir').value;
+  const fVuelo   =document.getElementById('fVuelo').value.trim();
+  const fTurno   =document.getElementById('fTurno').value; // 'am'|'pm'|''
+
+  let activeCount=0;
+  if(fFecha)activeCount++;if(fStaff)activeCount++;if(fTramo)activeCount++;
+  if(fPasajero)activeCount++;if(fWCH)activeCount++;if(fDir)activeCount++;
+  if(fVuelo)activeCount++;if(fTurno)activeCount++;
+
+  const badge=document.getElementById('activeFiltersCount');
+  badge.textContent=activeCount+' activo'+(activeCount!==1?'s':'');
+  badge.classList.toggle('show',activeCount>0);
+  const isFiltered=activeCount>0;
+
+  filteredRecords=allRecords.filter(function(r){
+    if((r.aerolinea||'').toUpperCase()!=='AV') return false;
+    if(fFecha&&fechaToISO(r.fecha||'')!==fFecha) return false;
+    if(fStaff&&!(r.usuario||'').toLowerCase().includes(fStaff)) return false;
+    if(fTramo&&!(r.tramo||'').toLowerCase().includes(fTramo)) return false;
+    if(fPasajero&&!(r.pasajero||'').toLowerCase().includes(fPasajero)) return false;
+    if(fWCH&&(r.wchType||'').toUpperCase()!==fWCH) return false;
+    if(fDir&&getDir(r.tramo)!==fDir) return false;
+    if(fVuelo&&!(r.vuelo||'').toLowerCase().includes(fVuelo.toLowerCase())) return false;
+    if(fTurno&&getTurno(r.hora)!==fTurno) return false;
+    return true;
+  });
+
+  updateVueloSummary(fVuelo);
+
+  const total=filteredRecords.length;
+  const salCount=filteredRecords.filter(r=>getDir(r.tramo)==='SAL').length;
+  const lleCount=filteredRecords.filter(r=>getDir(r.tramo)==='LLE').length;
+  const billCount=filteredRecords.filter(r=>isBillable(r.tramo)).length;
+  document.getElementById('metTotal').textContent=total.toLocaleString();
+  document.getElementById('metSal').textContent=salCount.toLocaleString();
+  document.getElementById('metLle').textContent=lleCount.toLocaleString();
+  document.getElementById('metBillable').textContent=billCount.toLocaleString();
+  ['tagTotal','tagSal','tagLle','tagBillable'].forEach(function(id){
+    document.getElementById(id).classList.toggle('show',isFiltered);
+  });
+  doSort();currentPage=1;renderTable();
+}
+
+function clearFilters(){
+  ['fFecha','fPasajero','fVuelo'].forEach(function(id){document.getElementById(id).value='';});
+  ['fStaff','fTramo','fWCH','fDir','fTurno'].forEach(function(id){document.getElementById(id).value='';});
+  setTramoChip('');setDirChip('');setTurnoChip('');
+}
+function setTramoChip(tramo){
+  document.querySelectorAll('#tramoChips .chip').forEach(function(c){c.classList.toggle('active-chip',c.dataset.tramo===tramo);});
+  document.getElementById('fTramo').value=tramo;applyFilters();
+}
+function setDirChip(dir){
+  document.querySelectorAll('.dir-chip').forEach(function(c){c.classList.toggle('active-dir',c.dataset.dir===dir);});
+  document.getElementById('fDir').value=dir;applyFilters();
+}
+function setTurnoChip(turno){
+  document.querySelectorAll('.turno-chip').forEach(function(c){c.classList.toggle('active-turno',c.dataset.turno===turno);});
+  document.getElementById('fTurno').value=turno;applyFilters();
+}
+
+// ── SORT ──
+function sortBy(field){
+  if(sortField===field)sortDir*=-1;else{sortField=field;sortDir=1;}
+  document.querySelectorAll('th').forEach(function(th){th.classList.remove('sorted');});
+  const sh=document.getElementById('sh-'+field);
+  if(sh){sh.closest('th').classList.add('sorted');sh.textContent=sortDir===1?'\u2191':'\u2193';}
+  doSort();renderTable();
+}
+function doSort(){
+  filteredRecords.sort(function(a,b){
+    if(sortField==='fecha')return (fechaToTs(b.fecha,b.hora)-fechaToTs(a.fecha,a.hora))*sortDir;
+    return ((a[sortField]||'').toString()).localeCompare((b[sortField]||'').toString())*sortDir;
+  });
+}
+
+// ── RENDER TABLE ──
+function renderTable(){
+  const tbody=document.getElementById('tableBody');
+  const total=filteredRecords.length;
+  document.getElementById('resultsCount').textContent=total.toLocaleString()+' resultado'+(total!==1?'s':'');
+  if(total===0){
+    tbody.innerHTML='<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">&#128269;</div><div class="empty-title">Sin resultados</div><div class="empty-sub">Ajuste los filtros</div></div></td></tr>';
+    document.getElementById('paginationBar').style.display='none';return;
+  }
+  const start=(currentPage-1)*PAGE_SIZE;
+  const pageData=filteredRecords.slice(start,start+PAGE_SIZE);
+  tbody.innerHTML=pageData.map(function(r){
+    const dir=getDir(r.tramo);
+    const rowCls=dir==='SAL'?'sal-row':dir==='LLE'?'lle-row':'';
+    const dirPill=dir==='SAL'?'<span class="dir-pill sal">&#9650; SAL</span>':dir==='LLE'?'<span class="dir-pill lle">&#9660; LLE</span>':'';
+    const billPill=isBillable(r.tramo)?'<span class="billable-pill">&#9830; factura</span>':'';
+    const hora=r.hora?r.hora.slice(0,5):'';
+    const turno=getTurno(r.hora);
+    const turnoPill=turno==='am'?'<span class="turno-pill am">&#9728; AM</span>':turno==='pm'?'<span class="turno-pill pm">&#9790; PM</span>':'';
+    return '<tr class="'+rowCls+'">'
+      +'<td class="cell-date">'+esc(r.fecha||'\u2013')+(hora?' <span style="opacity:.45">'+esc(hora)+'</span>':'')+'</td>'
+      +'<td>'+esc(r.usuario||'\u2013')+'</td>'
+      +'<td>'+tramoToBadge(r.tramo)+dirPill+billPill+'</td>'
+      +'<td class="cell-name">'+esc(r.pasajero||'\u2013')+'</td>'
+      +'<td>'+wchToBadge(r.wchType)+'</td>'
+      +'<td class="cell-vuelo">'+esc(r.vuelo||'\u2013')+'</td>'
+      +'<td>'+turnoPill+'</td>'
+      +'</tr>';
+  }).join('');
+  renderPagination(total);
+}
+
+// ── PAGINATION ──
+function renderPagination(total){
+  const tp=Math.ceil(total/PAGE_SIZE);
+  const bar=document.getElementById('paginationBar');
+  if(tp<=1){bar.style.display='none';return;}
+  bar.style.display='flex';
+  let pages=[],html='';
+  if(tp<=7){for(let i=1;i<=tp;i++)pages.push(i);}
+  else{pages=[1];let s=Math.max(2,currentPage-2),e=Math.min(tp-1,currentPage+2);if(s>2)pages.push('...');for(let i=s;i<=e;i++)pages.push(i);if(e<tp-1)pages.push('...');pages.push(tp);}
+  html+='<button class="page-btn" onclick="goPage('+(currentPage-1)+')" '+(currentPage===1?'disabled style="opacity:.3"':'')+'>&#8249;</button>';
+  pages.forEach(function(p){
+    if(p==='...')html+='<span class="page-info">...</span>';
+    else html+='<button class="page-btn'+(p===currentPage?' active':'')+'" onclick="goPage('+p+')">'+p+'</button>';
+  });
+  html+='<button class="page-btn" onclick="goPage('+(currentPage+1)+')" '+(currentPage===tp?'disabled style="opacity:.3"':'')+'>&#8250;</button>';
+  html+='<span class="page-info">'+((currentPage-1)*PAGE_SIZE+1)+'\u2013'+Math.min(currentPage*PAGE_SIZE,total)+' de '+total+'</span>';
+  bar.innerHTML=html;
+}
+function goPage(p){
+  const tp=Math.ceil(filteredRecords.length/PAGE_SIZE);
+  if(p<1||p>tp)return;currentPage=p;renderTable();window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── BADGES ──
+function tramoToBadge(t){
+  const tl=(t||'').toLowerCase();
+  if(tl.includes('counter'))    return '<span class="badge badge-counter">Counter&#8594;Insp</span>';
+  if(tl.includes('sala'))       return '<span class="badge badge-sala">Insp&#8594;Sala</span>';
+  if(tl.includes('aeronave'))   return '<span class="badge badge-aeronave">Aeronave&#8594;Salida</span>';
+  if(tl.includes('desabordaje'))return '<span class="badge badge-des">Desabordaje</span>';
+  if(tl==='otro')               return '<span class="badge badge-otro">Otro</span>';
+  return '<span class="badge">'+esc(t||'\u2013')+'</span>';
+}
+function wchToBadge(w){
+  const wu=(w||'').toUpperCase();
+  if(wu==='WCHR')return '<span class="badge badge-wchr">WCHR</span>';
+  if(wu==='WCHS')return '<span class="badge badge-wchs">WCHS</span>';
+  if(wu==='WCHC')return '<span class="badge badge-wchc">WCHC</span>';
+  return '<span class="badge badge-wch">'+esc(w||'\u2013')+'</span>';
+}
+
+// ── EXPORT CSV ──
+function exportCSV(){
+  if(!filteredRecords.length){alert('Sin datos');return;}
+  const h=['Fecha','Hora','Turno','Staff','Tramo','Direccion','Facturable','Pasajero','WCH','Vuelo'];
+  const rows=filteredRecords.map(function(r){
+    return [r.fecha||'',r.hora||'',getTurno(r.hora).toUpperCase()||'',r.usuario||'',r.tramo||'',getDir(r.tramo)||'N/A',
+      isBillable(r.tramo)?'SI':'NO',r.pasajero||'',r.wchType||'',r.vuelo||'']
+      .map(function(v){return '"'+String(v).replace(/"/g,'""')+'"';}).join(',');
+  });
+  const csv=[h.join(',')].concat(rows).join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'}));
+  a.download='wch-'+new Date().toISOString().split('T')[0]+'.csv';
+  a.click();
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// ── EXPORT PDF CONSOLIDADO POR VUELO — DOS COLUMNAS (SAL | LLE) ──
+// ══════════════════════════════════════════════════════════════════════
+function exportPDF(){
+  const banco=document.getElementById('pdfBanco').value;
+  if(!filteredRecords.length){alert('Sin datos para exportar.');return;}
+
+  // Filtrar banco
+  let recs=filteredRecords;
+  if(banco==='am') recs=filteredRecords.filter(r=>getTurno(r.hora)==='am');
+  if(banco==='pm') recs=filteredRecords.filter(r=>getTurno(r.hora)==='pm');
+  if(!recs.length){
+    const label=banco==='am'?'AM':banco==='pm'?'PM':'';
+    alert('No hay registros para el banco '+label+' con los filtros actuales.');return;
+  }
+
+  // Solo registros facturables (SAL + LLE) para el consolidado
+  const recsBill=recs.filter(r=>isBillable(r.tramo));
+  // Separar SAL y LLE
+  const recsSAL=recsBill.filter(r=>getDir(r.tramo)==='SAL');
+  const recsLLE=recsBill.filter(r=>getDir(r.tramo)==='LLE');
+
+  // Agrupar por vuelo → para cada vuelo: {vuelo, items}
+  function groupByVuelo(arr){
+    const map={};
+    arr.forEach(function(r){
+      const v=r.vuelo||'S/N';
+      if(!map[v])map[v]=[];
+      map[v].push(r);
+    });
+    // Ordenar por vuelo
+    return Object.keys(map).sort().map(function(v){return {vuelo:v,items:map[v]};});
+  }
+  const groupsSAL=groupByVuelo(recsSAL);
+  const groupsLLE=groupByVuelo(recsLLE);
+
+  // Número máximo de filas para alinear las dos columnas
+  const maxGroups=Math.max(groupsSAL.length,groupsLLE.length);
+
+  // Render de una columna de vuelos
+  function renderVueloCol(groups,dir){
+    if(!groups.length) return '<div class="col-empty">Sin registros</div>';
+    // Conteos WCH por vuelo
+    return groups.map(function(g){
+      const wchr=g.items.filter(r=>(r.wchType||'').toUpperCase()==='WCHR').length;
+      const wchs=g.items.filter(r=>(r.wchType||'').toUpperCase()==='WCHS').length;
+      const wchc=g.items.filter(r=>(r.wchType||'').toUpperCase()==='WCHC').length;
+      const otros=g.items.length-wchr-wchs-wchc;
+      const breakdown=[]
+        .concat(wchr>0?['<span class="wch-sm wch-wchr">WCHR &times;'+wchr+'</span>']:[])
+        .concat(wchs>0?['<span class="wch-sm wch-wchs">WCHS &times;'+wchs+'</span>']:[])
+        .concat(wchc>0?['<span class="wch-sm wch-wchc">WCHC &times;'+wchc+'</span>']:[])
+        .concat(otros>0?['<span class="wch-sm wch-">Otro &times;'+otros+'</span>']:[])
+        .join(' ');
+      return '<div class="vuelo-block">'
+        +'<div class="vuelo-block-header">'
+        +'<span class="vuelo-num">AV '+esc(g.vuelo)+'</span>'
+        +'<span class="vuelo-count">'+g.items.length+' PAX</span>'
+        +'</div>'
+        +'<div class="vuelo-block-body">'+breakdown+'</div>'
+        +'</div>';
+    }).join('');
+  }
+
+  // Metadatos
+  const bancoLabel=banco==='am'?'&#9728; Banco AM \u2014 Antes de 12:00'
+    :banco==='pm'?'&#9790; Banco PM \u2014 12:00 en adelante'
+    :'\u2708\uFE0F Todos los Vuelos';
+  const bancoClass=banco==='am'?'am':banco==='pm'?'pm':'all';
+
+  const fechas=[...new Set(recs.map(r=>r.fecha).filter(Boolean))].sort();
+  const fechaRange=fechas.length>1?fechas[0]+' \u2013 '+fechas[fechas.length-1]:fechas[0]||'--';
+
+  const now=new Date();
+  const nowFmt=now.toLocaleDateString('es-CR',{day:'2-digit',month:'2-digit',year:'numeric'})
+    +' '+now.toLocaleTimeString('es-CR',{hour:'2-digit',minute:'2-digit'});
+
+  // Filtros activos
+  const activosDesc=[];
+  const fF=document.getElementById('fFecha').value;
+  const fS=document.getElementById('fStaff').value;
+  const fT=document.getElementById('fTramo').value;
+  const fP=document.getElementById('fPasajero').value;
+  const fW=document.getElementById('fWCH').value;
+  const fD=document.getElementById('fDir').value;
+  const fV=document.getElementById('fVuelo').value;
+  const fTn=document.getElementById('fTurno').value;
+  if(fF)activosDesc.push('Fecha: '+fF);
+  if(fS)activosDesc.push('Staff: '+fS);
+  if(fT)activosDesc.push('Tramo: '+fT);
+  if(fP)activosDesc.push('Pasajero: '+fP);
+  if(fW)activosDesc.push('Tipo: '+fW);
+  if(fD)activosDesc.push('Dir: '+fD);
+  if(fV)activosDesc.push('Vuelo: '+fV);
+  if(fTn)activosDesc.push('Turno: '+fTn.toUpperCase());
+  if(banco!=='all')activosDesc.push('Banco: '+banco.toUpperCase());
+
+  const html=`<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Consolidado WCH \u00B7 Avianca SAL</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;font-size:9pt;color:#1a1612;background:#fff;}
+
+/* ── HEADER ── */
+.rpt-header{background:#c8001a;color:#fff;padding:12px 20px 10px;display:flex;align-items:center;justify-content:space-between;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.rpt-logo{width:32px;height:32px;background:rgba(255,255,255,.18);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:17px;border:1px solid rgba(255,255,255,.3);flex-shrink:0;}
+.rpt-brand-area{display:flex;align-items:center;gap:11px;}
+.rpt-brand-title{font-size:12.5pt;font-weight:700;}
+.rpt-brand-sub{font-family:'DM Mono',monospace;font-size:7pt;opacity:.7;letter-spacing:2px;margin-top:1px;}
+.rpt-meta{text-align:right;font-family:'DM Mono',monospace;font-size:7.5pt;opacity:.75;line-height:1.7;}
+
+/* ── BANCO BANNER ── */
+.banco-banner{padding:8px 20px;display:flex;align-items:center;justify-content:space-between;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.banco-banner.am{background:#fff8e6;border-bottom:2px solid #b87600;}
+.banco-banner.pm{background:#eaf0fa;border-bottom:2px solid #1a4080;}
+.banco-banner.all{background:#f5f2ed;border-bottom:2px solid #c8001a;}
+.banco-label{font-size:10.5pt;font-weight:700;}
+.banco-label.am{color:#b87600;}
+.banco-label.pm{color:#1a4080;}
+.banco-label.all{color:#c8001a;}
+.banco-range{font-family:'DM Mono',monospace;font-size:8pt;color:#7a7268;}
+
+/* ── FILTROS ACTIVOS ── */
+.filtros-bar{padding:4px 20px;background:#fbeaea;border-bottom:1px solid #f5c6c6;font-family:'DM Mono',monospace;font-size:7pt;color:#c8001a;display:none;}
+.filtros-bar.show{display:block;}
+
+/* ── SUMMARY BAR ── */
+.summary-bar{display:flex;border-bottom:1px solid #ddd8d0;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.sum-item{flex:1;padding:9px 14px;border-right:1px solid #ddd8d0;}
+.sum-item:last-child{border-right:none;}
+.sum-lbl{font-size:6.5pt;color:#7a7268;font-family:'DM Mono',monospace;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px;}
+.sum-val{font-size:16pt;font-weight:700;line-height:1;}
+.sum-val.red{color:#c8001a;}
+.sum-val.sal{color:#1a6b45;}
+.sum-val.lle{color:#1a4080;}
+.sum-val.gold{color:#b87600;}
+.sum-sub{font-size:6.5pt;color:#7a7268;margin-top:1px;}
+
+/* ── DOS COLUMNAS PRINCIPALES ── */
+.cols-wrap{display:flex;gap:0;border-bottom:1px solid #ddd8d0;min-height:300px;}
+.col-sal,.col-lle{flex:1;min-width:0;}
+.col-sal{border-right:1px solid #ddd8d0;}
+.col-header{padding:8px 14px;display:flex;align-items:center;justify-content:space-between;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.col-header.sal{background:#eaf5ef;border-bottom:2px solid #1a6b45;}
+.col-header.lle{background:#eaf0fa;border-bottom:2px solid #1a4080;}
+.col-header-title{font-weight:700;font-size:10pt;display:flex;align-items:center;gap:6px;}
+.col-header-title.sal{color:#1a6b45;}
+.col-header-title.lle{color:#1a4080;}
+.col-header-count{font-family:'DM Mono',monospace;font-size:8pt;font-weight:600;padding:2px 8px;border-radius:10px;}
+.col-header-count.sal{background:#1a6b45;color:#fff;}
+.col-header-count.lle{background:#1a4080;color:#fff;}
+.col-body{padding:10px 12px;}
+.col-empty{padding:20px;text-align:center;color:#aaa;font-size:8.5pt;font-style:italic;}
+
+/* ── BLOQUE POR VUELO ── */
+.vuelo-block{margin-bottom:10px;border:1px solid #e8e4de;border-radius:6px;overflow:hidden;}
+.vuelo-block-header{display:flex;align-items:center;justify-content:space-between;padding:6px 10px;-webkit-print-color-adjust:exact;print-color-adjust:exact;background:#f5f2ed;}
+.vuelo-block-body{padding:7px 10px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.vuelo-num{font-family:'DM Mono',monospace;font-size:10pt;font-weight:700;color:#1a1612;letter-spacing:.5px;}
+.vuelo-count{font-family:'DM Mono',monospace;font-size:8pt;background:#1a1612;color:#fff;padding:1px 8px;border-radius:10px;}
+.inner-table{width:100%;border-collapse:collapse;font-size:8pt;}
+.inner-table th{padding:4px 8px;font-family:'DM Mono',monospace;font-size:6.5pt;letter-spacing:1px;text-transform:uppercase;color:#7a7268;border-bottom:1px solid #e8e4de;font-weight:500;background:#faf8f5;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.inner-table td{padding:4px 8px;border-bottom:1px solid #f0ede8;vertical-align:middle;}
+.inner-table tr:last-child td{border-bottom:none;}
+.inner-table tr:hover td{background:#f9f7f4;}
+.tc{text-align:center;}
+.mono{font-family:'DM Mono',monospace;}
+.small{font-size:7.5pt;}
+.wch-sm{display:inline-block;padding:1px 5px;border-radius:3px;font-family:'DM Mono',monospace;font-size:7pt;font-weight:500;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.wch-sm.wch-wchr{background:#e8f4fd;color:#0d5fc4;}
+.wch-sm.wch-wchs{background:#fdf3e0;color:#8a5200;}
+.wch-sm.wch-wchc{background:#fcebeb;color:#a32d2d;}
+.wch-sm.wch-{color:#aaa;}
+
+/* ── BLOQUE DE FIRMAS ── */
+.firmas-section{padding:18px 20px;border-bottom:1px solid #ddd8d0;}
+.firmas-title{font-family:'DM Mono',monospace;font-size:7pt;letter-spacing:2px;text-transform:uppercase;color:#7a7268;margin-bottom:14px;}
+.firmas-row{display:flex;gap:24px;}
+.firma-box{flex:1;border:1px solid #c8c4be;border-radius:6px;padding:14px 16px;}
+.firma-entity{font-family:'DM Mono',monospace;font-size:7.5pt;color:#7a7268;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;}
+.firma-name-line{border-bottom:1px solid #1a1612;height:26px;margin-bottom:5px;position:relative;}
+.firma-name-label{font-size:7pt;color:#aaa;margin-bottom:4px;}
+.firma-sign-row{display:flex;gap:16px;margin-top:10px;}
+.firma-sign-box{flex:1;}
+.firma-sign-line{border-bottom:1px solid #1a1612;height:32px;margin-bottom:4px;}
+.firma-sign-label{font-size:7pt;color:#aaa;}
+
+/* ── OBSERVACIONES ── */
+.obs-section{padding:16px 20px;}
+.obs-title{font-family:'DM Mono',monospace;font-size:7pt;letter-spacing:2px;text-transform:uppercase;color:#7a7268;margin-bottom:10px;}
+.obs-line{border-bottom:1px dashed #c8c4be;height:22px;margin-bottom:6px;}
+
+/* ── FOOTER ── */
+.rpt-footer{padding:7px 20px;background:#f5f2ed;display:flex;align-items:center;justify-content:space-between;font-family:'DM Mono',monospace;font-size:7pt;color:#7a7268;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+
+/* ── PRINT ── */
+@page{margin:0.5cm 0.7cm;size:A4 portrait;}
+.vuelo-block{page-break-inside:avoid;}
+.firmas-section{page-break-inside:avoid;}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="rpt-header">
+  <div class="rpt-brand-area">
+    <div class="rpt-logo">&#9855;</div>
+    <div>
+      <div class="rpt-brand-title">Monitor WCH &middot; Avianca SAL</div>
+      <div class="rpt-brand-sub">CONSOLIDADO DE OPERACIONES</div>
+    </div>
+  </div>
+  <div class="rpt-meta">
+    <div>Generado: ${esc(nowFmt)}</div>
+    <div>Per&iacute;odo: ${esc(fechaRange)}</div>
+  </div>
+</div>
+
+<!-- BANCO BANNER -->
+<div class="banco-banner ${bancoClass}">
+  <div class="banco-label ${bancoClass}">${bancoLabel}</div>
+  <div class="banco-range">${esc(fechaRange)} &nbsp;&bull;&nbsp; ${recsBill.length} PAX facturables</div>
+</div>
+
+<!-- FILTROS ACTIVOS -->
+<div class="filtros-bar${activosDesc.length?' show':''}">
+  Filtros: ${activosDesc.map(esc).join(' &nbsp;|&nbsp; ')}
+</div>
+
+<!-- RESUMEN -->
+<div class="summary-bar">
+  <div class="sum-item">
+    <div class="sum-lbl">Total facturables</div>
+    <div class="sum-val gold">${recsBill.length}</div>
+    <div class="sum-sub">SAL + LLE</div>
+  </div>
+  <div class="sum-item">
+    <div class="sum-lbl">&#9650; Salidas (SAL)</div>
+    <div class="sum-val sal">${recsSAL.length}</div>
+    <div class="sum-sub">${groupsSAL.length} vuelo${groupsSAL.length!==1?'s':''}</div>
+  </div>
+  <div class="sum-item">
+    <div class="sum-lbl">&#9660; Llegadas (LLE)</div>
+    <div class="sum-val lle">${recsLLE.length}</div>
+    <div class="sum-sub">${groupsLLE.length} vuelo${groupsLLE.length!==1?'s':''}</div>
+  </div>
+  <div class="sum-item">
+    <div class="sum-lbl">Total registros</div>
+    <div class="sum-val red">${recs.length}</div>
+    <div class="sum-sub">incl. no facturables</div>
+  </div>
+</div>
+
+<!-- DOS COLUMNAS -->
+<div class="cols-wrap">
+  <!-- COLUMNA SAL -->
+  <div class="col-sal">
+    <div class="col-header sal">
+      <div class="col-header-title sal">&#9650; Salidas &mdash; Counter &rarr; Insp</div>
+      <span class="col-header-count sal">${recsSAL.length} PAX</span>
+    </div>
+    <div class="col-body">
+      ${renderVueloCol(groupsSAL,'SAL')}
+    </div>
+  </div>
+  <!-- COLUMNA LLE -->
+  <div class="col-lle">
+    <div class="col-header lle">
+      <div class="col-header-title lle">&#9660; Llegadas &mdash; Aeronave &rarr; Salida</div>
+      <span class="col-header-count lle">${recsLLE.length} PAX</span>
+    </div>
+    <div class="col-body">
+      ${renderVueloCol(groupsLLE,'LLE')}
+    </div>
+  </div>
+</div>
+
+<!-- FIRMAS -->
+<div class="firmas-section">
+  <div class="firmas-title">&#9998; Firmas de Conformidad</div>
+  <div class="firmas-row">
+    <!-- Firma ADES -->
+    <div class="firma-box">
+      <div class="firma-entity">Encargado ADES</div>
+      <div class="firma-name-label">Nombre completo</div>
+      <div class="firma-name-line"></div>
+      <div class="firma-sign-row">
+        <div class="firma-sign-box">
+          <div class="firma-sign-line"></div>
+          <div class="firma-sign-label">Firma</div>
+        </div>
+        <div class="firma-sign-box">
+          <div class="firma-sign-line"></div>
+          <div class="firma-sign-label">Fecha / Hora</div>
+        </div>
+      </div>
+    </div>
+    <!-- Firma Avianca -->
+    <div class="firma-box">
+      <div class="firma-entity">Encargado Avianca</div>
+      <div class="firma-name-label">Nombre completo</div>
+      <div class="firma-name-line"></div>
+      <div class="firma-sign-row">
+        <div class="firma-sign-box">
+          <div class="firma-sign-line"></div>
+          <div class="firma-sign-label">Firma</div>
+        </div>
+        <div class="firma-sign-box">
+          <div class="firma-sign-line"></div>
+          <div class="firma-sign-label">Fecha / Hora</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- OBSERVACIONES -->
+<div class="obs-section">
+  <div class="obs-title">&#128221; Comentarios / Observaciones</div>
+  <div class="obs-line"></div>
+  <div class="obs-line"></div>
+  <div class="obs-line"></div>
+</div>
+
+<!-- FOOTER -->
+<div class="rpt-footer">
+  <span>Monitor WCH &middot; Avianca SAL &middot; ${esc(bancoClass.toUpperCase())}</span>
+  <span>Generado autom&aacute;ticamente ${esc(nowFmt)} &mdash; CONFIDENCIAL</span>
+</div>
+
+</body></html>`;
+
+  const frame=document.getElementById('printFrame');
+  frame.style.display='block';
+  const doc=frame.contentDocument||frame.contentWindow.document;
+  doc.open();doc.write(html);doc.close();
+  frame.contentWindow.focus();
+  setTimeout(function(){
+    frame.contentWindow.print();
+    setTimeout(function(){frame.style.display='none';},1000);
+  },400);
+}
+
+// ── DEBUG ──
+function toggleDebug(){document.getElementById('debugPanel').classList.toggle('open');}
+function dbg(type,msg){
+  console.log('[WCH]['+type.toUpperCase()+'] '+msg);
+  const ts=new Date().toLocaleTimeString('es-CR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  debugLines.push({type,msg,ts});
+  const log=document.getElementById('debugLog');if(!log)return;
+  const line=document.createElement('div');line.className='debug-line '+type;
+  line.textContent='['+ts+'] '+msg;log.appendChild(line);log.scrollTop=log.scrollHeight;
+}
+function clearDebug(){debugLines=[];document.getElementById('debugLog').innerHTML='<div class="debug-line info">Log limpiado.</div>';}
+function copyDebugLog(){
+  const t=debugLines.map(l=>'['+l.ts+']['+l.type+'] '+l.msg).join('\n');
+  navigator.clipboard.writeText(t).then(()=>dbg('success','Copiado')).catch(()=>dbg('warn','No se pudo copiar'));
+}
+function testRawFetch(){
+  if(!window._scriptUrl){dbg('error','Sin URL');return;}
+  window.open(window._scriptUrl+'?action=getDashboardData&callback=test','_blank');
+}
+
+// ── UI HELPERS ──
+function showLoading(s){document.getElementById('loadingBar').style.display=s?'block':'none';}
+function setStatus(type,msg){
+  const live=document.getElementById('liveStatus');
+  const pDot=document.getElementById('liveDot');
+  if(type==='connected'){live.textContent='EN VIVO';pDot.style.background='#4ade80';}
+  else if(type==='error'){live.textContent='ERROR';pDot.style.background='#ef4444';}
+  else{live.textContent='CARGANDO';pDot.style.background='#fbbf24';}
+}
+function nowStr(){return new Date().toLocaleTimeString('es-CR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+<script id="edit-tramo-js">
+ 
+// ── Estado del modal ──────────────────────────────────────────
+let etCurrentRecord = null;  // registro completo de la fila seleccionada
+ 
+// ── Abrir modal ───────────────────────────────────────────────
+function openEditTramo(record) {
+  etCurrentRecord = record;
+ 
+  // Resetear estado
+  document.getElementById('etFormWrap').style.display  = 'block';
+  document.getElementById('etSuccess').classList.remove('show');
+  document.getElementById('etErrMsg').classList.remove('show');
+  document.getElementById('etNuevoTramo').value = '';
+  document.getElementById('etNombre').value     = '';
+  document.getElementById('etMotivo').value     = '';
+  document.getElementById('etImpact').classList.remove('show');
+  document.getElementById('etNombre').classList.remove('error');
+  document.getElementById('etMotivo').classList.remove('error');
+  document.getElementById('etBtnConfirm').disabled = false;
+  document.getElementById('etBtnConfirm').innerHTML = '&#9998; Confirmar cambio';
+ 
+  // Datos del registro
+  const tramoActual = record.tramo || '';
+  const vueloLabel  = record.vuelo    ? 'Vuelo ' + record.vuelo : '';
+  const paxLabel    = record.pasajero ? record.pasajero          : '(sin nombre)';
+ 
+  document.getElementById('etModalSubtitle').textContent =
+    (vueloLabel ? vueloLabel + ' · ' : '') + paxLabel.slice(0, 30);
+ 
+  // Tramo actual
+  const tramoLabel = etTramoToLabel(tramoActual);
+  const el = document.getElementById('etTramoActualLabel');
+  el.textContent  = tramoLabel;
+  el.className    = 'et-tramo-val ' + etTramoToClass(tramoActual);
+ 
+  // Abrir overlay
+  document.getElementById('etOverlay').classList.add('open');
+  setTimeout(() => document.getElementById('etNuevoTramo').focus(), 200);
+}
+ 
+// ── Cerrar modal ──────────────────────────────────────────────
+function etClose() {
+  document.getElementById('etOverlay').classList.remove('open');
+  etCurrentRecord = null;
+}
+ 
+function etClickOutside(e) {
+  if (e.target === document.getElementById('etOverlay')) etClose();
+}
+ 
+// ── Cambio de selector → actualizar banner de impacto ─────────
+function etOnTramoChange() {
+  etClearErr();
+  const nuevoTramo  = document.getElementById('etNuevoTramo').value;
+  const tramoActual = (etCurrentRecord && etCurrentRecord.tramo) || '';
+  const impact      = document.getElementById('etImpact');
+ 
+  if (!nuevoTramo) { impact.classList.remove('show'); return; }
+  if (nuevoTramo === tramoActual.toLowerCase()) {
+    etShowImpact('neutral', '&#8212; SIN CAMBIO',
+      'El tramo seleccionado es igual al actual.');
+    return;
+  }
+ 
+  const eraFacturable = etIsBillable(tramoActual);
+  const seraFacturable = nuevoTramo !== 'inspeccion-sala';
+ 
+  if (!eraFacturable && seraFacturable) {
+    etShowImpact('add', '&#9650; SE AGREGA UNA FACTURA',
+      'El nuevo tramo (' + etTramoToLabel(nuevoTramo) + ') es facturable (SAL o LLE). '
+      + 'Se sumará un servicio al conteo de facturación.');
+  } else if (eraFacturable && !seraFacturable) {
+    etShowImpact('remove', '&#9660; SE REMUEVE UNA FACTURA',
+      'El tramo actual (' + etTramoToLabel(tramoActual) + ') es facturable. '
+      + 'Al cambiar a Insp → Sala se elimina de la facturación.');
+  } else if (eraFacturable && seraFacturable) {
+    const dirAntes = etGetDir(tramoActual);
+    const dirDespues = nuevoTramo === 'counter-inspeccion' ? 'SAL' : 'LLE';
+    etShowImpact(dirAntes !== dirDespues ? 'remove' : 'neutral',
+      '&#8646; CAMBIA DIRECCIÓN DE FACTURACIÓN',
+      'La factura cambia de ' + dirAntes + ' a ' + dirDespues + '. '
+      + 'El total facturable se mantiene igual pero el desglose SAL/LLE cambia.');
+  } else {
+    etShowImpact('neutral', '&#8212; SIN IMPACTO EN FACTURACIÓN',
+      'Ambos tramos son no facturables. No afecta los conteos de billing.');
+  }
+}
+ 
+function etShowImpact(type, title, text) {
+  const el = document.getElementById('etImpact');
+  el.innerHTML = '<strong>' + title + '</strong>' + text;
+  el.className  = 'et-impact show ' + type;
+}
+ 
+// ── Confirmar y llamar al script ──────────────────────────────
+function etConfirm() {
+  etClearErr();
+ 
+  const nuevoTramo = document.getElementById('etNuevoTramo').value.trim();
+  const nombre     = document.getElementById('etNombre').value.trim();
+  const motivo     = document.getElementById('etMotivo').value.trim();
+ 
+  // Validación cliente
+  let hasErr = false;
+  if (!nuevoTramo) {
+    etShowErr('Seleccione el nuevo tramo.'); hasErr = true;
+  }
+  if (!nombre || nombre.split(' ').filter(Boolean).length < 2) {
+    document.getElementById('etNombre').classList.add('error');
+    etShowErr('Ingrese su nombre completo (nombre y apellido).'); hasErr = true;
+  }
+  if (!motivo || motivo.length < 10) {
+    document.getElementById('etMotivo').classList.add('error');
+    if (!hasErr) etShowErr('El motivo debe tener al menos 10 caracteres.');
+    hasErr = true;
+  }
+  if (nuevoTramo === (etCurrentRecord.tramo || '').toLowerCase()) {
+    etShowErr('El tramo seleccionado es el mismo que el actual.'); hasErr = true;
+  }
+  if (hasErr) return;
+ 
+  // Deshabilitar botón
+  const btn = document.getElementById('etBtnConfirm');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="et-spinner"></span>Guardando...';
+ 
+  const reportId      = etCurrentRecord.numeroReporte || '';
+  const tramoAnterior = etCurrentRecord.tramo || '';
+  const usuario       = currentUserId || '';
+ 
+  const url = window._scriptUrl
+    + '?action=updateTramo'
+    + '&reportId='           + encodeURIComponent(reportId)
+    + '&nuevoTramo='         + encodeURIComponent(nuevoTramo)
+    + '&tramoAnterior='      + encodeURIComponent(tramoAnterior)
+    + '&nombreResponsable='  + encodeURIComponent(nombre)
+    + '&motivo='             + encodeURIComponent(motivo)
+    + '&usuario='            + encodeURIComponent(usuario)
+    + '&callback=etCb_' + Date.now();
+ 
+  const cbName = url.match(/callback=(etCb_\d+)/)[1];
+ 
+  window[cbName] = function(data) {
+    delete window[cbName];
+    const s = document.getElementById('etscr'); if (s) s.remove();
+    btn.disabled = false;
+    btn.innerHTML = '&#9998; Confirmar cambio';
+ 
+    if (data && data.success) {
+      // Actualizar el registro local
+      etCurrentRecord.tramo = nuevoTramo;
+      const idx = allRecords.findIndex(r => r.numeroReporte === reportId);
+      if (idx !== -1) allRecords[idx].tramo = nuevoTramo;
+      applyFilters();
+      renderBillingGrid(allRecords);
+ 
+      // Mostrar éxito
+      document.getElementById('etFormWrap').style.display = 'none';
+      document.getElementById('etSuccessSub').innerHTML =
+        '<b>' + esc(tramoAnterior) + '</b> &rarr; <b>' + esc(nuevoTramo) + '</b><br>'
+        + 'Registrado por: ' + esc(nombre) + '<br>'
+        + 'La facturación ha sido actualizada.';
+      document.getElementById('etSuccess').classList.add('show');
+ 
+      setTimeout(etClose, 2800);
+      dbg('success', 'Tramo actualizado: ' + reportId + ' → ' + nuevoTramo);
+    } else {
+      const msg = (data && data.message) ? data.message : 'Error desconocido';
+      etShowErr('Error del servidor: ' + msg);
+      dbg('error', 'updateTramo falló: ' + msg);
+    }
+  };
+ 
+  const scr = document.createElement('script');
+  scr.id  = 'etscr';
+  scr.src = url;
+  scr.onerror = function() {
+    delete window[cbName]; scr.remove();
+    btn.disabled = false;
+    btn.innerHTML = '&#9998; Confirmar cambio';
+    etShowErr('Error de red. Verifique su conexión e intente de nuevo.');
+  };
+  document.body.appendChild(scr);
+ 
+  setTimeout(function() {
+    if (window[cbName]) {
+      delete window[cbName];
+      btn.disabled = false;
+      btn.innerHTML = '&#9998; Confirmar cambio';
+      etShowErr('Tiempo de espera agotado. Intente de nuevo.');
+    }
+  }, 15000);
+}
+ 
+// ── Helpers del modal ─────────────────────────────────────────
+function etShowErr(msg) {
+  const el = document.getElementById('etErrMsg');
+  el.textContent = msg;
+  el.classList.add('show');
+}
+function etClearErr() {
+  document.getElementById('etErrMsg').classList.remove('show');
+}
+function etTramoToLabel(t) {
+  const tl = (t || '').toLowerCase();
+  if (tl.includes('counter'))    return 'Counter → Insp (SAL)';
+  if (tl.includes('sala'))       return 'Insp → Sala';
+  if (tl.includes('aeronave'))   return 'Aeronave → Salida (LLE)';
+  return t || '—';
+}
+function etTramoToClass(t) {
+  const tl = (t || '').toLowerCase();
+  if (tl.includes('counter'))  return 'counter';
+  if (tl.includes('aeronave')) return 'aeronave';
+  return 'sala';
+}
+function etIsBillable(tramo) {
+  const tl = (tramo || '').toLowerCase();
+  return tl.includes('counter') || tl.includes('aeronave');
+}
+function etGetDir(tramo) {
+  const tl = (tramo || '').toLowerCase();
+  if (tl.includes('counter'))  return 'SAL';
+  if (tl.includes('aeronave')) return 'LLE';
+  return '';
+}
+ 
+// Escape para ESC key
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') etClose();
+});
+
+</script>
+</body>
+</html>
