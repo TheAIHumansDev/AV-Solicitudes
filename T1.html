@@ -1,0 +1,567 @@
+<!-- ══════════════════════════════════════════════════════════════
+     FRAGMENTO 1 — CSS: pegar dentro del <style> existente
+     ══════════════════════════════════════════════════════════════ -->
+<style id="edit-tramo-css">
+
+/* ── MODAL OVERLAY ── */
+.et-overlay{
+  position:fixed;inset:0;background:rgba(26,22,18,.55);
+  backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);
+  display:flex;align-items:center;justify-content:center;
+  z-index:9000;padding:20px;opacity:0;pointer-events:none;
+  transition:opacity .2s;
+}
+.et-overlay.open{opacity:1;pointer-events:all;}
+
+/* ── MODAL CARD ── */
+.et-modal{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:14px;width:100%;max-width:500px;
+  box-shadow:0 24px 60px rgba(0,0,0,.25);
+  transform:translateY(12px);transition:transform .25s;
+  overflow:hidden;
+}
+.et-overlay.open .et-modal{transform:translateY(0);}
+
+/* ── HEADER ── */
+.et-header{
+  background:var(--amber);padding:14px 20px;
+  display:flex;align-items:center;gap:10px;
+}
+.et-header-icon{
+  width:34px;height:34px;background:rgba(255,255,255,.18);
+  border-radius:8px;display:flex;align-items:center;justify-content:center;
+  font-size:16px;flex-shrink:0;border:1px solid rgba(255,255,255,.28);
+}
+.et-header-title{
+  font-family:'Unbounded',sans-serif;font-size:11px;font-weight:700;
+  color:#fff;letter-spacing:.3px;
+}
+.et-header-sub{
+  font-family:'DM Mono',monospace;font-size:9px;color:rgba(255,255,255,.65);
+  margin-top:1px;letter-spacing:1px;
+}
+
+/* ── WARNING BANNER ── */
+.et-warn{
+  background:#fff8e6;border-bottom:2px solid var(--amber);
+  padding:10px 18px;display:flex;gap:10px;align-items:flex-start;
+}
+.et-warn-icon{font-size:16px;flex-shrink:0;margin-top:1px;}
+.et-warn-text{font-size:11px;color:var(--amber);line-height:1.55;}
+.et-warn-text strong{display:block;font-family:'DM Mono',monospace;font-size:10px;
+  letter-spacing:.5px;margin-bottom:2px;}
+
+/* ── BODY ── */
+.et-body{padding:18px 20px 20px;}
+
+/* ── TRAMO SELECTOR ── */
+.et-tramo-row{
+  display:grid;grid-template-columns:1fr auto 1fr;
+  gap:8px;align-items:center;margin-bottom:16px;
+}
+.et-tramo-box{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:9px;padding:10px 12px;
+}
+.et-tramo-lbl{
+  font-family:'DM Mono',monospace;font-size:8px;letter-spacing:1.5px;
+  text-transform:uppercase;color:var(--muted);margin-bottom:4px;
+}
+.et-tramo-val{
+  font-family:'Unbounded',sans-serif;font-size:9px;font-weight:700;
+  line-height:1.3;
+}
+.et-tramo-val.counter{color:var(--sal);}
+.et-tramo-val.sala{color:var(--muted);}
+.et-tramo-val.aeronave{color:var(--lle);}
+.et-arrow{
+  font-size:18px;color:var(--amber);text-align:center;flex-shrink:0;
+}
+.et-select-wrap{display:flex;flex-direction:column;gap:4px;}
+.et-select-wrap .et-tramo-lbl{color:var(--amber);}
+.et-tramo-select{
+  width:100%;padding:10px 28px 10px 11px;
+  background:var(--amber-light);border:1.5px solid var(--amber);
+  border-radius:9px;color:var(--amber);
+  font-size:11px;font-family:'DM Mono',monospace;
+  font-weight:600;outline:none;cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238a5200'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 9px center;
+  -webkit-appearance:none;appearance:none;
+}
+.et-tramo-select:focus{border-color:var(--red);}
+
+/* ── BILLING IMPACT ── */
+.et-impact{
+  border-radius:9px;padding:10px 13px;margin-bottom:14px;
+  font-size:11px;line-height:1.55;display:none;border:1px solid;
+}
+.et-impact.show{display:block;}
+.et-impact.add{
+  background:var(--green-light);border-color:#95d4b4;color:var(--green);
+}
+.et-impact.remove{
+  background:var(--red-light);border-color:var(--red-mid);color:var(--red);
+}
+.et-impact.neutral{
+  background:var(--surface2);border-color:var(--border);color:var(--muted);
+}
+.et-impact strong{
+  font-family:'DM Mono',monospace;font-size:10px;
+  letter-spacing:.5px;display:block;margin-bottom:2px;
+}
+
+/* ── FORM FIELDS ── */
+.et-field{margin-bottom:13px;}
+.et-label{
+  display:block;font-size:10px;font-family:'DM Mono',monospace;
+  color:var(--muted);letter-spacing:1px;text-transform:uppercase;
+  margin-bottom:5px;
+}
+.et-label span{color:var(--red);}
+.et-input{
+  width:100%;padding:10px 13px;
+  background:var(--surface2);border:1.5px solid var(--border);
+  border-radius:8px;color:var(--text);font-size:13px;
+  font-family:'DM Sans',sans-serif;outline:none;
+  transition:border-color .2s;
+}
+.et-input:focus{border-color:var(--red);}
+.et-input.error{border-color:var(--red);background:var(--red-light);}
+.et-hint{font-size:10px;color:var(--muted);margin-top:3px;
+  font-family:'DM Mono',monospace;}
+
+/* ── FOOTER BUTTONS ── */
+.et-footer{
+  display:flex;gap:8px;justify-content:flex-end;
+  border-top:1px solid var(--border);padding:12px 20px;
+  background:var(--surface2);
+}
+.et-btn-cancel{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:8px;padding:9px 18px;font-size:12px;color:var(--muted);
+  cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;
+}
+.et-btn-cancel:hover{border-color:var(--text);color:var(--text);}
+.et-btn-confirm{
+  background:var(--amber);color:#fff;border:none;
+  border-radius:8px;padding:9px 22px;font-size:12px;font-weight:600;
+  font-family:'DM Sans',sans-serif;cursor:pointer;transition:background .2s;
+  display:flex;align-items:center;gap:7px;
+}
+.et-btn-confirm:hover{background:#7a4800;}
+.et-btn-confirm:disabled{opacity:.5;pointer-events:none;}
+.et-spinner{
+  width:14px;height:14px;border:2px solid rgba(255,255,255,.3);
+  border-top-color:#fff;border-radius:50%;
+  animation:spin .6s linear infinite;flex-shrink:0;
+}
+.et-err-msg{
+  background:var(--red-light);border:1px solid var(--red-mid);
+  border-radius:7px;padding:8px 12px;font-size:11px;color:var(--red);
+  font-family:'DM Mono',monospace;margin-bottom:12px;display:none;
+}
+.et-err-msg.show{display:block;}
+
+/* ── ÉXITO ── */
+.et-success{
+  text-align:center;padding:32px 20px;display:none;
+}
+.et-success.show{display:block;}
+.et-success-icon{font-size:40px;margin-bottom:12px;}
+.et-success-title{
+  font-family:'Unbounded',sans-serif;font-size:13px;font-weight:700;
+  color:var(--green);margin-bottom:6px;
+}
+.et-success-sub{font-size:11px;color:var(--muted);line-height:1.5;}
+
+/* ── EDIT BUTTON en tabla ── */
+.btn-edit-tramo{
+  background:none;border:1px solid var(--border);border-radius:5px;
+  padding:2px 8px;font-size:9px;cursor:pointer;font-family:'DM Mono',monospace;
+  color:var(--muted);transition:all .2s;margin-left:6px;
+  display:inline-flex;align-items:center;gap:3px;
+}
+.btn-edit-tramo:hover{border-color:var(--amber);color:var(--amber);}
+
+</style>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     FRAGMENTO 2 — MODAL HTML: pegar justo antes de </body>
+     ══════════════════════════════════════════════════════════════ -->
+
+<div class="et-overlay" id="etOverlay" onclick="etClickOutside(event)">
+  <div class="et-modal" role="dialog" aria-modal="true" aria-labelledby="etModalTitle">
+
+    <!-- HEADER -->
+    <div class="et-header">
+      <div class="et-header-icon">&#9998;</div>
+      <div>
+        <div class="et-header-title" id="etModalTitle">Editar Tramo / Dirección</div>
+        <div class="et-header-sub" id="etModalSubtitle">&#8212;</div>
+      </div>
+    </div>
+
+    <!-- FORM -->
+    <div id="etFormWrap">
+      <!-- WARNING -->
+      <div class="et-warn">
+        <div class="et-warn-icon">&#9888;</div>
+        <div class="et-warn-text">
+          <strong>&#9830; IMPACTO EN FACTURACIÓN</strong>
+          Este cambio puede agregar o remover un servicio facturable
+          (SAL o LLE). Requiere justificación y nombre completo del responsable.
+        </div>
+      </div>
+
+      <div class="et-body">
+
+        <!-- ERROR global -->
+        <div class="et-err-msg" id="etErrMsg"></div>
+
+        <!-- SELECTOR DE TRAMO -->
+        <div class="et-tramo-row">
+          <div class="et-tramo-box">
+            <div class="et-tramo-lbl">Tramo actual</div>
+            <div class="et-tramo-val" id="etTramoActualLabel">&#8212;</div>
+          </div>
+          <div class="et-arrow">&#8594;</div>
+          <div>
+            <div class="et-select-wrap">
+              <div class="et-tramo-lbl">Nuevo tramo <span style="color:var(--red)">*</span></div>
+              <select class="et-tramo-select" id="etNuevoTramo" onchange="etOnTramoChange()">
+                <option value="">— Seleccione —</option>
+                <option value="counter-inspeccion">&#9650; Counter → Insp (SAL)</option>
+                <option value="inspeccion-sala">Insp → Sala</option>
+                <option value="aeronave-salida">&#9660; Aeronave → Salida (LLE)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- IMPACTO EN FACTURACIÓN (dinámico) -->
+        <div class="et-impact" id="etImpact"></div>
+
+        <!-- NOMBRE COMPLETO -->
+        <div class="et-field">
+          <label class="et-label" for="etNombre">
+            Nombre completo del responsable <span>*</span>
+          </label>
+          <input type="text" class="et-input" id="etNombre"
+                 placeholder="Nombre y apellido completo"
+                 autocomplete="name" oninput="etClearErr()">
+          <div class="et-hint">Debe coincidir con su identificación oficial</div>
+        </div>
+
+        <!-- MOTIVO -->
+        <div class="et-field">
+          <label class="et-label" for="etMotivo">
+            Motivo del cambio <span>*</span>
+          </label>
+          <input type="text" class="et-input" id="etMotivo"
+                 placeholder="Explique la razón del cambio de tramo..."
+                 oninput="etClearErr()">
+          <div class="et-hint">Mínimo 10 caracteres</div>
+        </div>
+
+      </div><!-- /et-body -->
+
+      <!-- FOOTER -->
+      <div class="et-footer">
+        <button class="et-btn-cancel" onclick="etClose()">Cancelar</button>
+        <button class="et-btn-confirm" id="etBtnConfirm" onclick="etConfirm()">
+          &#9998; Confirmar cambio
+        </button>
+      </div>
+    </div><!-- /etFormWrap -->
+
+    <!-- ÉXITO -->
+    <div class="et-success" id="etSuccess">
+      <div class="et-success-icon">&#9989;</div>
+      <div class="et-success-title">Tramo actualizado</div>
+      <div class="et-success-sub" id="etSuccessSub"></div>
+    </div>
+
+  </div>
+</div><!-- /et-overlay -->
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     FRAGMENTO 3 — JAVASCRIPT: pegar dentro del <script> existente
+     ══════════════════════════════════════════════════════════════ -->
+<script id="edit-tramo-js">
+
+// ── Estado del modal ──────────────────────────────────────────
+let etCurrentRecord = null;  // registro completo de la fila seleccionada
+
+// ── Abrir modal ───────────────────────────────────────────────
+function openEditTramo(record) {
+  etCurrentRecord = record;
+
+  // Resetear estado
+  document.getElementById('etFormWrap').style.display  = 'block';
+  document.getElementById('etSuccess').classList.remove('show');
+  document.getElementById('etErrMsg').classList.remove('show');
+  document.getElementById('etNuevoTramo').value = '';
+  document.getElementById('etNombre').value     = '';
+  document.getElementById('etMotivo').value     = '';
+  document.getElementById('etImpact').classList.remove('show');
+  document.getElementById('etNombre').classList.remove('error');
+  document.getElementById('etMotivo').classList.remove('error');
+  document.getElementById('etBtnConfirm').disabled = false;
+  document.getElementById('etBtnConfirm').innerHTML = '&#9998; Confirmar cambio';
+
+  // Datos del registro
+  const tramoActual = record.tramo || '';
+  const vueloLabel  = record.vuelo    ? 'Vuelo ' + record.vuelo : '';
+  const paxLabel    = record.pasajero ? record.pasajero          : '(sin nombre)';
+
+  document.getElementById('etModalSubtitle').textContent =
+    (vueloLabel ? vueloLabel + ' · ' : '') + paxLabel.slice(0, 30);
+
+  // Tramo actual
+  const tramoLabel = etTramoToLabel(tramoActual);
+  const el = document.getElementById('etTramoActualLabel');
+  el.textContent  = tramoLabel;
+  el.className    = 'et-tramo-val ' + etTramoToClass(tramoActual);
+
+  // Abrir overlay
+  document.getElementById('etOverlay').classList.add('open');
+  setTimeout(() => document.getElementById('etNuevoTramo').focus(), 200);
+}
+
+// ── Cerrar modal ──────────────────────────────────────────────
+function etClose() {
+  document.getElementById('etOverlay').classList.remove('open');
+  etCurrentRecord = null;
+}
+
+function etClickOutside(e) {
+  if (e.target === document.getElementById('etOverlay')) etClose();
+}
+
+// ── Cambio de selector → actualizar banner de impacto ─────────
+function etOnTramoChange() {
+  etClearErr();
+  const nuevoTramo  = document.getElementById('etNuevoTramo').value;
+  const tramoActual = (etCurrentRecord && etCurrentRecord.tramo) || '';
+  const impact      = document.getElementById('etImpact');
+
+  if (!nuevoTramo) { impact.classList.remove('show'); return; }
+  if (nuevoTramo === tramoActual.toLowerCase()) {
+    etShowImpact('neutral', '&#8212; SIN CAMBIO',
+      'El tramo seleccionado es igual al actual.');
+    return;
+  }
+
+  const eraFacturable = etIsBillable(tramoActual);
+  const seraFacturable = nuevoTramo !== 'inspeccion-sala';
+
+  if (!eraFacturable && seraFacturable) {
+    etShowImpact('add', '&#9650; SE AGREGA UNA FACTURA',
+      'El nuevo tramo (' + etTramoToLabel(nuevoTramo) + ') es facturable (SAL o LLE). '
+      + 'Se sumará un servicio al conteo de facturación.');
+  } else if (eraFacturable && !seraFacturable) {
+    etShowImpact('remove', '&#9660; SE REMUEVE UNA FACTURA',
+      'El tramo actual (' + etTramoToLabel(tramoActual) + ') es facturable. '
+      + 'Al cambiar a Insp → Sala se elimina de la facturación.');
+  } else if (eraFacturable && seraFacturable) {
+    const dirAntes = etGetDir(tramoActual);
+    const dirDespues = nuevoTramo === 'counter-inspeccion' ? 'SAL' : 'LLE';
+    etShowImpact(dirAntes !== dirDespues ? 'remove' : 'neutral',
+      '&#8646; CAMBIA DIRECCIÓN DE FACTURACIÓN',
+      'La factura cambia de ' + dirAntes + ' a ' + dirDespues + '. '
+      + 'El total facturable se mantiene igual pero el desglose SAL/LLE cambia.');
+  } else {
+    etShowImpact('neutral', '&#8212; SIN IMPACTO EN FACTURACIÓN',
+      'Ambos tramos son no facturables. No afecta los conteos de billing.');
+  }
+}
+
+function etShowImpact(type, title, text) {
+  const el = document.getElementById('etImpact');
+  el.innerHTML = '<strong>' + title + '</strong>' + text;
+  el.className  = 'et-impact show ' + type;
+}
+
+// ── Confirmar y llamar al script ──────────────────────────────
+function etConfirm() {
+  etClearErr();
+
+  const nuevoTramo = document.getElementById('etNuevoTramo').value.trim();
+  const nombre     = document.getElementById('etNombre').value.trim();
+  const motivo     = document.getElementById('etMotivo').value.trim();
+
+  // Validación cliente
+  let hasErr = false;
+  if (!nuevoTramo) {
+    etShowErr('Seleccione el nuevo tramo.'); hasErr = true;
+  }
+  if (!nombre || nombre.split(' ').filter(Boolean).length < 2) {
+    document.getElementById('etNombre').classList.add('error');
+    etShowErr('Ingrese su nombre completo (nombre y apellido).'); hasErr = true;
+  }
+  if (!motivo || motivo.length < 10) {
+    document.getElementById('etMotivo').classList.add('error');
+    if (!hasErr) etShowErr('El motivo debe tener al menos 10 caracteres.');
+    hasErr = true;
+  }
+  if (nuevoTramo === (etCurrentRecord.tramo || '').toLowerCase()) {
+    etShowErr('El tramo seleccionado es el mismo que el actual.'); hasErr = true;
+  }
+  if (hasErr) return;
+
+  // Deshabilitar botón
+  const btn = document.getElementById('etBtnConfirm');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="et-spinner"></span>Guardando...';
+
+  const reportId      = etCurrentRecord.numeroReporte || '';
+  const tramoAnterior = etCurrentRecord.tramo || '';
+  const usuario       = currentUserId || '';
+
+  const url = window._scriptUrl
+    + '?action=updateTramo'
+    + '&reportId='           + encodeURIComponent(reportId)
+    + '&nuevoTramo='         + encodeURIComponent(nuevoTramo)
+    + '&tramoAnterior='      + encodeURIComponent(tramoAnterior)
+    + '&nombreResponsable='  + encodeURIComponent(nombre)
+    + '&motivo='             + encodeURIComponent(motivo)
+    + '&usuario='            + encodeURIComponent(usuario)
+    + '&callback=etCb_' + Date.now();
+
+  const cbName = url.match(/callback=(etCb_\d+)/)[1];
+
+  window[cbName] = function(data) {
+    delete window[cbName];
+    const s = document.getElementById('etscr'); if (s) s.remove();
+    btn.disabled = false;
+    btn.innerHTML = '&#9998; Confirmar cambio';
+
+    if (data && data.success) {
+      // Actualizar el registro local
+      etCurrentRecord.tramo = nuevoTramo;
+      const idx = allRecords.findIndex(r => r.numeroReporte === reportId);
+      if (idx !== -1) allRecords[idx].tramo = nuevoTramo;
+      applyFilters();
+      renderBillingGrid(allRecords);
+
+      // Mostrar éxito
+      document.getElementById('etFormWrap').style.display = 'none';
+      document.getElementById('etSuccessSub').innerHTML =
+        '<b>' + esc(tramoAnterior) + '</b> &rarr; <b>' + esc(nuevoTramo) + '</b><br>'
+        + 'Registrado por: ' + esc(nombre) + '<br>'
+        + 'La facturación ha sido actualizada.';
+      document.getElementById('etSuccess').classList.add('show');
+
+      setTimeout(etClose, 2800);
+      dbg('success', 'Tramo actualizado: ' + reportId + ' → ' + nuevoTramo);
+    } else {
+      const msg = (data && data.message) ? data.message : 'Error desconocido';
+      etShowErr('Error del servidor: ' + msg);
+      dbg('error', 'updateTramo falló: ' + msg);
+    }
+  };
+
+  const scr = document.createElement('script');
+  scr.id  = 'etscr';
+  scr.src = url;
+  scr.onerror = function() {
+    delete window[cbName]; scr.remove();
+    btn.disabled = false;
+    btn.innerHTML = '&#9998; Confirmar cambio';
+    etShowErr('Error de red. Verifique su conexión e intente de nuevo.');
+  };
+  document.body.appendChild(scr);
+
+  setTimeout(function() {
+    if (window[cbName]) {
+      delete window[cbName];
+      btn.disabled = false;
+      btn.innerHTML = '&#9998; Confirmar cambio';
+      etShowErr('Tiempo de espera agotado. Intente de nuevo.');
+    }
+  }, 15000);
+}
+
+// ── Helpers del modal ─────────────────────────────────────────
+function etShowErr(msg) {
+  const el = document.getElementById('etErrMsg');
+  el.textContent = msg;
+  el.classList.add('show');
+}
+function etClearErr() {
+  document.getElementById('etErrMsg').classList.remove('show');
+}
+function etTramoToLabel(t) {
+  const tl = (t || '').toLowerCase();
+  if (tl.includes('counter'))    return 'Counter → Insp (SAL)';
+  if (tl.includes('sala'))       return 'Insp → Sala';
+  if (tl.includes('aeronave'))   return 'Aeronave → Salida (LLE)';
+  return t || '—';
+}
+function etTramoToClass(t) {
+  const tl = (t || '').toLowerCase();
+  if (tl.includes('counter'))  return 'counter';
+  if (tl.includes('aeronave')) return 'aeronave';
+  return 'sala';
+}
+function etIsBillable(tramo) {
+  const tl = (tramo || '').toLowerCase();
+  return tl.includes('counter') || tl.includes('aeronave');
+}
+function etGetDir(tramo) {
+  const tl = (tramo || '').toLowerCase();
+  if (tl.includes('counter'))  return 'SAL';
+  if (tl.includes('aeronave')) return 'LLE';
+  return '';
+}
+
+// Escape para ESC key
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') etClose();
+});
+</script>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     FRAGMENTO 4 — Modificación en renderTable()
+     Reemplazar la línea que genera el badge del tramo en el <td>
+     para agregar el botón de editar.
+     
+     BUSCAR esta línea en renderTable():
+       +'<td>'+tramoToBadge(r.tramo)+dirPill+billPill+'</td>'
+     
+     REEMPLAZAR por:
+       +'<td>'+tramoToBadge(r.tramo)+dirPill+billPill
+       +'<button class="btn-edit-tramo" onclick="openEditTramo(filteredRecords['
+       +(start+idx)+'])" title="Editar tramo">&#9998;</button></td>'
+     
+     O si usas el patrón de pageData.map() con índice, así:
+     ══════════════════════════════════════════════════════════════ -->
+
+<!-- 
+  INSTRUCCIÓN DE INTEGRACIÓN:
+  
+  En la función renderTable(), busca el map que genera las filas:
+  
+    const pageData = filteredRecords.slice(start, start + PAGE_SIZE);
+    tbody.innerHTML = pageData.map(function(r) {
+    
+  Cambia a:
+  
+    tbody.innerHTML = pageData.map(function(r, idx) {
+    
+  Y la línea del tramo:
+  
+    +'<td>'+tramoToBadge(r.tramo)+dirPill+billPill+'</td>'
+    
+  Cámbiala por:
+  
+    +'<td>'+tramoToBadge(r.tramo)+dirPill+billPill
+    +'<button class="btn-edit-tramo" '
+    +'onclick="openEditTramo(filteredRecords['+(start+idx)+'])" '
+    +'title="Editar tramo">&#9998; editar</button></td>'
+-->
