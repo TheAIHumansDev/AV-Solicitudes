@@ -1204,8 +1204,8 @@ function renderTable(){
     document.getElementById('paginationBar').style.display='none';return;
   }
   const start=(currentPage-1)*PAGE_SIZE;
-  const pageData=filteredRecords.slice(start,start+PAGE_SIZE);
-  tbody.innerHTML=pageData.map(function(r){
+const pageData=filteredRecords.slice(start,start+PAGE_SIZE);
+  tbody.innerHTML=pageData.map(function(r, idx){
     const dir=getDir(r.tramo);
     const rowCls=dir==='SAL'?'sal-row':dir==='LLE'?'lle-row':'';
     const dirPill=dir==='SAL'?'<span class="dir-pill sal">&#9650; SAL</span>':dir==='LLE'?'<span class="dir-pill lle">&#9660; LLE</span>':'';
@@ -1216,7 +1216,7 @@ function renderTable(){
     return '<tr class="'+rowCls+'">'
       +'<td class="cell-date">'+esc(r.fecha||'\u2013')+(hora?' <span style="opacity:.45">'+esc(hora)+'</span>':'')+'</td>'
       +'<td>'+esc(r.usuario||'\u2013')+'</td>'
-      +'<td>'+tramoToBadge(r.tramo)+dirPill+billPill+'</td>'
+      +'<td>'+tramoToBadge(r.tramo)+dirPill+billPill+'<button class="btn-edit-tramo" onclick="openEditTramo(filteredRecords['+(start+idx)+'])" title="Editar tramo">&#9998; editar</button></td>'
       +'<td class="cell-name">'+esc(r.pasajero||'\u2013')+'</td>'
       +'<td>'+wchToBadge(r.wchType)+'</td>'
       +'<td class="cell-vuelo">'+esc(r.vuelo||'\u2013')+'</td>'
