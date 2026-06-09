@@ -1355,29 +1355,7 @@ function checkVueloConsistency(vueloRecs, fVuelo){
   }
 }
  
- 
-<!-- ══════════════════════════════════════════════════════════
-     FRAGMENTO D — Marcar filas con error en la tabla
-     
-     En renderTable(), la línea que construye cada <tr>:
-     
-     BUSCAR:
-       return '<tr class="'+rowCls+'">'
-     
-     REEMPLAZAR por:
-       const alertClass = vaGetRowAlertClass(r);
-       return '<tr class="'+rowCls+' '+alertClass+'">'
-     
-     Y agregar el badge de error en la celda del pasajero.
-     
-     BUSCAR esta línea en renderTable():
-       +'<td class="cell-name">'+esc(r.pasajero||'\u2013')+'</td>'
-     
-     REEMPLAZAR por:
-       +'<td class="cell-name">'+esc(r.pasajero||'\u2013')+vaGetRowBadge(r)+'</td>'
-     
-     Luego pegar estas dos funciones helper al final del script:
-     ══════════════════════════════════════════════════════════ -->
+
  
 function vaGetRowAlertClass(r){
   // Solo aplica cuando hay filtro de vuelo activo
