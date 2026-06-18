@@ -1079,11 +1079,11 @@ function doLogin(){
       launchApp(scriptUrl,data.records||[]);
     }else{showLoginErr('ID incorrecto o sin acceso. Verifique e intente de nuevo.');}
   };
-  const scr=document.createElement('script');
-  scr.id='ls';scr.src=scriptUrl+'?action=getDashboardData&callback='+cbName;
-  scr.onerror=function(){delete window[cbName];scr.remove();btn.innerHTML='Acceder';btn.disabled=false;showLoginErr('No se pudo conectar. Verifique su ID.');};
+const scr=document.createElement('script');
+  scr.id='als';scr.src=scriptUrl+'?action=getDashboardData&dateFrom='+encodeURIComponent(getDateFrom(30))+'&callback='+cbName;
+  scr.onerror=function(){delete window[cbName];scr.remove();};
   document.body.appendChild(scr);
-  setTimeout(function(){if(window[cbName]){delete window[cbName];btn.innerHTML='Acceder';btn.disabled=false;showLoginErr('Tiempo de espera agotado.');}},15000);
+  setTimeout(function(){if(window[cbName])delete window[cbName];},10000);
 }
 function showLoginErr(msg){const el=document.getElementById('loginErr');el.textContent=msg;el.classList.add('show');}
 function togglePwd(){const inp=document.getElementById('loginId');inp.type=inp.type==='password'?'text':'password';}
