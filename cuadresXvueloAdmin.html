@@ -254,6 +254,15 @@ td.cell-name{font-weight:500;}
 }
 #appWrap{display:none;}
 
+/* ══ DATE NAV ══ */
+.date-nav{display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:3px 8px;}
+.date-nav-btn{background:none;border:none;color:#fff;font-size:16px;cursor:pointer;padding:0 4px;line-height:1;opacity:.8;transition:opacity .2s;}
+.date-nav-btn:hover{opacity:1;}
+.date-nav-input{background:none;border:none;color:#fff;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.5px;cursor:pointer;outline:none;width:96px;}
+.date-nav-input::-webkit-calendar-picker-indicator{filter:invert(1);opacity:.7;cursor:pointer;}
+.date-nav-today{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:10px;color:#fff;font-family:'DM Mono',monospace;font-size:9px;padding:2px 8px;cursor:pointer;letter-spacing:.5px;transition:background .2s;}
+.date-nav-today:hover{background:rgba(255,255,255,.28);}
+
 /* ══ RESPONSIVE ══ */
 @media (max-width:1100px){
   .filters-grid{grid-template-columns:1fr 1fr 1fr 1fr;}
@@ -688,6 +697,12 @@ tr.row-alert-warn  td:first-child{border-left:3px solid var(--amber)!important;}
     <div class="header-user">
       <span class="header-user-name" id="headerUserId">&#8212;</span>
     </div>
+    <div class="date-nav" id="dateNav">
+      <button class="date-nav-btn" onclick="shiftDay(-1)" title="Día anterior">&#8249;</button>
+      <input type="date" id="dateNavInput" onchange="onDateNavChange()" class="date-nav-input">
+      <button class="date-nav-btn" onclick="shiftDay(1)" title="Día siguiente">&#8250;</button>
+      <button class="date-nav-today" onclick="goToday()">Hoy</button>
+    </div>
     <button class="debug-toggle-btn" onclick="toggleDebug()">&#128270; DEBUG</button>
     <button class="btn-logout" onclick="doLogout()">Salir</button>
   </div>
@@ -1006,13 +1021,29 @@ const PAGE_SIZE   = 30;
 const REFRESH_MS  = 60000;
 
 // ── Helper: fecha de hace N días en formato DD/MM/YYYY ──
+// ── Helpers de fecha ──
 function getDateFrom(daysBack) {
   const d = new Date();
-  d.setDate(d.getDate() - (daysBack || 30));
-  const dd   = String(d.getDate()).padStart(2, '0');
-  const mm   = String(d.getMonth() + 1).padStart(2, '0');
-  const yyyy = d.getFullYear();
-  return dd + '/' + mm + '/' + yyyy;
+  d.setDate(d.getDate() - (daysBack || 0));
+  return fmtDate(d);
+}
+function getTodayStr() { return fmtDate(new Date()); }
+function fmtDate(d) {
+  return String(d.getDate()).padStart(2,'0') + '/'
+       + String(d.getMonth()+1).padStart(2,'0') + '/'
+       + d.getFullYear();
+}
+function isoToDisplay(iso) {
+  // '2026-05-19' → '19/05/2026'
+  if (!iso) return getTodayStr();
+  const p = iso.split('-');
+  return p[2] + '/' + p[1] + '/' + p[0];
+}
+function displayToIso(disp) {
+  // '19/05/2026' → '2026-05-19'
+  if (!disp) return '';
+  const p = disp.split('/');
+  return p[2] + '-' + p[1] + '-' + p[0];
 }
 
 let allRecords      = [];
@@ -1132,7 +1163,67 @@ const scr=document.createElement('script');
 })();
 
 // ── LOAD DATA ──
-function loadData(silent){
+
+// ── LOAD DATA ──
+let currentDateStr = '';   // 'DD/MM/YYYY' del día visible
+
+function loadData(silent, dateStr) {
+  const url = window._scriptUrl;
+  if (!url) { dbg('error','Sin URL de script'); return; }
+
+  // Si no se pasa fecha, usar la que está en el navegador o hoy
+  const targetDate = dateStr || currentDateStr || getTodayStr();
+  currentDateStr = targetDate;
+
+  // Sincronizar el input del header
+  const navInput = document.getElementById('dateNavInput');
+  if (navInput) navInput.value = displayToIso(targetDate);
+
+  const cbName  = 'dashCb_' + Date.now();
+  const fullUrl = url
+    + '?action=getDashboardData'
+    + '&dateFrom=' + encodeURIComponent(targetDate)
+    + '&dateTo='   + encodeURIComponent(targetDate)
+    + '&callback=' + cbName;
+
+  document.getElementById('debugUrl').textContent = 'URL: ' + fullUrl;
+  if (!silent) { setStatus('loading','Cargando ' + targetDate + '...'); showLoading(true); }
+
+  window[cbName] = function(data) {
+    delete window[cbName];
+    const s = document.getElementById('ds'); if (s) s.remove();
+    showLoading(false);
+    if (data && data.success) {
+      allRecords = data.records || [];
+      if (!silent) dbg('success', targetDate + ' → ' + allRecords.length + ' registros');
+      populateStaffSelect(allRecords);
+      applyFilters();
+      renderBillingGrid(allRecords);
+      setStatus('connected', targetDate + ' · ' + allRecords.length + ' registros');
+      document.getElementById('liveStatus').textContent = 'EN VIVO';
+      startRefreshCountdown();
+    } else {
+      if (!silent) dbg('error','Error: ' + (data ? (data.message||'error') : 'sin respuesta'));
+      setStatus('error','Error al actualizar');
+    }
+  };
+
+  const scr = document.createElement('script');
+  scr.id  = 'ds';
+  scr.src = fullUrl;
+  scr.onerror = function() {
+    delete window[cbName]; scr.remove();
+    showLoading(false); setStatus('error','Error de red.');
+  };
+  document.body.appendChild(scr);
+  setTimeout(function() {
+    if (window[cbName]) {
+      delete window[cbName]; showLoading(false); setStatus('error','Timeout');
+    }
+  }, 15000);
+}
+
+  
   const url=window._scriptUrl;
   if(!url){dbg('error','Sin URL de script');return;}
 const cbName='dashCb_'+Date.now();
