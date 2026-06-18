@@ -1228,36 +1228,6 @@ function loadData(silent, dateStr) {
 }
 
   
-  const url=window._scriptUrl;
-  if(!url){dbg('error','Sin URL de script');return;}
-const cbName='dashCb_'+Date.now();
-  const fullUrl=url+'?action=getDashboardData&dateFrom='+encodeURIComponent(getDateFrom(30))+'&callback='+cbName;
-  document.getElementById('debugUrl').textContent='URL: '+fullUrl;
-  if(!silent){setStatus('loading','Actualizando...');showLoading(true);}
-  window[cbName]=function(data){
-    delete window[cbName];
-    const s=document.getElementById('ds');if(s)s.remove();
-    showLoading(false);
-    if(data&&data.success){
-      allRecords=data.records||[];
-      if(!silent)dbg('success','Actualizados '+allRecords.length+' registros');
-      populateStaffSelect(allRecords);
-      applyFilters();
-      renderBillingGrid(allRecords);
-      setStatus('connected','Actualizado '+nowStr()+' \xB7 '+allRecords.length+' registros');
-      document.getElementById('liveStatus').textContent='EN VIVO';
-      startRefreshCountdown();
-    }else{
-      if(!silent)dbg('error','Error: '+(data?(data.message||'error'):'sin respuesta'));
-      setStatus('error','Error al actualizar');
-    }
-  };
-  const scr=document.createElement('script');
-  scr.id='ds';scr.src=fullUrl;
-  scr.onerror=function(){delete window[cbName];scr.remove();showLoading(false);setStatus('error','Error de red.');};
-  document.body.appendChild(scr);
-  setTimeout(function(){if(window[cbName]){delete window[cbName];showLoading(false);setStatus('error','Timeout');}},15000);
-}
 
 // ── DATE NAV ──
 function onDateNavChange() {
