@@ -1124,8 +1124,8 @@ function launchApp(scriptUrl,records){
     if(data&&data.success){currentUserId=saved;launchApp(scriptUrl,data.records||[]);}
   };
   
-  const scr=document.createElement('script');
-  scr.id='ls';scr.src=scriptUrl+'?action=getDashboardData&dateFrom='+encodeURIComponent(getDateFrom(30))+'&callback='+cbName;
+const scr=document.createElement('script');
+  scr.id='als';scr.src=scriptUrl+'?action=getDashboardData&dateFrom='+encodeURIComponent(getDateFrom(30))+'&callback='+cbName;
   scr.onerror=function(){delete window[cbName];scr.remove();};
   document.body.appendChild(scr);
   setTimeout(function(){if(window[cbName])delete window[cbName];},10000);
