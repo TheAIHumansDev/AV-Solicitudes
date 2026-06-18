@@ -1136,7 +1136,7 @@ function loadData(silent){
   const url=window._scriptUrl;
   if(!url){dbg('error','Sin URL de script');return;}
   const cbName='dashCb_'+Date.now();
-  const fullUrl=url+'?action=getDashboardData&callback='+cbName;
+  const fullUrl=url+'?action=getDashboardData&dateFrom='+encodeURIComponent(getDateFrom(30))+'&callback='+cbName;
   document.getElementById('debugUrl').textContent='URL: '+fullUrl;
   if(!silent){setStatus('loading','Actualizando...');showLoading(true);}
   window[cbName]=function(data){
