@@ -1135,6 +1135,10 @@ function launchApp(scriptUrl,records){
   document.getElementById('headerUserId').textContent=currentUserId.slice(0,8)+'***';
   window._scriptUrl=scriptUrl;
   dbg('success','Acceso correcto.');
+  // Inicializar navegador de fecha en hoy
+  const todayIso = new Date().toISOString().split('T')[0];
+  document.getElementById('dateNavInput').value = todayIso;
+  currentDateStr = getTodayStr();
   allRecords=records;
   populateStaffSelect(allRecords);
   applyFilters();
@@ -1254,13 +1258,35 @@ const cbName='dashCb_'+Date.now();
   document.body.appendChild(scr);
   setTimeout(function(){if(window[cbName]){delete window[cbName];showLoading(false);setStatus('error','Timeout');}},15000);
 }
+
+// ── DATE NAV ──
+function onDateNavChange() {
+  const iso = document.getElementById('dateNavInput').value;
+  if (!iso) return;
+  loadData(false, isoToDisplay(iso));
+}
+function shiftDay(delta) {
+  const iso = document.getElementById('dateNavInput').value || displayToIso(getTodayStr());
+  const d   = new Date(iso);
+  d.setDate(d.getDate() + delta);
+  const newIso = d.toISOString().split('T')[0];
+  document.getElementById('dateNavInput').value = newIso;
+  loadData(false, isoToDisplay(newIso));
+}
+function goToday() {
+  const iso = new Date().toISOString().split('T')[0];
+  document.getElementById('dateNavInput').value = iso;
+  loadData(false, getTodayStr());
+}
+
+  
 function startRefreshCountdown(){
   if(countdownTimer)clearInterval(countdownTimer);
   if(refreshTimer)clearTimeout(refreshTimer);
   let cnt=Math.floor(REFRESH_MS/1000);
   document.getElementById('refreshInfo').textContent='refresh en '+cnt+'s';
   countdownTimer=setInterval(function(){cnt--;document.getElementById('refreshInfo').textContent='refresh en '+cnt+'s';if(cnt<=0)clearInterval(countdownTimer);},1000);
-  refreshTimer=setTimeout(function(){loadData(true);},REFRESH_MS);
+refreshTimer=setTimeout(function(){loadData(true, currentDateStr);},REFRESH_MS);
 }
 
 // ── BILLING GRID ──
