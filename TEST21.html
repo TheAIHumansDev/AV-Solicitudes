@@ -1638,36 +1638,47 @@ async function exportXLS(){
 
   ws.addRow([]); // fila 4 vacía
 
-  // ── Fila fecha + banco (fila 5) ──
+  // ── Fila fecha (fila 5) ──
+  const bancoTxt = banco==='am' ? 'BANCO AM' : banco==='pm' ? 'BANCO PM' : 'TODOS LOS VUELOS';
   const rFecha = ws.getRow(5);
   rFecha.getCell(1).value='FECHA'; rFecha.getCell(2).value=fechaDisplay;
-  rFecha.getCell(4).value='SALIENDO'; rFecha.getCell(6).value='LLEGANDO';
-  rFecha.getCell(9).value= banco==='pm' ? 'BANCO DE VUELO  PM' : 'BANCO DE VUELO  AM';
   rFecha.getCell(13).value='FECHA'; rFecha.getCell(14).value=fechaDisplay;
-  rFecha.getCell(16).value='SALIENDO'; rFecha.getCell(18).value='LLEGANDO';
-  rFecha.getCell(21).value= banco==='pm' ? 'BANCO DE VUELO  PM' : 'BANCO DE VUELO  AM';
   [1,13].forEach(c=>{ rFecha.getCell(c).font={bold:true,color:{argb:C_WHITE}}; rFecha.getCell(c).fill=fill(C_BLUE_DK); });
   [2,14].forEach(c=>{ rFecha.getCell(c).font={bold:true,color:{argb:C_TEXT}}; rFecha.getCell(c).fill=fill(C_GOLD_LT); });
-  [4,16].forEach(c=>{ rFecha.getCell(c).font={bold:true,color:{argb:'FF1A6B45'}}; });
-  [6,18].forEach(c=>{ rFecha.getCell(c).font={bold:true,color:{argb:C_BLUE}}; });
-  [9,21].forEach(c=>{ rFecha.getCell(c).font={bold:true,color:{argb:C_WHITE}}; rFecha.getCell(c).fill=fill(C_RED); ws.mergeCells(5,c,5,c+1); rFecha.getCell(c).alignment={horizontal:'center'}; });
   rFecha.height = 18;
 
-  ws.addRow([]); // fila 6 vacía
+  // ── Fila 6 — BANNER DE DIRECCIÓN (esto es lo que faltaba) ──
+  // Bloque izquierdo = SIEMPRE Salidas (Counter→Insp) · Bloque derecho = SIEMPRE Llegadas (Aeronave→Salida)
+  // Independiente de si hay datos o no, el rótulo indica la dirección real de cada bloque.
+  const rDir = ws.getRow(6);
+  ws.mergeCells(6,1,6,11);
+  ws.mergeCells(6,13,6,23);
+  rDir.getCell(1).value  = '▲ SALIDAS — Counter → Inspección  ·  ' + bancoTxt + '  ·  ' + groupsSAL.length + ' vuelo' + (groupsSAL.length!==1?'s':'') + ' / ' + totSAL + ' PAX';
+  rDir.getCell(13).value = '▼ LLEGADAS — Aeronave → Salida  ·  ' + bancoTxt + '  ·  ' + groupsLLE.length + ' vuelo' + (groupsLLE.length!==1?'s':'') + ' / ' + totLLE + ' PAX';
+  rDir.getCell(1).font  = {bold:true, size:10.5, color:{argb:C_WHITE}};
+  rDir.getCell(13).font = {bold:true, size:10.5, color:{argb:C_WHITE}};
+  rDir.getCell(1).fill  = fill('FF1A6B45'); // verde = salidas (igual que el dashboard)
+  rDir.getCell(13).fill = fill(C_BLUE);     // azul = llegadas (igual que el dashboard)
+  rDir.getCell(1).alignment  = {horizontal:'center', vertical:'middle'};
+  rDir.getCell(13).alignment = {horizontal:'center', vertical:'middle'};
+  rDir.height = 20;
 
-  // ── Fila 7 — encabezados de columna ──
+  ws.addRow([]); // fila 7 vacía (separador antes de encabezados)
+
+  // ── Fila 8 — encabezados de columna ──
+  // Ya no repiten "SALIENDO/LLEGANDO" — la dirección del bloque ya quedó indicada en la fila 6.
   const COL_H=['#','# VUELO','CÓDIGO IATA',
-    'WCHR SALIENDO','WCHS SALIENDO','WCHC SALIENDO',
-    'WCHR LLEG. CNX','WCHC LLEG. CNX',
-    'WCHR LLEG. LOCAL','WCHC LLEG. LOCAL','TOTAL'];
-  const headerRow = ws.getRow(7);
+    'WCHR','WCHS','WCHC',
+    'WCHR CNX','WCHC CNX',
+    'WCHR LOCAL','WCHC LOCAL','TOTAL'];
+  const headerRow = ws.getRow(8);
   COL_H.forEach((h,i)=>{ headerRow.getCell(1+i).value=h; });
   COL_H.forEach((h,i)=>{ headerRow.getCell(13+i).value=h; });
   for(let c=1;c<=23;c++){
     if(c===12) continue; // separador
     const cell=headerRow.getCell(c);
     cell.font={bold:true, size:8.5, color:{argb:C_WHITE}};
-    cell.fill=fill(c<=11?C_BLUE:C_RED);
+    cell.fill=fill(c<=11?'FF1A6B45':C_BLUE);
     cell.alignment={horizontal:'center', vertical:'middle', wrapText:true};
     cell.border=borderAll;
   }
@@ -1675,7 +1686,7 @@ async function exportXLS(){
 
   // ── Filas de datos ──
   const maxRows=Math.max(groupsSAL.length,groupsLLE.length,1);
-  const firstDataRow = 8;
+  const firstDataRow = 9;
   for(let i=0;i<maxRows;i++){
     const row = ws.getRow(firstDataRow+i);
     const stripe = i%2===0 ? C_GREY_LT : C_WHITE;
@@ -1720,7 +1731,7 @@ async function exportXLS(){
     if(c===12) continue;
     const cell=rT.getCell(c);
     cell.border=borderAll;
-    cell.fill=fill(c<=11?C_BLUE:C_RED);
+    cell.fill=fill(c<=11?'FF1A6B45':C_BLUE);
     cell.font={bold:true,color:{argb:C_WHITE},size:10};
     cell.alignment={horizontal:'center',vertical:'middle'};
   }
