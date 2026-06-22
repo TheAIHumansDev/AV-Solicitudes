@@ -1562,6 +1562,42 @@ async function exportXLS(){
 
   // Solo AV facturables
   const recsBill=recs.filter(r=>(r.aerolinea||'').toUpperCase()==='AV'&&isBillable(r.tramo));
+
+  // ═══════════════════════════════════════════════
+  // VALIDACIÓN PREVIA — Mezcla de tramos por vuelo
+  // Un vuelo de SALIDA solo debe tener counter-inspeccion.
+  // Un vuelo de LLEGADA solo debe tener aeronave-salida.
+  // Si un mismo # VUELO AV tiene ambos tramos mezclados, se bloquea la exportación.
+  // ═══════════════════════════════════════════════
+  const vueloTramoMap = {};
+  recsBill.forEach(r=>{
+    const tl=(r.tramo||'').toLowerCase();
+    const esCounter  = tl.includes('counter');
+    const esAeronave = tl.includes('aeronave');
+    if(!esCounter && !esAeronave) return;
+    const vKey = 'AV'+(r.vuelo||'S/N');
+    if(!vueloTramoMap[vKey]) vueloTramoMap[vKey] = {counter:[], aeronave:[]};
+    if(esCounter)  vueloTramoMap[vKey].counter.push(r);
+    if(esAeronave) vueloTramoMap[vKey].aeronave.push(r);
+  });
+  const vuelosConflicto = Object.keys(vueloTramoMap)
+    .filter(v=>vueloTramoMap[v].counter.length>0 && vueloTramoMap[v].aeronave.length>0)
+    .sort();
+
+  if(vuelosConflicto.length>0){
+    let msg = '⚠ NO SE PUEDE EXPORTAR — Vuelos con tramos mezclados:\n\n';
+    msg += 'Un vuelo de SALIDA solo debe tener pasajeros en Counter→Insp.\n';
+    msg += 'Un vuelo de LLEGADA solo debe tener pasajeros en Aeronave→Salida.\n\n';
+    vuelosConflicto.forEach(v=>{
+      const g=vueloTramoMap[v];
+      msg += '• '+v+':  '+g.counter.length+' en Counter→Insp (SAL)  +  '+g.aeronave.length+' en Aeronave→Salida (LLE)\n';
+    });
+    msg += '\nCorrija el tramo de estos pasajeros (botón "✎ editar" en la tabla) antes de exportar.';
+    alert(msg);
+    dbg('error','Exportación bloqueada — vuelos con tramo mezclado: '+vuelosConflicto.join(', '));
+    return;
+  }
+
   const recsSAL =recsBill.filter(r=>getDir(r.tramo)==='SAL');
   const recsLLE =recsBill.filter(r=>getDir(r.tramo)==='LLE');
 
@@ -1755,19 +1791,19 @@ async function exportXLS(){
   ws.pageSetup = { orientation:'landscape', fitToPage:true, fitToWidth:1, fitToHeight:0 };
 
   // ═══════════════════════════════════════════════
-  // HOJA 2 — PAX (listado completo de pasajeros)
+  // HOJA 2 — PAX (listado de pasajeros)
   // Solo tramos: counter-inspeccion / aeronave-salida
   // NUNCA inspeccion-sala
   // Ordenado por vuelo, un pasajero por fila
+  // Columnas: #, VUELO AV, DIRECCIÓN, PASAJERO (únicamente)
   // ═══════════════════════════════════════════════
   const wsPax = wb.addWorksheet('PAX', { views:[{showGridLines:false, state:'frozen', ySplit:1}] });
 
   wsPax.columns = [
-    {width:5}, {width:11}, {width:9}, {width:30}, {width:14},
-    {width:10}, {width:9}, {width:9}, {width:9}, {width:16}, {width:9},
+    {width:5}, {width:11}, {width:11}, {width:34},
   ];
 
-  const PAX_H = ['#','VUELO AV','DIRECCIÓN','PASAJERO','PNR','TRAMO','TIPO WCH','TURNO','FECHA','STAFF','HORA'];
+  const PAX_H = ['#','VUELO AV','DIRECCIÓN','PASAJERO'];
   const paxHeaderRow = wsPax.getRow(1);
   PAX_H.forEach((h,i)=>{ paxHeaderRow.getCell(1+i).value=h; });
   paxHeaderRow.eachCell((cell)=>{
@@ -1799,16 +1835,9 @@ async function exportXLS(){
     row.getCell(2).value = 'AV'+(p.vuelo||'');
     row.getCell(3).value = dir==='SAL' ? '▲ SAL' : '▼ LLE';
     row.getCell(4).value = p.pasajero || '(sin nombre)';
-    row.getCell(5).value = p.pnr || '';
-    row.getCell(6).value = (p.tramo||'').toLowerCase().includes('counter') ? 'Counter→Insp' : 'Aeronave→Salida';
-    row.getCell(7).value = p.wchType || '';
-    row.getCell(8).value = getTurno(p.hora).toUpperCase();
-    row.getCell(9).value = p.fecha || '';
-    row.getCell(10).value = p.usuario || '';
-    row.getCell(11).value = p.hora ? p.hora.slice(0,5) : '';
 
     const stripe = idx%2===0 ? C_GREY_LT : C_WHITE;
-    for(let c=1;c<=11;c++){
+    for(let c=1;c<=4;c++){
       const cell=row.getCell(c);
       cell.border=borderAll;
       cell.fill=fill(stripe);
@@ -1825,17 +1854,15 @@ async function exportXLS(){
   const paxTotalRow = wsPax.getRow(paxList.length+2);
   paxTotalRow.getCell(1).value = 'TOTAL';
   paxTotalRow.getCell(4).value = paxList.length + ' pasajeros';
-  ws_total_style: {
-    paxTotalRow.eachCell((cell,colNum)=>{
-      if(colNum>4) return;
-      cell.font={bold:true,color:{argb:C_WHITE},size:10};
-      cell.fill=fill(C_RED);
-      cell.border=borderAll;
-      cell.alignment={horizontal:'center',vertical:'middle'};
-    });
-  }
+  paxTotalRow.eachCell((cell,colNum)=>{
+    if(colNum>4) return;
+    cell.font={bold:true,color:{argb:C_WHITE},size:10};
+    cell.fill=fill(C_RED);
+    cell.border=borderAll;
+    cell.alignment={horizontal:'center',vertical:'middle'};
+  });
   wsPax.mergeCells(paxList.length+2,1,paxList.length+2,3);
-  wsPax.autoFilter = { from:'A1', to:'K1' };
+  wsPax.autoFilter = { from:'A1', to:'D1' };
 
   // ── Descargar ──
   const fechaStr=fechas.length>0?fechaToISO(fechas[0]):new Date().toISOString().split('T')[0];
