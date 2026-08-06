@@ -139,64 +139,12 @@
         .conexion-flight-block.show { display:block; animation:slideDown 0.3s ease; }
         .cnx-label-badge { display:inline-flex; align-items:center; gap:5px; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.3); border-radius:6px; padding:3px 10px; margin-bottom:8px; font-size:10px; font-weight:700; color:#93c5fd; font-family:'JetBrains Mono',monospace; }
 
-        /* PASSENGER LIST (relevo tramo 2) */
-        .passenger-list { display:flex; flex-direction:column; gap:8px; margin-bottom:12px; }
-        .passenger-card { display:flex; align-items:center; gap:12px; padding:12px 14px; border-radius:12px; background:rgba(16,22,50,0.6); border:1.5px solid rgba(232,0,29,0.16); cursor:pointer; transition:all 0.22s; }
-        .passenger-card:hover { border-color:rgba(232,0,29,0.45); }
-        .passenger-card.selected { border-color:var(--green); background:rgba(0,220,130,0.08); }
-        .passenger-card .pc-avatar { width:36px; height:36px; border-radius:50%; flex-shrink:0; background:linear-gradient(135deg,var(--red),var(--red2)); display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; color:#fff; }
-        .passenger-card.selected .pc-avatar { background:linear-gradient(135deg,var(--green),var(--green2)); }
-        .passenger-card .pc-body { flex:1; min-width:0; }
-        .passenger-card .pc-name { font-size:13px; font-weight:700; color:#fff; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-        .passenger-card .pc-meta { font-size:10px; color:var(--muted); font-family:'JetBrains Mono',monospace; margin-top:2px; }
-        .passenger-card .pc-check { font-size:20px; color:var(--green); opacity:0; transition:opacity 0.25s; flex-shrink:0; }
-        .passenger-card.selected .pc-check { opacity:1; }
-
-        /* AERONAVE PASSENGER DB */
-        .aeronave-db-section { background:rgba(59,130,246,0.06); border:1px solid rgba(59,130,246,0.22); border-radius:14px; padding:14px; margin-bottom:14px; }
-        .aeronave-db-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
-        .aeronave-db-title { font-size:11px; font-weight:700; color:#93c5fd; font-family:'JetBrains Mono',monospace; letter-spacing:1px; text-transform:uppercase; }
-        .btn-add-passenger { padding:5px 12px; border-radius:8px; background:rgba(59,130,246,0.18); border:1px solid rgba(59,130,246,0.4); color:#93c5fd; font-size:11px; font-weight:700; cursor:pointer; font-family:'Syne',sans-serif; transition:all 0.2s; }
-        .btn-add-passenger:hover { background:rgba(59,130,246,0.3); }
-        .aeronave-search-wrap { position:relative; margin-bottom:10px; }
-        .aeronave-search-input { width:100%; padding:10px 36px 10px 14px; background:rgba(16,22,50,0.7); border:1px solid rgba(59,130,246,0.25); border-radius:10px; color:#fff; font-size:13px; outline:none; transition:all 0.25s; font-family:'Syne',sans-serif; }
-        .aeronave-search-input:focus { border-color:var(--blue); box-shadow:0 0 0 3px rgba(59,130,246,0.12); }
-        .aeronave-search-input::placeholder { color:#3d4a66; }
-        .aeronave-search-icon { position:absolute; right:12px; top:50%; transform:translateY(-50%); font-size:15px; pointer-events:none; }
-        .aeronave-passenger-list { display:flex; flex-direction:column; gap:6px; max-height:240px; overflow-y:auto; }
-        .aeronave-passenger-list::-webkit-scrollbar { width:3px; }
-        .aeronave-passenger-list::-webkit-scrollbar-thumb { background:rgba(59,130,246,0.3); border-radius:2px; }
-        .aero-pcard { display:flex; align-items:center; gap:10px; padding:10px 12px; background:rgba(16,22,50,0.6); border:1.5px solid rgba(59,130,246,0.15); border-radius:10px; cursor:pointer; transition:all 0.2s; }
-        .aero-pcard:hover { border-color:rgba(59,130,246,0.45); background:rgba(59,130,246,0.08); }
-        .aero-pcard.selected { border-color:var(--blue); background:rgba(59,130,246,0.14); }
-        .aero-pcard .apc-av { width:32px; height:32px; border-radius:50%; flex-shrink:0; background:linear-gradient(135deg,var(--blue2),var(--blue)); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#fff; }
-        .aero-pcard.selected .apc-av { background:linear-gradient(135deg,var(--green),var(--green2)); }
-        .aero-pcard .apc-body { flex:1; min-width:0; }
-        .aero-pcard .apc-name { font-size:12px; font-weight:700; color:#fff; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-        .aero-pcard .apc-meta { font-size:9px; color:var(--muted); font-family:'JetBrains Mono',monospace; margin-top:1px; }
-        .aero-pcard .apc-check { font-size:16px; color:var(--green); opacity:0; transition:opacity 0.2s; flex-shrink:0; }
-        .aero-pcard.selected .apc-check { opacity:1; }
-        .aero-pcard .apc-del { font-size:14px; color:var(--muted); cursor:pointer; padding:2px 4px; flex-shrink:0; transition:color 0.2s; }
-        .aero-pcard .apc-del:hover { color:var(--red3); }
-        .aero-empty { padding:14px; text-align:center; color:var(--muted); font-size:11px; font-family:'JetBrains Mono',monospace; line-height:1.6; }
-        .aero-sync-status { display:flex; align-items:center; gap:6px; font-size:10px; color:var(--muted); font-family:'JetBrains Mono',monospace; margin-bottom:8px; }
-        .aero-sync-dot { width:6px; height:6px; border-radius:50%; background:var(--green); flex-shrink:0; }
-        .aero-sync-dot.syncing { background:var(--gold2); animation:blink 1s ease-in-out infinite; }
-        .aero-sync-dot.error { background:var(--red); }
-
-        /* RELEVO STATUS */
+        /* RELEVO STATUS (legacy, ya no se usa la búsqueda por vuelo) */
         .relevo-loading { display:flex; align-items:center; gap:10px; color:var(--muted); font-size:12px; padding:14px 0; font-family:'JetBrains Mono',monospace; }
         .relevo-spinner { width:16px; height:16px; border:2px solid rgba(232,0,29,0.2); border-top-color:var(--red); border-radius:50%; animation:spin .7s linear infinite; flex-shrink:0; }
         .relevo-empty { background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.28); border-radius:10px; padding:12px 14px; font-size:12px; color:#fcd34d; line-height:1.5; }
 
-        /* DATA SUMMARY CARDS */
-        .relevo-data-card { background:rgba(0,220,130,0.06); border:1px solid rgba(0,220,130,0.2); border-radius:12px; padding:12px 14px; margin-top:10px; }
-        .relevo-data-row { display:flex; justify-content:space-between; align-items:center; padding:5px 0; border-bottom:1px solid rgba(0,220,130,0.08); font-size:12px; }
-        .relevo-data-row:last-child { border-bottom:none; }
-        .relevo-data-row span { color:var(--muted); }
-        .relevo-data-row strong { color:#fff; font-family:'JetBrains Mono',monospace; font-size:11px; }
-
-        /* MODAL */
+        /* MODAL (usado solo por el modal de destino final / otros, no pasajeros) */
         .modal-overlay { position:fixed; inset:0; background:rgba(6,8,15,0.88); backdrop-filter:blur(8px); z-index:300; display:none; align-items:flex-end; justify-content:center; }
         .modal-overlay.show { display:flex; animation:fadeIn 0.2s ease; }
         .modal-sheet { background:#0a0e20; border-top:1px solid rgba(59,130,246,0.3); border-radius:20px 20px 0 0; padding:20px 20px 36px; width:100%; max-width:480px; animation:slideUp 0.3s cubic-bezier(0.34,1.56,0.64,1); max-height:92vh; overflow-y:auto; }
@@ -674,164 +622,6 @@
 
 </div>
 
-<!-- MODAL: Agregar pasajero aeronave -->
-<!-- MODAL: Agregar pasajero aeronave -->
-<div class="modal-overlay" id="modalAddPassenger">
-    <div class="modal-sheet">
-        <div class="modal-handle"></div>
-        <div class="modal-title">✈️ Agregar Pasajero</div>
-
-        <!-- ── DATOS DEL VUELO (solo en aeronave, ocultos en otros contextos) ── -->
-        <div id="modalFlightBlock">
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
-                <div style="flex:1;height:1px;background:rgba(59,130,246,0.15);"></div>
-                <span style="font-size:10px;font-weight:700;letter-spacing:2px;color:#64748b;font-family:'JetBrains Mono',monospace;">✈️ DATOS DEL VUELO</span>
-                <div style="flex:1;height:1px;background:rgba(59,130,246,0.15);"></div>
-            </div>
-            <div class="input-row" style="margin-bottom:10px;">
-                <div class="form-group">
-                    <label>✈️ Aerolínea <span style="color:var(--red3)">*</span></label>
-                    <select id="modalAirline" class="input-field">
-                        <option value="">-- Aerolínea --</option>
-                        <option value="AV">Avianca</option>
-                        <option value="CM">Copa Airlines</option>
-                        <option value="IB">Iberia</option>
-                        <option value="NK">Spirit</option>
-                        <option value="TS">Air Transat</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>🔢 # Vuelo <span style="color:var(--red3)">*</span></label>
-                    <input type="text" id="modalFlight" class="input-field" placeholder="Ej: 201">
-                </div>
-            </div>
-            <div class="input-row" style="margin-bottom:14px;">
-                <div class="form-group">
-                    <label>🛬 Origen <span style="color:var(--red3)">*</span></label>
-                    <select id="modalOrigen" class="input-field">
-                        <option value="">-- Origen --</option>
-                        <option value="SAL">SAL · El Salvador</option>
-                        <option value="BOS">BOS · Boston</option>
-                        <option value="DFW">DFW · Dallas/Fort Worth</option>
-                        <option value="IAH">IAH · Houston</option>
-                        <option value="IAD">IAD · Washington Dulles</option>
-                        <option value="JFK">JFK · Nueva York JFK</option>
-                        <option value="LAS">LAS · Las Vegas</option>
-                        <option value="LAX">LAX · Los Ángeles</option>
-                        <option value="MCO">MCO · Orlando</option>
-                        <option value="MIA">MIA · Miami</option>
-                        <option value="ONT">ONT · Ontario, California</option>
-                        <option value="ORD">ORD · Chicago O'Hare</option>
-                        <option value="SFO">SFO · San Francisco</option>
-                        <option value="YUL">YUL · Montreal</option>
-                        <option value="YYZ">YYZ · Toronto</option>
-                        <option value="GUA">GUA · Ciudad de Guatemala</option>
-                        <option value="MGA">MGA · Managua</option>
-                        <option value="PTY">PTY · Ciudad de Panamá</option>
-                        <option value="SAP">SAP · San Pedro Sula</option>
-                        <option value="SJO">SJO · San José</option>
-                        <option value="XPL">XPL · Comayagua (Palmerola)</option>
-                        <option value="BOG">BOG · Bogotá</option>
-                        <option value="LIM">LIM · Lima</option>
-                        <option value="MDE">MDE · Medellín</option>
-                        <option value="UIO">UIO · Quito</option>
-                        <option value="CUN">CUN · Cancún</option>
-                        <option value="MEX">MEX · Ciudad de México</option>
-                        <option value="MAD">MAD · Madrid</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>🛫 Destino <span style="color:var(--red3)">*</span></label>
-                    <select id="modalDestino" class="input-field">
-                        <option value="">-- Destino --</option>
-                        <option value="SAL">SAL · El Salvador</option>
-                        <option value="BOS">BOS · Boston</option>
-                        <option value="DFW">DFW · Dallas/Fort Worth</option>
-                        <option value="IAH">IAH · Houston</option>
-                        <option value="IAD">IAD · Washington Dulles</option>
-                        <option value="JFK">JFK · Nueva York JFK</option>
-                        <option value="LAS">LAS · Las Vegas</option>
-                        <option value="LAX">LAX · Los Ángeles</option>
-                        <option value="MCO">MCO · Orlando</option>
-                        <option value="MIA">MIA · Miami</option>
-                        <option value="ONT">ONT · Ontario, California</option>
-                        <option value="ORD">ORD · Chicago O'Hare</option>
-                        <option value="SFO">SFO · San Francisco</option>
-                        <option value="YUL">YUL · Montreal</option>
-                        <option value="YYZ">YYZ · Toronto</option>
-                        <option value="GUA">GUA · Ciudad de Guatemala</option>
-                        <option value="MGA">MGA · Managua</option>
-                        <option value="PTY">PTY · Ciudad de Panamá</option>
-                        <option value="SAP">SAP · San Pedro Sula</option>
-                        <option value="SJO">SJO · San José</option>
-                        <option value="XPL">XPL · Comayagua (Palmerola)</option>
-                        <option value="BOG">BOG · Bogotá</option>
-                        <option value="LIM">LIM · Lima</option>
-                        <option value="MDE">MDE · Medellín</option>
-                        <option value="UIO">UIO · Quito</option>
-                        <option value="CUN">CUN · Cancún</option>
-                        <option value="MEX">MEX · Ciudad de México</option>
-                        <option value="MAD">MAD · Madrid</option>
-                    </select>
-                </div>
-            </div>
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
-                <div style="flex:1;height:1px;background:rgba(59,130,246,0.15);"></div>
-                <span style="font-size:10px;font-weight:700;letter-spacing:2px;color:#64748b;font-family:'JetBrains Mono',monospace;">👤 PASAJERO</span>
-                <div style="flex:1;height:1px;background:rgba(59,130,246,0.15);"></div>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <label>👤 Nombre Completo <span style="color:var(--red3)">*</span></label>
-            <input type="text" id="modalPaxName" class="input-field" placeholder="Nombre del pasajero">
-        </div>
-        <div class="input-row">
-            <div class="form-group">
-                <label>🎫 PNR <span style="color:var(--red3)">*</span></label>
-                <input type="text" id="modalPaxPNR" class="input-field" placeholder="ABC123" style="text-transform:uppercase;" maxlength="8">
-            </div>
-            <div class="form-group">
-                <label>💺 # Silla <span style="color:var(--red3)">*</span></label>
-                <input type="text" id="modalPaxSilla" class="input-field" placeholder="12A" style="text-transform:uppercase;" maxlength="4">
-            </div>
-        </div>
-        <div class="form-group">
-            <label>🏷️ Tipo WCH <span style="color:var(--red3)">*</span></label>
-            <div class="wch-type-group">
-                <button type="button" class="wch-type-btn" id="mWCHR" onclick="selectModalWCH('WCHR')"><span class="wch-code">WCHR</span><span class="wch-desc">Camina, no escaleras</span></button>
-                <button type="button" class="wch-type-btn" id="mWCHS" onclick="selectModalWCH('WCHS')"><span class="wch-code">WCHS</span><span class="wch-desc">No largas distancias</span></button>
-                <button type="button" class="wch-type-btn" id="mWCHC" onclick="selectModalWCH('WCHC')"><span class="wch-code">WCHC</span><span class="wch-desc">No camina</span></button>
-            </div>
-        </div>
-        <div class="form-group">
-            <label>📄 ¿Posee documentos?</label>
-            <div class="toggle-group">
-                <button type="button" class="toggle-btn" id="mDocsYes" onclick="selectModalToggle('docs','si')">✅ Sí</button>
-                <button type="button" class="toggle-btn" id="mDocsNo"  onclick="selectModalToggle('docs','no')">❌ No</button>
-            </div>
-        </div>
-        <div class="form-group">
-            <label>💓 ¿Posee marcapasos?</label>
-            <div class="toggle-group">
-                <button type="button" class="toggle-btn" id="mPaceYes" onclick="selectModalToggle('pace','si')">✅ Sí</button>
-                <button type="button" class="toggle-btn" id="mPaceNo"  onclick="selectModalToggle('pace','no')">❌ No</button>
-            </div>
-        </div>
-        <div class="form-group">
-            <label>🚶 ¿Puede caminar a la puerta?</label>
-            <div class="toggle-group">
-                <button type="button" class="toggle-btn" id="mWalkYes" onclick="selectModalToggle('walk','si')">✅ Sí</button>
-                <button type="button" class="toggle-btn" id="mWalkNo"  onclick="selectModalToggle('walk','no')">❌ No</button>
-            </div>
-        </div>
-        <div class="modal-actions">
-            <button class="btn-modal-cancel" onclick="closeModal()">Cancelar</button>
-            <button class="btn-modal-save"   onclick="saveModalPassenger()">💾 Guardar</button>
-        </div>
-    </div>
-</div>
-
 <div class="app-shell">
     <header class="app-header">
         <div class="header-row">
@@ -1062,7 +852,7 @@
                     </div>
                 </div>
 
-                <!-- ══ BLOQUE AERONAVE-SALIDA ══ -->
+                <!-- ══ BLOQUE AERONAVE-SALIDA (manual, igual que Counter→Inspección) ══ -->
                 <div id="passengerAeronaveBlock" style="display:none;">
                     <div class="form-section-divider"><span>🗺️ Tipo de Destino Final</span></div>
                     <div class="form-group">
@@ -1085,79 +875,108 @@
                         </div>
                     </div>
 
-                    <div class="form-section-divider"><span>👥 Pasajeros Registrados</span></div>
-                    <div class="aeronave-db-section">
-                        <div class="aeronave-db-header">
-                            <span class="aeronave-db-title">👥 Lista de Pasajeros</span>
-                            <button class="btn-add-passenger" onclick="openModal()">+ Agregar</button>
+                    <div class="form-section-divider"><span>👤 Datos del Pasajero</span></div>
+                    <div class="form-group">
+                        <label>👤 Nombre <span style="color:var(--red3);font-size:11px;">*</span></label>
+                        <input type="text" id="passengerNameA" class="input-field" placeholder="Nombre completo" oninput="checkFormReady()">
+                    </div>
+                    <div class="input-row">
+                        <div class="form-group">
+                            <label>🎫 PNR <span style="color:var(--red3);font-size:11px;">*</span></label>
+                            <input type="text" id="pnrNumberA" class="input-field" placeholder="ABC123" oninput="checkFormReady()" style="text-transform:uppercase;" maxlength="8">
                         </div>
-                        <div class="aero-sync-status" id="aeroSyncStatus">
-                            <div class="aero-sync-dot" id="aeroSyncDot"></div>
-                            <span id="aeroSyncLabel">Cargando desde servidor…</span>
-                        </div>
-                        <div class="aeronave-search-wrap">
-                            <input type="text" class="aeronave-search-input" id="aeronaveSearchInput"
-                                placeholder="Buscar por nombre, PNR o silla…"
-                                oninput="filterAeronavePassengers(this.value)">
-                            <span class="aeronave-search-icon">🔍</span>
-                        </div>
-                        <div class="aeronave-passenger-list" id="aeronavePassengerList">
-                            <div class="aero-empty">Cargando pasajeros…</div>
+                        <div class="form-group">
+                            <label>💺 # Silla <span style="color:var(--red3);font-size:11px;">*</span></label>
+                            <input type="text" id="numeroSillaA" class="input-field" placeholder="12A" oninput="checkFormReady()" style="text-transform:uppercase;" maxlength="4">
                         </div>
                     </div>
 
-                    <div id="aeronaveSelectedSummary" style="display:none;">
-                        <div class="relevo-data-card">
-                            <div class="relevo-data-row"><span>👤 Pasajero</span><strong id="aeroSumName">–</strong></div>
-                            <div class="relevo-data-row"><span>🎫 PNR</span><strong id="aeroSumPNR">–</strong></div>
-                            <div class="relevo-data-row"><span>💺 Silla</span><strong id="aeroSumSilla">–</strong></div>
-                            <div class="relevo-data-row"><span>♿ WCH</span><strong id="aeroSumWCH">–</strong></div>
-                            <div class="relevo-data-row"><span>📄 Docs</span><strong id="aeroSumDocs">–</strong></div>
-                            <div class="relevo-data-row"><span>💓 Marcapasos</span><strong id="aeroSumPace">–</strong></div>
-                            <div class="relevo-data-row"><span>🚶 Camina</span><strong id="aeroSumWalk">–</strong></div>
+                    <div class="form-section-divider"><span>♿ Clasificación WCH</span></div>
+                    <div class="form-group">
+                        <label>🏷️ Tipo WCH <span style="color:var(--red3);font-size:11px;">*</span></label>
+                        <div class="wch-type-group">
+                            <button type="button" class="wch-type-btn" id="wchAWCHR" onclick="selectWCH('WCHR','A')"><span class="wch-code">WCHR</span><span class="wch-desc">Camina, no sube escaleras</span></button>
+                            <button type="button" class="wch-type-btn" id="wchAWCHS" onclick="selectWCH('WCHS','A')"><span class="wch-code">WCHS</span><span class="wch-desc">No largas distancias</span></button>
+                            <button type="button" class="wch-type-btn" id="wchAWCHC" onclick="selectWCH('WCHC','A')"><span class="wch-code">WCHC</span><span class="wch-desc">No puede caminar</span></button>
+                        </div>
+                    </div>
+
+                    <div class="form-section-divider"><span>✅ Verificaciones</span></div>
+                    <div class="form-group">
+                        <label>📄 ¿Posee documentos? <span style="color:var(--red3);font-size:11px;">*</span></label>
+                        <div class="toggle-group">
+                            <button type="button" class="toggle-btn" id="docsAYes" onclick="selectToggle('docs','si','A')">✅ Sí</button>
+                            <button type="button" class="toggle-btn" id="docsANo"  onclick="selectToggle('docs','no','A')">❌ No</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>💓 ¿Posee marcapasos? <span style="color:var(--red3);font-size:11px;">*</span></label>
+                        <div class="toggle-group">
+                            <button type="button" class="toggle-btn" id="paceAYes" onclick="selectToggle('pace','si','A')">✅ Sí</button>
+                            <button type="button" class="toggle-btn" id="paceANo"  onclick="selectToggle('pace','no','A')">❌ No</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>🚶 ¿Puede caminar a la puerta? <span style="color:var(--red3);font-size:11px;">*</span></label>
+                        <div class="toggle-group">
+                            <button type="button" class="toggle-btn" id="walkAYes" onclick="selectToggle('walk','si','A')">✅ Sí</button>
+                            <button type="button" class="toggle-btn" id="walkANo"  onclick="selectToggle('walk','no','A')">❌ No</button>
                         </div>
                     </div>
                 </div>
 
-                <!-- ══ BLOQUE INSPECCION-SALA (relevo) ══ -->
-               <!-- ══ BLOQUE INSPECCION-SALA ══ -->
-<div id="passengerRelevoBlock" style="display:none;">
-    <div class="form-section-divider"><span>👥 Pasajeros en Sala</span></div>
-    <div class="aeronave-db-section" style="border-color:rgba(0,220,130,0.22);background:rgba(0,220,130,0.04);">
-        <div class="aeronave-db-header">
-            <span class="aeronave-db-title" style="color:#6ee7b7;">👥 Lista de Pasajeros</span>
-            <button class="btn-add-passenger" style="background:rgba(0,220,130,0.15);border-color:rgba(0,220,130,0.4);color:#6ee7b7;" onclick="openModal()">+ Agregar</button>
-        </div>
-        <div class="aero-sync-status" id="salasSyncStatus">
-            <div class="aero-sync-dot" id="salaSyncDot"></div>
-            <span id="salaSyncLabel">Cargando desde servidor…</span>
-        </div>
-        <div class="aeronave-search-wrap">
-            <input type="text" class="aeronave-search-input" id="salaSearchInput"
-                placeholder="Buscar por nombre, PNR o silla…"
-                oninput="filterSalaPassengers(this.value)"
-                style="border-color:rgba(0,220,130,0.25);">
-            <span class="aeronave-search-icon">🔍</span>
-        </div>
-        <div class="aeronave-passenger-list" id="salaPassengerList">
-            <div class="aero-empty">Cargando pasajeros…</div>
-        </div>
-    </div>
+                <!-- ══ BLOQUE INSPECCION-SALA (manual, igual que Counter→Inspección) ══ -->
+                <div id="passengerRelevoBlock" style="display:none;">
+                    <div class="form-section-divider"><span>👤 Datos del Pasajero</span></div>
+                    <div class="form-group">
+                        <label>👤 Nombre <span style="color:var(--red3);font-size:11px;">*</span></label>
+                        <input type="text" id="passengerNameS" class="input-field" placeholder="Nombre completo" oninput="checkFormReady()">
+                    </div>
+                    <div class="input-row">
+                        <div class="form-group">
+                            <label>🎫 PNR <span style="color:var(--red3);font-size:11px;">*</span></label>
+                            <input type="text" id="pnrNumberS" class="input-field" placeholder="ABC123" oninput="checkFormReady()" style="text-transform:uppercase;" maxlength="8">
+                        </div>
+                        <div class="form-group">
+                            <label>💺 # Silla <span style="color:var(--red3);font-size:11px;">*</span></label>
+                            <input type="text" id="numeroSillaS" class="input-field" placeholder="12A" oninput="checkFormReady()" style="text-transform:uppercase;" maxlength="4">
+                        </div>
+                    </div>
 
-    <div id="salaSelectedSummary" style="display:none;">
-        <div class="relevo-data-card">
-            <div class="relevo-data-row"><span>👤 Pasajero</span><strong id="salaSumName">–</strong></div>
-            <div class="relevo-data-row"><span>🎫 PNR</span><strong id="salaSumPNR">–</strong></div>
-            <div class="relevo-data-row"><span>💺 Silla</span><strong id="salaSumSilla">–</strong></div>
-            <div class="relevo-data-row"><span>♿ WCH</span><strong id="salaSumWCH">–</strong></div>
-            <div class="relevo-data-row"><span>📄 Docs</span><strong id="salaSumDocs">–</strong></div>
-            <div class="relevo-data-row"><span>💓 Marcapasos</span><strong id="salaSumPace">–</strong></div>
-            <div class="relevo-data-row"><span>🚶 Camina</span><strong id="salaSumWalk">–</strong></div>
-        </div>
-    </div>
-</div>
+                    <div class="form-section-divider"><span>♿ Clasificación WCH</span></div>
+                    <div class="form-group">
+                        <label>🏷️ Tipo WCH <span style="color:var(--red3);font-size:11px;">*</span></label>
+                        <div class="wch-type-group">
+                            <button type="button" class="wch-type-btn" id="wchSWCHR" onclick="selectWCH('WCHR','S')"><span class="wch-code">WCHR</span><span class="wch-desc">Camina, no sube escaleras</span></button>
+                            <button type="button" class="wch-type-btn" id="wchSWCHS" onclick="selectWCH('WCHS','S')"><span class="wch-code">WCHS</span><span class="wch-desc">No largas distancias</span></button>
+                            <button type="button" class="wch-type-btn" id="wchSWCHC" onclick="selectWCH('WCHC','S')"><span class="wch-code">WCHC</span><span class="wch-desc">No puede caminar</span></button>
+                        </div>
+                    </div>
 
-              
+                    <div class="form-section-divider"><span>✅ Verificaciones</span></div>
+                    <div class="form-group">
+                        <label>📄 ¿Posee documentos? <span style="color:var(--red3);font-size:11px;">*</span></label>
+                        <div class="toggle-group">
+                            <button type="button" class="toggle-btn" id="docsSYes" onclick="selectToggle('docs','si','S')">✅ Sí</button>
+                            <button type="button" class="toggle-btn" id="docsSNo"  onclick="selectToggle('docs','no','S')">❌ No</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>💓 ¿Posee marcapasos? <span style="color:var(--red3);font-size:11px;">*</span></label>
+                        <div class="toggle-group">
+                            <button type="button" class="toggle-btn" id="paceSYes" onclick="selectToggle('pace','si','S')">✅ Sí</button>
+                            <button type="button" class="toggle-btn" id="paceSNo"  onclick="selectToggle('pace','no','S')">❌ No</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>🚶 ¿Puede caminar a la puerta? <span style="color:var(--red3);font-size:11px;">*</span></label>
+                        <div class="toggle-group">
+                            <button type="button" class="toggle-btn" id="walkSYes" onclick="selectToggle('walk','si','S')">✅ Sí</button>
+                            <button type="button" class="toggle-btn" id="walkSNo"  onclick="selectToggle('walk','no','S')">❌ No</button>
+                        </div>
+                    </div>
+                </div>
+
                 <button class="btn-primary" onclick="submitFlightInfo()" style="margin-top:14px;" id="btnIniciarServicio" disabled>♿ Guardar Pasajero →</button>
             </div>
           </div>
@@ -1378,7 +1197,6 @@
                 <div class="sum-row"><span class="sum-label">Documentos</span><span class="sum-val" id="sumDocs">–</span></div>
                 <div class="sum-row"><span class="sum-label">Marcapasos</span><span class="sum-val" id="sumPace">–</span></div>
                 <div class="sum-row"><span class="sum-label">Puede caminar</span><span class="sum-val" id="sumWalk">–</span></div>
-                <div class="sum-row" id="sumRelevoRow" style="display:none;"><span class="sum-label">Relevo de</span><span class="sum-val" id="sumRelevo">–</span></div>
             </div>
 
             <div class="summary-glass">
@@ -1417,12 +1235,6 @@ const SVC_LABELS    = {
     'aeronave-salida':    'Aeronave → Salida/Parqueo'
 };
 
-// Airline code mapping from boarding pass text
-const AIRLINE_CODE_MAP = {
-    'avianca':'AV','av':'AV','iberia':'IB','ib':'IB','spirit':'NK','nk':'NK',
-    'air transat':'TS','transat':'TS','ts':'TS'
-};
-
 // ════════════════════════════════════════════════════════════
 //  ESTADO GLOBAL
 // ════════════════════════════════════════════════════════════
@@ -1438,16 +1250,11 @@ let tramoType='';
 let origenVuelo='', destinoVuelo='';
 let destinoTipo='', conexionFlight='';
 
-let relevoPassengers=[], selectedRelevoId='', flightSearchTimer=null;
-let aeronavePassengers=[], selectedAeronaveId='';
-let modalWchType='', modalDocs='', modalPace='', modalWalk='';
 let stops=[], activeStop=null, totalStopMs=0, stopElapsedTimer=null;
 
 let destinoFinalTipo = '', destinoFinalDetalle = '';
-  
-// NUEVP SCRIPT TRAMO 2
 
-  // ════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════
 //  DESTINO FINAL (tramo 2)
 // ════════════════════════════════════════════════════════════
 const DESTINO_FINAL_LABELS = {
@@ -1502,8 +1309,6 @@ function confirmDestinoFinal(){
         updateProgress(); scrollTo('sectionIncident');
     });
 }
-  
-// _scanCancelled, _camStream, _ocrPending declared in scanner section
 
 // ════════════════════════════════════════════════════════════
 //  AUTH
@@ -1515,14 +1320,9 @@ function confirmDestinoFinal(){
         currentUser = JSON.parse(raw);
         document.getElementById('usernameDisplay').textContent = currentUser.username;
         document.getElementById('avatarInitial').textContent  = (currentUser.username||'?').slice(0,2).toUpperCase();
- updateApiKeyHeaderBtn();
-        loadAeronavePassengersFromServer();
-        loadSalaPassengersFromServer();
+        updateApiKeyHeaderBtn();
     }catch(e){ window.location.href='index.html'; }
 })();
-
-// ════════════════════════════════════════════════════════════
-//  THREE.JS BACKGROUND
 
 // ════════════════════════════════════════════════════════════
 //  THREE.JS BACKGROUND
@@ -1544,120 +1344,6 @@ function confirmDestinoFinal(){
     (function a(){ requestAnimationFrame(a); tr.rotation.x+=.006; tr.rotation.z+=.003; rd.render(sc,cm); })();
     window.addEventListener('resize',()=>{ cm.aspect=innerWidth/innerHeight; cm.updateProjectionMatrix(); rd.setSize(innerWidth,innerHeight); });
 })();
-
-
-  // ════════════════════════════════════════════════════════════
-//  SALA PASSENGERS (tramo 2 — igual que aeronave)
-// ════════════════════════════════════════════════════════════
-let salaPassengers = [], selectedSalaId = '';
-
-function setSalaSyncStatus(state, msg){
-    const dot   = document.getElementById('salaSyncDot');
-    const label = document.getElementById('salaSyncLabel');
-    if(!dot||!label) return;
-    dot.className = 'aero-sync-dot' + (state==='syncing' ? ' syncing' : state==='error' ? ' error' : '');
-    label.textContent = msg;
-}
-
-function loadSalaPassengersFromServer(){
-    setSalaSyncStatus('syncing','Sincronizando pasajeros…');
-    const cbName = 'salaLoad'+Date.now();
-    const url = SCRIPT_URL+'?action=getSalaPassengers&user='+encodeURIComponent(currentUser.username)+'&callback='+cbName;
-    window[cbName] = function(data){
-        delete window[cbName]; document.getElementById('salaScr')?.remove();
-        if(data?.success && data.passengers){
-            salaPassengers = data.passengers;
-            setSalaSyncStatus('ok','Sincronizado ✓ · '+salaPassengers.length+' pasajero(s)');
-        } else {
-            setSalaSyncStatus('error','Sin conexión — modo local');
-        }
-        renderSalaPassengers('');
-    };
-    const scr = document.createElement('script'); scr.id='salaScr'; scr.src=url;
-    scr.onerror = ()=>{ delete window[cbName]; scr.remove(); setSalaSyncStatus('error','Error de conexión'); renderSalaPassengers(''); };
-    document.body.appendChild(scr);
-    setTimeout(()=>{ if(window[cbName]){ delete window[cbName]; setSalaSyncStatus('error','Tiempo agotado'); renderSalaPassengers(''); }}, 12000);
-}
-
-function filterSalaPassengers(q){ renderSalaPassengers(q); }
-
-function renderSalaPassengers(query){
-    const list = document.getElementById('salaPassengerList');
-    if(!list) return;
-    const q = (query||'').toLowerCase().trim();
-    const filtered = q
-        ? salaPassengers.filter(p => p.nombre?.toLowerCase().includes(q) || p.pnr?.toLowerCase().includes(q) || p.numeroSilla?.toLowerCase().includes(q))
-        : salaPassengers;
-
-    if(filtered.length === 0){
-        list.innerHTML = `<div class="aero-empty">${salaPassengers.length===0
-            ? 'Sin pasajeros aún.<br>Toca <strong>+ Agregar</strong> para registrar uno.'
-            : '🔍 Sin resultados para <em>"'+esc(query)+'"</em>'}</div>`;
-        return;
-    }
-
-    list.innerHTML = filtered.map(p => {
-        const init  = (p.nombre||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-        const isSel = p.id === selectedSalaId;
-        return `<div class="aero-pcard${isSel?' selected':''}" id="spa_${p.id}" onclick="selectSalaPassenger('${p.id}')">
-            <div class="apc-av" style="background:linear-gradient(135deg,var(--green2),var(--green));">${init}</div>
-            <div class="apc-body">
-                <div class="apc-name">${esc(p.nombre)}</div>
-                <div class="apc-meta">🎫 ${esc(p.pnr||'–')} · 💺 ${esc(p.numeroSilla||'–')} · ♿ ${esc(p.wchType||'–')}</div>
-                <div class="apc-meta">✈️ ${esc(p.airline||'–')} ${esc(p.flight||'–')} · ${esc(p.origenVuelo||'–')}→${esc(p.destinoVuelo||'–')}</div>
-            </div>
-            <div class="apc-check">✓</div>
-            <div class="apc-del" onclick="deleteSalaPassenger('${p.id}',event)" title="Eliminar">✕</div>
-        </div>`;
-    }).join('');
-}
-
-function selectSalaPassenger(id){
-    const p = salaPassengers.find(x => x.id === id);
-    if(!p) return;
-    selectedSalaId   = id;
-    selectedRelevoId = id; // compatibilidad con sendToSheet
-    passengerName  = p.nombre;
-    pnrNumber      = p.pnr;
-    numeroSilla    = p.numeroSilla || '';
-    wchType        = p.wchType;
-    hasDocs        = p.hasDocs;
-    hasPacemaker   = p.hasPacemaker;
-    canWalk        = p.canWalk;
-    // Sincronizar vuelo al formulario principal
-    if(p.airline)      { document.getElementById('airlineSelect').value = p.airline;      airlineCode  = p.airline; }
-    if(p.flight)       { document.getElementById('flightNumber').value  = p.flight;       flightNum    = p.flight; }
-    if(p.origenVuelo)  { document.getElementById('origenVuelo').value   = p.origenVuelo;  origenVuelo  = p.origenVuelo; }
-    if(p.destinoVuelo) { document.getElementById('destinoVuelo').value  = p.destinoVuelo; destinoVuelo = p.destinoVuelo; }
-
-    renderSalaPassengers(document.getElementById('salaSearchInput')?.value || '');
-
-    const s = document.getElementById('salaSelectedSummary');
-    if(s) s.style.display = 'block';
-    document.getElementById('salaSumName').textContent  = p.nombre;
-    document.getElementById('salaSumPNR').textContent   = p.pnr || '–';
-    document.getElementById('salaSumSilla').textContent = p.numeroSilla || '–';
-    document.getElementById('salaSumWCH').textContent   = p.wchType || '–';
-    document.getElementById('salaSumDocs').textContent  = p.hasDocs==='si' ? '✅ Sí' : '❌ No';
-    document.getElementById('salaSumPace').textContent  = p.hasPacemaker==='si' ? '⚠️ Sí' : '✅ No';
-    document.getElementById('salaSumWalk').textContent  = p.canWalk==='si' ? '✅ Sí' : '❌ No';
-    document.getElementById('btnIniciarServicio').disabled = false;
-    checkFormReady();
-}
-
-function deleteSalaPassenger(id, evt){
-    evt.stopPropagation();
-    if(selectedSalaId === id){ selectedSalaId = ''; selectedRelevoId = ''; }
-    salaPassengers = salaPassengers.filter(p => p.id !== id);
-    renderSalaPassengers(document.getElementById('salaSearchInput')?.value || '');
-    showToast('🗑 Pasajero eliminado','gold');
-    const cbName = 'delSala'+Date.now();
-    const url = SCRIPT_URL+'?action=deleteSalaPassenger&id='+encodeURIComponent(id)+'&callback='+cbName;
-    window[cbName] = function(){ delete window[cbName]; document.getElementById('dSalaScr')?.remove(); };
-    const scr = document.createElement('script'); scr.id='dSalaScr'; scr.src=url;
-    scr.onerror = ()=>{ delete window[cbName]; scr.remove(); };
-    document.body.appendChild(scr);
-}
 
 // ════════════════════════════════════════════════════════════
 //  API KEY MANAGEMENT
@@ -1690,7 +1376,6 @@ function openApiKeyModal(){
     document.getElementById('apikeyStatus').className = 'apikey-status';
     document.getElementById('apikeyStatus').textContent = '';
     document.getElementById('apikeySave').disabled = !existing;
-    // Hide cancel button if no key set yet (force them to save one)
     document.getElementById('apikeyCancel').style.display = existing ? '' : 'none';
     document.getElementById('apikeyOverlay').classList.add('show');
     setTimeout(()=> input.focus(), 350);
@@ -1710,9 +1395,7 @@ function toggleApiKeyVisibility(){
 function onApiKeyInput(val){
     const trimmed = val.trim();
     const saveBtn = document.getElementById('apikeySave');
-    // Enable save if it looks like an Anthropic key (starts with sk-ant)
     saveBtn.disabled = trimmed.length < 10;
-    // Clear any previous status
     const st = document.getElementById('apikeyStatus');
     st.className = 'apikey-status';
 }
@@ -1749,12 +1432,11 @@ function clearApiKey(){
 //  LIVE CAMERA BOARDING PASS SCANNER
 // ════════════════════════════════════════════════════════════
 
-let _camStream   = null;   // active MediaStream
-let _ocrPending  = {};     // extracted data being edited
+let _camStream   = null;
+let _ocrPending  = {};
 let _scanCancelled = false;
-let _bpExpired   = false;  // true when flight date is in the past — blocks confirm + submit
+let _bpExpired   = false;
 
-// OCR fields definition — what we extract + how to display/edit
 const BP_FIELDS = [
     { key:'passengerName',  label:'👤 Nombre Completo',      placeholder:'Ej: Leandro Jose Camacho',  required:true  },
     { key:'flightNumber',   label:'✈️ # Vuelo',               placeholder:'Ej: 609',                    required:true  },
@@ -1787,11 +1469,10 @@ async function triggerBoardingPassScan(){
 
 async function startCamera(){
     try {
-        // Stop any existing stream first
         stopCamera();
         const constraints = {
             video: {
-                facingMode: { ideal: 'environment' }, // rear camera on mobile
+                facingMode: { ideal: 'environment' },
                 width:  { ideal: 1280 },
                 height: { ideal: 720 }
             }
@@ -1800,7 +1481,6 @@ async function startCamera(){
         const video = document.getElementById('camVideo');
         video.srcObject = _camStream;
         await video.play();
-        // Animate scan line
         document.getElementById('scanLine')?.classList.remove('paused');
     } catch(err){
         showCamError('Sin acceso a cámara', err.name === 'NotAllowedError'
@@ -1824,20 +1504,16 @@ function captureFrame(){
     const canvas = document.getElementById('camCanvas');
     if(!video || !canvas || !video.videoWidth) return;
 
-    // Draw current frame onto canvas
     canvas.width  = video.videoWidth;
     canvas.height = video.videoHeight;
     const ctx = canvas.getContext('2d');
     ctx.drawImage(video, 0, 0);
 
-    // Stop camera — we have what we need
     stopCamera();
 
-    // Switch to analyzing state
     camState('camAnalyzing');
     document.getElementById('scanLine')?.classList.add('paused');
 
-    // Compress: max 900px, JPEG 0.7 — boarding pass text needs to stay readable
     const MAX = 900;
     let w = canvas.width, h = canvas.height;
     if(w > MAX || h > MAX){
@@ -1940,7 +1616,6 @@ IMPORTANT:
         let parsed = {};
         try { parsed = JSON.parse(clean); } catch(e) { throw new Error('Respuesta de IA no parseable'); }
 
-        // Remove nulls
         Object.keys(parsed).forEach(k => {
             if(parsed[k] === null || parsed[k] === undefined || parsed[k] === '') delete parsed[k];
             else parsed[k] = String(parsed[k]).trim();
@@ -1969,7 +1644,6 @@ IMPORTANT:
 
 let _countdownTimer = null;
 
-// Parse HH:MM → {h, min} or null
 function parseHHMM(str){
     if(!str) return null;
     const m = String(str).match(/(\d{1,2})[:\.\-](\d{2})/);
@@ -1977,7 +1651,6 @@ function parseHHMM(str){
     return { h: parseInt(m[1]), min: parseInt(m[2]) };
 }
 
-// Parse DD/MM/YYYY → Date object (midnight local) or null
 function parseDDMMYYYY(str){
     if(!str) return null;
     const m = String(str).match(/(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{2,4})/);
@@ -1987,7 +1660,6 @@ function parseDDMMYYYY(str){
     return new Date(parseInt(y), parseInt(mo)-1, parseInt(d));
 }
 
-// Combine date + HH:MM into full Date
 function buildDateTime(dateObj, hhmmObj){
     if(!dateObj || !hhmmObj) return null;
     const d = new Date(dateObj);
@@ -1995,14 +1667,12 @@ function buildDateTime(dateObj, hhmmObj){
     return d;
 }
 
-// Format diff in minutes to human string
 function fmtDiff(diffMin){
     const abs = Math.abs(diffMin);
     if(abs < 60) return abs + ' min';
     return Math.floor(abs/60) + 'h ' + (abs%60) + 'm';
 }
 
-// Run all validations and update the panel — called every second
 function runValidation(data){
     const panel = document.getElementById('validationPanel');
     if(!panel) return;
@@ -2012,25 +1682,21 @@ function runValidation(data){
     const nowMin  = now.getHours() * 60 + now.getMinutes();
     const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-    // Parse extracted fields
     const flightDate   = parseDDMMYYYY(data.flightDate);
     const boardingHHMM = parseHHMM(data.boardingTime);
     const departHHMM   = parseHHMM(data.departureTime);
 
-    // Full datetime objects
     const boardingDT   = buildDateTime(flightDate || todayMidnight, boardingHHMM);
     const departureDT  = buildDateTime(flightDate || todayMidnight, departHHMM);
 
     const boardingMin  = boardingHHMM ? boardingHHMM.h * 60 + boardingHHMM.min : null;
     const departMin    = departHHMM   ? departHHMM.h   * 60 + departHHMM.min   : null;
 
-    // ── Update live clock ──
     document.getElementById('vpNow').textContent =
         String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
     document.getElementById('vpDate').textContent =
         String(now.getDate()).padStart(2,'0') + '/' + String(now.getMonth()+1).padStart(2,'0');
 
-    // ── Boarding time column ──
     if(boardingHHMM){
         document.getElementById('vpBoardingTime').textContent =
             String(boardingHHMM.h).padStart(2,'0') + ':' + String(boardingHHMM.min).padStart(2,'0');
@@ -2044,7 +1710,6 @@ function runValidation(data){
         document.getElementById('vpBoardingDiff').textContent = '';
     }
 
-    // ── Departure time column ──
     if(departHHMM){
         document.getElementById('vpDepartureTime').textContent =
             String(departHHMM.h).padStart(2,'0') + ':' + String(departHHMM.min).padStart(2,'0');
@@ -2058,7 +1723,6 @@ function runValidation(data){
         document.getElementById('vpDepartureDiff').textContent = '';
     }
 
-    // ── Countdown to boarding ──
     const numEl   = document.getElementById('vpCountdownNum');
     const lblEl   = document.getElementById('vpCountdownLabel');
     const barEl   = document.getElementById('vpBar');
@@ -2086,10 +1750,8 @@ function runValidation(data){
         barEl.style.width = '50%';
     }
 
-    // ════ VALIDATION CHECKS ════
     const checks = [];
 
-    // 1. Flight date validation
     if(flightDate){
         const flightMidnight = new Date(flightDate.getFullYear(), flightDate.getMonth(), flightDate.getDate());
         const dayDiff = Math.round((flightMidnight - todayMidnight) / 86400000);
@@ -2107,7 +1769,6 @@ function runValidation(data){
         checks.push({ key:'date', ok:null, icon:'📅', label:'Fecha de vuelo', detail:'No detectada — verifique manualmente' });
     }
 
-    // 2. Boarding time check — is there still time to get to gate?
     if(boardingMin !== null){
         const diff = boardingMin - nowMin;
         if(diff < 0){
@@ -2123,7 +1784,6 @@ function runValidation(data){
         checks.push({ ok:null, icon:'🚪', label:'Hora en sala', detail:'No detectada' });
     }
 
-    // 3. Departure time check
     if(departMin !== null){
         const diff = departMin - nowMin;
         if(diff < -5){
@@ -2135,7 +1795,6 @@ function runValidation(data){
         }
     }
 
-    // 4. Origin airport check
     if(data.origin){
         const validOrigins = ['SAL'];
         if(validOrigins.includes(data.origin.toUpperCase())){
@@ -2145,7 +1804,6 @@ function runValidation(data){
         }
     }
 
-    // 5. PNR format check
     if(data.pnr){
         const pnrValid = /^[A-Z0-9]{5,8}$/.test(data.pnr.toUpperCase());
         checks.push({ ok:pnrValid, icon:'🎫', label:'PNR', detail: pnrValid ? `${data.pnr} — formato válido` : `"${data.pnr}" — formato inusual, verifique` });
@@ -2153,7 +1811,6 @@ function runValidation(data){
         checks.push({ ok:false, icon:'🎫', label:'PNR', detail:'No detectado — requerido', critical:false });
     }
 
-    // Render checks
     document.getElementById('vpChecks').innerHTML = checks.map(c => {
         const bg    = c.ok === true ? 'rgba(0,220,130,0.07)'   : c.ok === false ? 'rgba(232,0,29,0.09)'   : 'rgba(245,158,11,0.07)';
         const bdr   = c.ok === true ? 'rgba(0,220,130,0.25)'   : c.ok === false ? 'rgba(232,0,29,0.35)'   : 'rgba(245,158,11,0.3)';
@@ -2166,8 +1823,6 @@ function runValidation(data){
         </div>`;
     }).join('');
 
-    // ── Overall verdict ──
-    // Date expiry is the only hard block — everything else is a warning
     const dateExpired  = checks.some(c => c.ok === false && c.critical && c.key === 'date');
     const hasCritical  = checks.some(c => c.ok === false && c.critical);
     const hasWarning   = checks.some(c => c.ok === false || c.ok === null);
@@ -2176,11 +1831,9 @@ function runValidation(data){
     const verdictBadge  = document.getElementById('vpVerdictBadge');
     const btn           = document.getElementById('btnConfirmOcr');
 
-    // Update global expiry flag — used by confirmOcrData + submitFlightInfo
     _bpExpired = dateExpired;
 
     if(dateExpired){
-        // HARD BLOCK — expired boarding pass
         verdictBanner.style.background = 'rgba(232,0,29,0.15)';
         panel.style.borderColor = 'rgba(232,0,29,0.6)';
         document.getElementById('vpVerdictIcon').textContent  = '🚫';
@@ -2194,7 +1847,6 @@ function runValidation(data){
             btn.textContent = '🚫 Tarjeta expirada — no se puede guardar';
         }
     } else if(hasCritical){
-        // Other critical (flight already departed etc.) — warn but allow
         verdictBanner.style.background = 'rgba(232,0,29,0.1)';
         panel.style.borderColor = 'rgba(232,0,29,0.45)';
         document.getElementById('vpVerdictIcon').textContent  = '⚠️';
@@ -2250,14 +1902,12 @@ function renderOcrResults(data){
     const container = document.getElementById('ocrFieldsContainer');
     if(!container) return;
 
-    // Start live validation panel
     startValidation(data);
 
     container.innerHTML = BP_FIELDS.map(f => {
         const val    = data[f.key] || '';
         const filled = val.trim().length > 0;
 
-        // Special styling for expired flight date
         let borderColor, bgColor, labelColor = '#94a3b8', extraHint = '';
         if(f.key === 'flightDate' && filled){
             const parsed  = parseDDMMYYYY(val);
@@ -2281,7 +1931,6 @@ function renderOcrResults(data){
             ? (f.key === 'flightDate' && extraHint ? `<span style="color:var(--red3);font-size:10px;font-weight:800;">✕</span>` : `<span style="color:var(--green);font-size:10px;">✓</span>`)
             : `<span style="color:var(--gold2);font-size:10px;">✎</span>`;
 
-   // Para fecha: convertir DD/MM/YYYY → YYYY-MM-DD para input[type=date]
         let inputHtml;
         if(f.type === 'date'){
             const dateVal = parseDDMMYYYY(val);
@@ -2322,11 +1971,9 @@ function ocrLiveEdit(input){
     _ocrPending[key] = input.value.trim();
     const filled = input.value.trim().length > 0;
 
-    // Special handling for flightDate — show expiry state inline
     if(key === 'flightDate'){
         const parsed  = parseDDMMYYYY(input.value.trim());
         const todayMs = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()).getTime();
-        // Remove existing hint if any
         const existingHint = input.nextElementSibling;
         if(existingHint && existingHint.dataset.expiryHint) existingHint.remove();
 
@@ -2348,34 +1995,29 @@ function ocrLiveEdit(input){
         input.style.background  = filled ? 'rgba(0,220,130,0.06)' : 'rgba(245,158,11,0.07)';
     }
 
-    // Re-run full validation on relevant field changes
     if(['boardingTime','departureTime','flightDate','origin','pnr'].includes(key)){
         runValidation(_ocrPending);
     }
 
-    // Update confirm button opacity (expiry hard-block handled by runValidation)
     const btn = document.getElementById('btnConfirmOcr');
     if(!btn || _bpExpired) return;
     const requiredFilled = BP_FIELDS.filter(f=>f.required).every(f => (_ocrPending[f.key]||'').trim().length > 0);
     btn.style.opacity = requiredFilled ? '1' : '0.6';
 }
 
-    function ocrDateChange(input){
-    // Convierte YYYY-MM-DD (valor del input date) → DD/MM/YYYY (formato interno)
-    const iso = input.value; // "2026-04-11"
+function ocrDateChange(input){
+    const iso = input.value;
     if(!iso){ _ocrPending['flightDate'] = ''; return; }
     const [y,m,d] = iso.split('-');
     const ddmmyyyy = d+'/'+m+'/'+y;
     _ocrPending['flightDate'] = ddmmyyyy;
 
-    // Actualizar color del borde
     const dateObj = new Date(parseInt(y), parseInt(m)-1, parseInt(d));
     const today   = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
     const expired = dateObj < today;
     input.style.borderColor = expired ? 'rgba(232,0,29,0.7)' : 'rgba(0,220,130,0.4)';
     input.style.background  = expired ? 'rgba(232,0,29,0.1)' : 'rgba(0,220,130,0.06)';
 
-    // Remover hint previo si existe
     const existing = input.nextElementSibling;
     if(existing && existing.dataset.expiryHint) existing.remove();
 
@@ -2391,6 +2033,7 @@ function ocrLiveEdit(input){
     runValidation(_ocrPending);
 }
 
+// Pre-llena el formulario (manual, sin listas de servidor) según el tramo activo
 function confirmOcrData(){
     if(_bpExpired){
         showToast('🚫 Tarjeta expirada — no se puede iniciar el servicio', 'error');
@@ -2407,54 +2050,14 @@ function confirmOcrData(){
         setTimeout(()=> el.classList.remove('scan-filled'), 3000);
     };
 
-    // ══════════════════════════════════════════════════
-    // TRAMO AERONAVE: pre-llenar modal con datos del scan
-    // ══════════════════════════════════════════════════
-    if(tramoType === 'aeronave-salida' || tramoType === 'inspeccion-sala'){
+    if(!tramoType) selectTramo('counter-inspeccion');
 
-        cancelScan();
+    // Determina sufijo de campos según tramo activo: '' (counter), 'A' (aeronave), 'S' (sala)
+    const suffix = isTramoAeronave() ? 'A' : (isTramo2() ? 'S' : '');
+    const nameId  = suffix ? 'passengerName'+suffix : 'passengerName';
+    const pnrId   = suffix ? 'pnrNumber'+suffix     : 'pnrNumber';
+    const seatId  = suffix ? 'numeroSilla'+suffix   : 'numeroSilla';
 
-        // Pasajero
-        document.getElementById('modalPaxName').value  = d.passengerName || '';
-        document.getElementById('modalPaxPNR').value   = (d.pnr         || '').toUpperCase();
-        document.getElementById('modalPaxSilla').value = (d.seatNumber   || '').toUpperCase();
-
-        // Vuelo — mostrar bloque y pre-llenar desde OCR
-        document.getElementById('modalFlightBlock').style.display = 'block';
-
-        const airlineSel = document.getElementById('modalAirline');
-        const ocrCode    = (d.airlineCode || '').toUpperCase();
-        if(ocrCode && [...airlineSel.options].some(o => o.value === ocrCode))
-            airlineSel.value = ocrCode;
-
-        document.getElementById('modalFlight').value = (d.flightNumber || '').trim();
-
-        const origenSel = document.getElementById('modalOrigen');
-        const ocrOrigen = (d.origin || '').toUpperCase();
-        if(ocrOrigen && [...origenSel.options].some(o => o.value === ocrOrigen))
-            origenSel.value = ocrOrigen;
-
-        const destinoSel = document.getElementById('modalDestino');
-        const ocrDestino = (d.destination || '').toUpperCase();
-        if(ocrDestino && [...destinoSel.options].some(o => o.value === ocrDestino))
-            destinoSel.value = ocrDestino;
-
-        // Reset WCH/verificaciones — supervisor debe confirmar estos
-        modalWchType = ''; modalDocs = ''; modalPace = ''; modalWalk = '';
-        ['mWCHR','mWCHS','mWCHC'].forEach(id => document.getElementById(id)?.classList.remove('selected'));
-        ['mDocsYes','mDocsNo','mPaceYes','mPaceNo','mWalkYes','mWalkNo'].forEach(id => {
-            const el = document.getElementById(id); if(el) el.className = 'toggle-btn';
-        });
-
-        document.getElementById('modalAddPassenger').classList.add('show');
-        setTimeout(() => document.getElementById('modalPaxName').focus(), 350);
-        showToast('🎫 Datos del pase cargados — confirme WCH y verificaciones');
-        return;
-    }
-
-    // ══════════════════════════════════════════════════
-    // TRAMOS 1 y 2: poblar campos del formulario
-    // ══════════════════════════════════════════════════
     if(d.airlineCode){
         const sel = document.getElementById('airlineSelect');
         const code = String(d.airlineCode).toUpperCase();
@@ -2475,21 +2078,16 @@ function confirmOcrData(){
         if([...sel.options].some(o => o.value === code)){ sel.value = code; markFilled(sel); }
     }
     if(d.passengerName){
-        const el = document.getElementById('passengerName');
+        const el = document.getElementById(nameId);
         if(el){ el.value = d.passengerName; markFilled(el); }
     }
     if(d.pnr){
-        const el = document.getElementById('pnrNumber');
+        const el = document.getElementById(pnrId);
         if(el){ el.value = d.pnr.toUpperCase(); markFilled(el); }
     }
     if(d.seatNumber){
-        const el = document.getElementById('numeroSilla');
+        const el = document.getElementById(seatId);
         if(el){ el.value = d.seatNumber.toUpperCase(); markFilled(el); }
-    }
-
-    if(!tramoType){
-        selectTramo('counter-inspeccion');
-        markFilled(document.getElementById('tramoCounter'));
     }
 
     cancelScan();
@@ -2501,7 +2099,7 @@ function confirmOcrData(){
 
     onFlightChange();
     checkFormReady();
-    showToast('🎫 Tarjeta escaneada correctamente');
+    showToast('🎫 Tarjeta escaneada correctamente — confirme WCH y verificaciones');
 }
 
 function retakeScan(){
@@ -2551,23 +2149,14 @@ function selectTramo(tramo){
     document.getElementById('passengerAeronaveBlock').style.display = isTramoAeronave() ? 'block' : 'none';
     document.getElementById('passengerRelevoBlock').style.display   = isTramo2() ? 'block' : 'none';
 
-selectedSalaId=''; salaPassengers=[];
-    selectedAeronaveId='';
-    document.getElementById('salaPassengerList').innerHTML='<div class="aero-empty">Cargando pasajeros…</div>';
-    document.getElementById('salaSelectedSummary').style.display='none';
-    document.getElementById('aeronaveSelectedSummary').style.display='none';
+    // Reset de los datos del pasajero al cambiar de tramo
+    passengerName=''; pnrNumber=''; numeroSilla=''; wchType=''; hasDocs=''; hasPacemaker=''; canWalk='';
     document.getElementById('btnIniciarServicio').disabled=true;
-    loadSalaPassengersFromServer();
-
-if(isTramo2()) loadSalaPassengersFromServer();
     checkFormReady();
 }
 
 // ════════════════════════════════════════════════════════════
-//  DESTINO TIPO (SAL / CNX)
-  
-// ════════════════════════════════════════════════════════════
-//  DESTINO TIPO (SAL / CNX)
+//  DESTINO TIPO (SAL / CNX) — solo tramo Aeronave
 // ════════════════════════════════════════════════════════════
 function selectDestino(tipo){
     destinoTipo = tipo;
@@ -2582,20 +2171,28 @@ function selectDestino(tipo){
 }
 
 // ════════════════════════════════════════════════════════════
-//  TOGGLES Y WCH
+//  TOGGLES Y WCH (genéricos, con sufijo por tramo: '', 'A', 'S')
 // ════════════════════════════════════════════════════════════
-function selectToggle(group, val){
-    const map = {docs:['docsYes','docsNo'],pace:['paceYes','paceNo'],walk:['walkYes','walkNo']};
+function selectToggle(group, val, suffix){
+    suffix = suffix || '';
+    const map = {
+        docs:['docs'+suffix+'Yes','docs'+suffix+'No'],
+        pace:['pace'+suffix+'Yes','pace'+suffix+'No'],
+        walk:['walk'+suffix+'Yes','walk'+suffix+'No']
+    };
     const [yId,nId] = map[group];
-    document.getElementById(yId).className = 'toggle-btn' + (val==='si'?' selected-yes':'');
-    document.getElementById(nId).className = 'toggle-btn' + (val==='no'?' selected-no':'');
+    const yEl = document.getElementById(yId), nEl = document.getElementById(nId);
+    if(yEl) yEl.className = 'toggle-btn' + (val==='si'?' selected-yes':'');
+    if(nEl) nEl.className = 'toggle-btn' + (val==='no'?' selected-no':'');
     if(group==='docs') hasDocs=val;
     if(group==='pace') hasPacemaker=val;
     if(group==='walk') canWalk=val;
     checkFormReady();
 }
-function selectWCH(type){
-    ['WCHR','WCHS','WCHC'].forEach(t=> document.getElementById('wch'+t)?.classList.toggle('selected', t===type));
+function selectWCH(type, suffix){
+    suffix = suffix || '';
+    const prefix = 'wch'+suffix;
+    ['WCHR','WCHS','WCHC'].forEach(t=> document.getElementById(prefix+t)?.classList.toggle('selected', t===type));
     wchType=type; checkFormReady();
 }
 
@@ -2614,15 +2211,21 @@ function checkFormReady(){
         const pnr = document.getElementById('pnrNumber').value.trim();
         const sl  = document.getElementById('numeroSilla').value.trim();
         ready = !!(tramoType && airline && flight && origen && destino && nm && pnr && sl && wchType && hasDocs && hasPacemaker && canWalk);
-} else if(isTramo2()){
-        ready = !!(tramoType && airline && flight && origen && destino && selectedSalaId);
+    } else if(isTramo2()){
+        const nm  = document.getElementById('passengerNameS').value.trim();
+        const pnr = document.getElementById('pnrNumberS').value.trim();
+        const sl  = document.getElementById('numeroSillaS').value.trim();
+        ready = !!(tramoType && airline && flight && origen && destino && nm && pnr && sl && wchType && hasDocs && hasPacemaker && canWalk);
     } else if(isTramoAeronave()){
+        const nm  = document.getElementById('passengerNameA').value.trim();
+        const pnr = document.getElementById('pnrNumberA').value.trim();
+        const sl  = document.getElementById('numeroSillaA').value.trim();
         let destOk = !!destinoTipo;
         if(destinoTipo==='CNX'){
             conexionFlight = document.getElementById('conexionFlight').value.trim();
             if(!conexionFlight) destOk = false;
         }
-        ready = !!(tramoType && airline && flight && origen && destino && selectedAeronaveId && destOk);
+        ready = !!(tramoType && airline && flight && origen && destino && nm && pnr && sl && wchType && hasDocs && hasPacemaker && canWalk && destOk);
     }
 
     document.getElementById('btnIniciarServicio').disabled = !ready;
@@ -2636,324 +2239,9 @@ function onFlightChange(){
 }
 
 // ════════════════════════════════════════════════════════════
-//  RELEVO PASSENGERS
-// ════════════════════════════════════════════════════════════
-function tryFetchRelevoPassengers(){
-    const airline = document.getElementById('airlineSelect').value;
-    const flight  = document.getElementById('flightNumber').value.trim();
-    if(!airline || !flight) return;
-
-    document.getElementById('relevoLoading').style.display='flex';
-   document.getElementById('salaPassengerList').innerHTML='';
-    document.getElementById('salaSelectedSummary').style.display='none';
-    document.getElementById('btnIniciarServicio').disabled=true;
-    selectedRelevoId='';
-
-    const cbName = 'relevoCb'+Date.now();
-    const url = SCRIPT_URL+'?action=getRelevoPassengers&airline='+encodeURIComponent(airline)+'&flight='+encodeURIComponent(flight)+'&callback='+cbName;
-
-    window[cbName] = function(data){
-        delete window[cbName]; document.getElementById('rscr')?.remove();
-        document.getElementById('relevoLoading').style.display='none';
-        if(data?.success && data.passengers?.length > 0){
-            relevoPassengers = data.passengers;
-            renderPassengerList();
-        } else {
-            relevoPassengers=[];
-            document.getElementById('relevoEmpty').style.display='block';
-        }
-    };
-    const scr = document.createElement('script'); scr.id='rscr'; scr.src=url;
-    scr.onerror = ()=>{ delete window[cbName]; scr.remove(); document.getElementById('relevoLoading').style.display='none'; document.getElementById('relevoEmpty').style.display='block'; };
-    document.body.appendChild(scr);
-    setTimeout(()=>{ if(window[cbName]){ delete window[cbName]; document.getElementById('relevoLoading').style.display='none'; document.getElementById('relevoEmpty').style.display='block'; }}, 12000);
-}
-
-function renderPassengerList(){
-    const list = document.getElementById('passengerList');
-    list.innerHTML = relevoPassengers.map((p,i)=>{
-        const init = (p.nombre||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-        return `<div class="passenger-card" id="pcard${i}" onclick="selectRelevoPassenger(${i})">
-            <div class="pc-avatar">${init}</div>
-            <div class="pc-body">
-                <div class="pc-name">${esc(p.nombre||'Pasajero '+i)}</div>
-                <div class="pc-meta">🎫 ${esc(p.pnrNumber||'–')} · 💺 ${esc(p.numeroSilla||'–')} · ♿ ${esc(p.wchType||'–')}</div>
-                <div class="pc-meta" style="margin-top:2px;">🛬 ${esc(p.origenVuelo||'–')} → 🛫 ${esc(p.destinoVuelo||'–')}</div>
-            </div>
-            <div class="pc-check">✓</div>
-        </div>`;
-    }).join('');
-}
-
-function selectRelevoPassenger(idx){
-    relevoPassengers.forEach((_,i)=> document.getElementById('pcard'+i)?.classList.toggle('selected', i===idx));
-    const p = relevoPassengers[idx];
-    selectedRelevoId = p.id || p.reportNum || String(idx);
-    passengerName  = p.nombre       || '';
-    pnrNumber      = p.pnrNumber    || '';
-    numeroSilla    = p.numeroSilla  || '';
-    wchType        = p.wchType      || '';
-    hasDocs        = p.hasDocs      || '';
-    hasPacemaker   = p.hasPacemaker || '';
-    canWalk        = p.canWalk      || '';
-    if(p.origenVuelo)  document.getElementById('origenVuelo').value  = p.origenVuelo;
-    if(p.destinoVuelo) document.getElementById('destinoVuelo').value = p.destinoVuelo;
-
-    document.getElementById('relevoNombre').textContent  = passengerName||'–';
-    document.getElementById('relevoSeat').textContent    = pnrNumber||'–';
-    document.getElementById('relevoSilla').textContent   = numeroSilla||'–';
-    document.getElementById('relevoWCH').textContent     = wchType||'–';
-    document.getElementById('relevoDocs').textContent    = hasDocs==='si'?'✅ Sí':'❌ No';
-    document.getElementById('relevoPace').textContent    = hasPacemaker==='si'?'⚠️ Sí':'✅ No';
-    document.getElementById('relevoWalk').textContent    = canWalk==='si'?'✅ Sí':'❌ No';
-    document.getElementById('relevoOrigen').textContent  = p.origenVuelo||'–';
-    document.getElementById('relevoDestino').textContent = p.destinoVuelo||'–';
-    document.getElementById('relevoDataSummary').style.display='block';
-    document.getElementById('btnIniciarServicio').disabled=false;
-    checkFormReady();
-}
-
-// ════════════════════════════════════════════════════════════
-//  AERONAVE PASSENGER DB
-// ════════════════════════════════════════════════════════════
-function setSyncStatus(state, msg){
-    const dot   = document.getElementById('aeroSyncDot');
-    const label = document.getElementById('aeroSyncLabel');
-    if(!dot||!label) return;
-    dot.className = 'aero-sync-dot' + (state==='syncing' ? ' syncing' : state==='error' ? ' error' : '');
-    label.textContent = msg;
-}
-
-function loadAeronavePassengersFromServer(){
-    setSyncStatus('syncing','Sincronizando pasajeros…');
-    const cbName = 'aeroLoad'+Date.now();
-    const url = SCRIPT_URL+'?action=getAeronavePassengers&user='+encodeURIComponent(currentUser.username)+'&callback='+cbName;
-    window[cbName] = function(data){
-        delete window[cbName]; document.getElementById('ascr')?.remove();
-        if(data?.success && data.passengers){
-            aeronavePassengers = data.passengers;
-            setSyncStatus('ok','Sincronizado ✓ · '+aeronavePassengers.length+' pasajero(s)');
-        } else {
-            setSyncStatus('error','Sin conexión — modo local');
-            try{ const r=sessionStorage.getItem('aeronavePassengers'); if(r) aeronavePassengers=JSON.parse(r); }catch(e){}
-        }
-        renderAeronavePassengers('');
-    };
-    const scr = document.createElement('script'); scr.id='ascr'; scr.src=url;
-    scr.onerror = ()=>{ delete window[cbName]; scr.remove(); setSyncStatus('error','Error de conexión'); renderAeronavePassengers(''); };
-    document.body.appendChild(scr);
-    setTimeout(()=>{ if(window[cbName]){ delete window[cbName]; setSyncStatus('error','Tiempo agotado'); renderAeronavePassengers(''); }}, 12000);
-}
-
-function openModal(){
-    document.getElementById('modalPaxName').value  = '';
-    document.getElementById('modalPaxPNR').value   = '';
-    document.getElementById('modalPaxSilla').value = '';
-    modalWchType=''; modalDocs=''; modalPace=''; modalWalk='';
-    ['mWCHR','mWCHS','mWCHC'].forEach(id => document.getElementById(id)?.classList.remove('selected'));
-    ['mDocsYes','mDocsNo','mPaceYes','mPaceNo','mWalkYes','mWalkNo'].forEach(id=>{
-        const el=document.getElementById(id); if(el) el.className='toggle-btn';
-    });
-
-    const flightBlock = document.getElementById('modalFlightBlock');
-    if(isTramoAeronave() || isTramo2()){
-        flightBlock.style.display = 'block';
-        document.getElementById('modalAirline').value  = document.getElementById('airlineSelect').value || '';
-        document.getElementById('modalFlight').value   = document.getElementById('flightNumber').value.trim() || '';
-        document.getElementById('modalOrigen').value   = document.getElementById('origenVuelo').value || '';
-        document.getElementById('modalDestino').value  = document.getElementById('destinoVuelo').value || '';
-    } else {
-        flightBlock.style.display = 'none';
-    }
-
-    document.getElementById('modalAddPassenger').classList.add('show');
-    setTimeout(()=> document.getElementById('modalPaxName').focus(), 350);
-}
-    
-    function closeModal(){ document.getElementById('modalAddPassenger').classList.remove('show'); }
-
-function selectModalWCH(type){
-    modalWchType = type;
-    ['mWCHR','mWCHS','mWCHC'].forEach(id=> document.getElementById(id)?.classList.toggle('selected', id==='m'+type));
-}
-function selectModalToggle(group, val){
-    const map = {docs:['mDocsYes','mDocsNo'],pace:['mPaceYes','mPaceNo'],walk:['mWalkYes','mWalkNo']};
-    const [yId,nId] = map[group];
-    document.getElementById(yId).className = 'toggle-btn' + (val==='si'?' selected-yes':'');
-    document.getElementById(nId).className = 'toggle-btn' + (val==='no'?' selected-no':'');
-    if(group==='docs') modalDocs=val;
-    if(group==='pace') modalPace=val;
-    if(group==='walk') modalWalk=val;
-}
-
-function saveModalPassenger(){
-    const nombre = document.getElementById('modalPaxName').value.trim();
-    const pnr    = document.getElementById('modalPaxPNR').value.trim().toUpperCase();
-    const silla  = document.getElementById('modalPaxSilla').value.trim().toUpperCase();
-    if(!nombre){ showToast('Ingrese el nombre','error'); return; }
-    if(!pnr)   { showToast('Ingrese el PNR','error'); return; }
-    if(!silla) { showToast('Ingrese el número de silla','error'); return; }
-    if(!modalWchType){ showToast('Seleccione tipo WCH','error'); return; }
-    if(!modalDocs)   { showToast('Indique documentos','error'); return; }
-    if(!modalPace)   { showToast('Indique marcapasos','error'); return; }
-    if(!modalWalk)   { showToast('Indique si puede caminar','error'); return; }
-
-    let modalAirline, modalFlightNum, modalOrigenV, modalDestinoV;
-    if(isTramoAeronave() || isTramo2()){
-        modalAirline   = document.getElementById('modalAirline').value;
-        modalFlightNum = document.getElementById('modalFlight').value.trim();
-        modalOrigenV   = document.getElementById('modalOrigen').value;
-        modalDestinoV  = document.getElementById('modalDestino').value;
-        if(!modalAirline)   { showToast('Seleccione la aerolínea','error'); return; }
-        if(!modalFlightNum) { showToast('Ingrese el número de vuelo','error'); return; }
-        if(!modalOrigenV)   { showToast('Seleccione el origen','error'); return; }
-        if(!modalDestinoV)  { showToast('Seleccione el destino','error'); return; }
-        document.getElementById('airlineSelect').value = modalAirline;
-        document.getElementById('flightNumber').value  = modalFlightNum;
-        document.getElementById('origenVuelo').value   = modalOrigenV;
-        document.getElementById('destinoVuelo').value  = modalDestinoV;
-        airlineCode  = modalAirline;
-        flightNum    = modalFlightNum;
-        origenVuelo  = modalOrigenV;
-        destinoVuelo = modalDestinoV;
-    } else {
-        modalAirline   = document.getElementById('airlineSelect').value;
-        modalFlightNum = document.getElementById('flightNumber').value.trim();
-        modalOrigenV   = document.getElementById('origenVuelo').value;
-        modalDestinoV  = document.getElementById('destinoVuelo').value;
-    }
-
-    // Acción Apps Script según tramo
-    const action = isTramo2() ? 'saveSalaPassenger' : 'saveAeronavePassenger';
-
-    closeModal();
-    const syncFn = isTramo2() ? setSalaSyncStatus : setSyncStatus;
-    syncFn('syncing','Guardando pasajero…');
-
-    const cbName = 'savePax'+Date.now();
-    const url = SCRIPT_URL
-        + '?action='       + action
-        + '&user='         + encodeURIComponent(currentUser.username)
-        + '&nombre='       + encodeURIComponent(nombre)
-        + '&pnr='          + encodeURIComponent(pnr)
-        + '&numeroSilla='  + encodeURIComponent(silla)
-        + '&wchType='      + encodeURIComponent(modalWchType)
-        + '&hasDocs='      + encodeURIComponent(modalDocs)
-        + '&hasPacemaker=' + encodeURIComponent(modalPace)
-        + '&canWalk='      + encodeURIComponent(modalWalk)
-        + '&airline='      + encodeURIComponent(modalAirline)
-        + '&flight='       + encodeURIComponent(modalFlightNum)
-        + '&origenVuelo='  + encodeURIComponent(modalOrigenV)
-        + '&destinoVuelo=' + encodeURIComponent(modalDestinoV)
-        + '&callback='     + cbName;
-
-    window[cbName] = function(data){
-        delete window[cbName]; document.getElementById('spscr')?.remove();
-        if(data?.success){
-            const newPax = {
-                id: data.id, nombre, pnr,
-                numeroSilla: silla, wchType: modalWchType,
-                hasDocs: modalDocs, hasPacemaker: modalPace, canWalk: modalWalk,
-                airline: modalAirline, flight: modalFlightNum,
-                origenVuelo: modalOrigenV, destinoVuelo: modalDestinoV,
-                usuario: currentUser.username
-            };
-            if(isTramo2()){
-                salaPassengers.push(newPax);
-                setSalaSyncStatus('ok','Guardado ✓ · '+salaPassengers.length+' pasajero(s)');
-                renderSalaPassengers('');
-            } else {
-                aeronavePassengers.push(newPax);
-                setSyncStatus('ok','Guardado ✓ · '+aeronavePassengers.length+' pasajero(s)');
-                renderAeronavePassengers('');
-            }
-            showToast('✅ Pasajero guardado: '+nombre);
-        } else {
-            (isTramo2() ? setSalaSyncStatus : setSyncStatus)('error','Error al guardar');
-            showToast('❌ Error al guardar pasajero','error');
-        }
-    };
-    const scr = document.createElement('script'); scr.id='spscr'; scr.src=url;
-    scr.onerror = ()=>{ delete window[cbName]; scr.remove(); showToast('❌ Error de conexión','error'); };
-    document.body.appendChild(scr);
-    setTimeout(()=>{ if(window[cbName]){ delete window[cbName]; }}, 12000);
-}
-
-function deleteAeronavePassenger(id, evt){
-    evt.stopPropagation();
-    if(selectedAeronaveId===id){ selectedAeronaveId=''; clearAeronaveSelection(); }
-    aeronavePassengers = aeronavePassengers.filter(p=>p.id!==id);
-    renderAeronavePassengers(document.getElementById('aeronaveSearchInput').value||'');
-    showToast('🗑 Pasajero eliminado','gold');
-    const cbName = 'delPax'+Date.now();
-    const url = SCRIPT_URL+'?action=deleteAeronavePassenger&id='+encodeURIComponent(id)+'&callback='+cbName;
-    window[cbName] = function(){ delete window[cbName]; document.getElementById('dscr')?.remove(); };
-    const scr = document.createElement('script'); scr.id='dscr'; scr.src=url;
-    scr.onerror = ()=>{ delete window[cbName]; scr.remove(); };
-    document.body.appendChild(scr);
-}
-
-function filterAeronavePassengers(q){ renderAeronavePassengers(q); }
-
-function renderAeronavePassengers(query){
-    const list = document.getElementById('aeronavePassengerList');
-    const q = (query||'').toLowerCase().trim();
-    const filtered = q
-        ? aeronavePassengers.filter(p=> p.nombre?.toLowerCase().includes(q) || p.pnr?.toLowerCase().includes(q) || p.numeroSilla?.toLowerCase().includes(q))
-        : aeronavePassengers;
-
-    if(filtered.length===0){
-        list.innerHTML = `<div class="aero-empty">${aeronavePassengers.length===0
-            ? 'Sin pasajeros aún.<br>Toca <strong>+ Agregar</strong> para registrar uno.'
-            : '🔍 Sin resultados para <em>"'+esc(query)+'"</em>'}</div>`;
-        return;
-    }
-
-    list.innerHTML = filtered.map(p=>{
-        const init = (p.nombre||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-        const isSel = p.id===selectedAeronaveId;
-        return `<div class="aero-pcard${isSel?' selected':''}" id="apc_${p.id}" onclick="selectAeronavePassenger('${p.id}')">
-            <div class="apc-av">${init}</div>
-            <div class="apc-body">
-                <div class="apc-name">${esc(p.nombre)}</div>
-                <div class="apc-meta">🎫 ${esc(p.pnr||'–')} · 💺 ${esc(p.numeroSilla||'–')} · ♿ ${esc(p.wchType||'–')}</div>
-            </div>
-            <div class="apc-check">✓</div>
-            <div class="apc-del" onclick="deleteAeronavePassenger('${p.id}',event)" title="Eliminar">✕</div>
-        </div>`;
-    }).join('');
-}
-
-function selectAeronavePassenger(id){
-    const p = aeronavePassengers.find(x=>x.id===id);
-    if(!p) return;
-    selectedAeronaveId=id;
-    passengerName=p.nombre; pnrNumber=p.pnr; numeroSilla=p.numeroSilla||'';
-    wchType=p.wchType; hasDocs=p.hasDocs; hasPacemaker=p.hasPacemaker; canWalk=p.canWalk;
-    renderAeronavePassengers(document.getElementById('aeronaveSearchInput').value||'');
-    const s = document.getElementById('aeronaveSelectedSummary');
-    s.style.display='block';
-    document.getElementById('aeroSumName').textContent  = p.nombre;
-    document.getElementById('aeroSumPNR').textContent   = p.pnr||'–';
-    document.getElementById('aeroSumSilla').textContent = p.numeroSilla||'–';
-    document.getElementById('aeroSumWCH').textContent   = p.wchType||'–';
-    document.getElementById('aeroSumDocs').textContent  = p.hasDocs==='si'?'✅ Sí':'❌ No';
-    document.getElementById('aeroSumPace').textContent  = p.hasPacemaker==='si'?'⚠️ Sí':'✅ No';
-    document.getElementById('aeroSumWalk').textContent  = p.canWalk==='si'?'✅ Sí':'❌ No';
-    checkFormReady();
-}
-
-function clearAeronaveSelection(){
-    passengerName=''; pnrNumber=''; numeroSilla=''; wchType=''; hasDocs=''; hasPacemaker=''; canWalk='';
-    document.getElementById('aeronaveSelectedSummary').style.display='none';
-    checkFormReady();
-}
-
-// ════════════════════════════════════════════════════════════
-//  SUBMIT VUELO
+//  SUBMIT VUELO — igual flujo para los 3 tramos (manual, sin GAS lookup)
 // ════════════════════════════════════════════════════════════
 function submitFlightInfo(){
-    // Hard block if a scanned boarding pass was flagged as expired
     if(_bpExpired){
         showToast('🚫 Tarjeta expirada — no se puede iniciar el reporte', 'error');
         return;
@@ -2973,17 +2261,25 @@ function submitFlightInfo(){
         passengerName = document.getElementById('passengerName').value.trim();
         pnrNumber     = document.getElementById('pnrNumber').value.trim().toUpperCase();
         numeroSilla   = document.getElementById('numeroSilla').value.trim().toUpperCase();
-        if(!passengerName){ showToast('Ingrese nombre del pasajero','error'); return; }
-        if(!pnrNumber)    { showToast('Ingrese el PNR','error'); return; }
-        if(!numeroSilla)  { showToast('Ingrese el número de silla','error'); return; }
-        if(!wchType)      { showToast('Seleccione tipo WCH','error'); return; }
-        if(!hasDocs)      { showToast('Indique si posee documentos','error'); return; }
-        if(!hasPacemaker) { showToast('Indique si posee marcapasos','error'); return; }
-        if(!canWalk)      { showToast('Indique si puede caminar','error'); return; }
-   } else if(isTramo2()){
-        if(!selectedSalaId){ showToast('Seleccione un pasajero de la sala','error'); return; }
+    } else if(isTramo2()){
+        passengerName = document.getElementById('passengerNameS').value.trim();
+        pnrNumber     = document.getElementById('pnrNumberS').value.trim().toUpperCase();
+        numeroSilla   = document.getElementById('numeroSillaS').value.trim().toUpperCase();
     } else if(isTramoAeronave()){
-        if(!selectedAeronaveId){ showToast('Seleccione un pasajero de la lista','error'); return; }
+        passengerName = document.getElementById('passengerNameA').value.trim();
+        pnrNumber     = document.getElementById('pnrNumberA').value.trim().toUpperCase();
+        numeroSilla   = document.getElementById('numeroSillaA').value.trim().toUpperCase();
+    }
+
+    if(!passengerName){ showToast('Ingrese nombre del pasajero','error'); return; }
+    if(!pnrNumber)    { showToast('Ingrese el PNR','error'); return; }
+    if(!numeroSilla)  { showToast('Ingrese el número de silla','error'); return; }
+    if(!wchType)      { showToast('Seleccione tipo WCH','error'); return; }
+    if(!hasDocs)      { showToast('Indique si posee documentos','error'); return; }
+    if(!hasPacemaker) { showToast('Indique si posee marcapasos','error'); return; }
+    if(!canWalk)      { showToast('Indique si puede caminar','error'); return; }
+
+    if(isTramoAeronave()){
         if(!destinoTipo){ showToast('Indique Destino SAL o Conexión','error'); return; }
         if(destinoTipo==='CNX'){
             conexionFlight = document.getElementById('conexionFlight').value.trim();
@@ -3077,7 +2373,6 @@ function handleCheckpointTap(cp){
             renderTimeline(); updateProgress();
             if(cp===2){
                 if(isTramo2()){
-                    // Mostrar panel de destino final antes del incidente
                     document.getElementById('sectionDestinoFinal').style.display = 'block';
                     scrollTo('sectionDestinoFinal');
                 } else {
@@ -3238,10 +2533,6 @@ function showCompletionScreen(){
             document.getElementById('sumCnx').textContent = conexionFlight;
         }
     }
-if(isTramo2() && selectedSalaId){
-        document.getElementById('sumRelevoRow').style.display='flex';
-        document.getElementById('sumRelevo').textContent = 'Pool de Sala · '+selectedSalaId;
-    }
 
     const tsLabels={1:'🚀 Inicio',2:'🏁 Fin',4:'🚨 Incidente',5:'♻️ Retorno'};
     let html='';
@@ -3333,9 +2624,8 @@ function sendToSheet(step, item, timestamp, onDone){
         + '&conexionVuelo='+ encodeURIComponent(conexionFlight)
         + '&callback='     + cbName;
 
-if(step===0){
+    if(step===0){
         url += '&serviceType=' + encodeURIComponent(tramoType);
-        if(isTramo2() && selectedSalaId) url += '&salaPassengerId='+encodeURIComponent(selectedSalaId);
         if(isResume&&resumeRowId) url += '&resumeRowId='+encodeURIComponent(resumeRowId);
     }
     if(stopsJson) url += '&stopsData='+encodeURIComponent(stopsJson);
@@ -3356,18 +2646,26 @@ function newReport(){
     reportId=''; flightNum=''; airlineCode=''; isResume=false; resumeRowId=null;
     passengerName=''; pnrNumber=''; numeroSilla=''; wchType=''; hasDocs=''; hasPacemaker=''; canWalk='';
     tramoType=''; origenVuelo=''; destinoVuelo=''; destinoTipo=''; conexionFlight='';
-    relevoPassengers=[]; selectedRelevoId=''; flightSearchTimer=null;
-    selectedAeronaveId=''; _scanCancelled=false; stopCamera(); _ocrPending={}; _bpExpired=false;
+    _scanCancelled=false; stopCamera(); _ocrPending={}; _bpExpired=false;
 
-    ['airlineSelect','flightNumber','origenVuelo','destinoVuelo','passengerName','pnrNumber','numeroSilla','conexionFlight','incidentDescription','aeronaveSearchInput'].forEach(id=>{ const e=document.getElementById(id); if(e) e.value=''; });
-    ['docsYes','docsNo','paceYes','paceNo','walkYes','walkNo'].forEach(id=>{ const el=document.getElementById(id); if(el) el.className='toggle-btn'; });
-    ['wchWCHR','wchWCHS','wchWCHC'].forEach(id=>{ document.getElementById(id)?.classList.remove('selected'); });
+    ['airlineSelect','flightNumber','origenVuelo','destinoVuelo',
+     'passengerName','pnrNumber','numeroSilla',
+     'passengerNameA','pnrNumberA','numeroSillaA',
+     'passengerNameS','pnrNumberS','numeroSillaS',
+     'conexionFlight','incidentDescription'].forEach(id=>{ const e=document.getElementById(id); if(e) e.value=''; });
+
+    ['docsYes','docsNo','paceYes','paceNo','walkYes','walkNo',
+     'docsAYes','docsANo','paceAYes','paceANo','walkAYes','walkANo',
+     'docsSYes','docsSNo','paceSYes','paceSNo','walkSYes','walkSNo'].forEach(id=>{ const el=document.getElementById(id); if(el) el.className='toggle-btn'; });
+
+    ['wchWCHR','wchWCHS','wchWCHC',
+     'wchAWCHR','wchAWCHS','wchAWCHC',
+     'wchSWCHR','wchSWCHS','wchSWCHC'].forEach(id=>{ document.getElementById(id)?.classList.remove('selected'); });
+
     ['tramoCounter','tramoSala','tramoAeronave'].forEach(id=>{ document.getElementById(id)?.classList.remove('selected'); });
     ['destinoSAL','destinoCNX'].forEach(id=>{ const el=document.getElementById(id); if(el) el.className='destino-btn'; });
     document.getElementById('conexionFlightBlock')?.classList.remove('show');
-document.getElementById('salaPassengerList').innerHTML='';
-    document.getElementById('salaSelectedSummary').style.display='none';
-    document.getElementById('aeronaveSelectedSummary').style.display='none';
+
     document.getElementById('passengerManualBlock').style.display='none';
     document.getElementById('passengerAeronaveBlock').style.display='none';
     document.getElementById('passengerRelevoBlock').style.display='none';
@@ -3397,24 +2695,18 @@ document.getElementById('salaPassengerList').innerHTML='';
     document.getElementById('returnDoneCheck').classList.remove('show');
     document.getElementById('returnCpTime').classList.remove('show');
     document.getElementById('returnCpItem').classList.remove('done');
-    ['sumDestTipoRow','sumCnxRow','sumRelevoRow'].forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display='none'; });
+    ['sumDestTipoRow','sumCnxRow'].forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display='none'; });
     document.getElementById('scanBadgeRow').classList.remove('show');
     document.getElementById('scanningOverlay').classList.remove('show');
 
-
-      salaPassengers=[]; selectedSalaId=''; destinoFinalTipo=''; destinoFinalDetalle='';
-    document.getElementById('salaPassengerList').innerHTML='';
-    document.getElementById('salaSelectedSummary').style.display='none';
+    destinoFinalTipo=''; destinoFinalDetalle='';
     document.getElementById('sectionDestinoFinal').style.display='none';
     document.getElementById('destinoFinalDetalleGroup').style.display='none';
     document.getElementById('destinoFinalDetalle').value='';
     ['dfVIP','dfRest','dfPuerta','dfOtro'].forEach(id=>{ const el=document.getElementById(id); if(el) el.className='destino-btn'; });
     document.getElementById('btnConfirmDestinoFinal').disabled=true;
 
-    renderAeronavePassengers('');
     renderTimeline(); updateProgress(); scrollToTop();
-    loadAeronavePassengersFromServer();
-    loadSalaPassengersFromServer();
 }
 
 // ════════════════════════════════════════════════════════════
